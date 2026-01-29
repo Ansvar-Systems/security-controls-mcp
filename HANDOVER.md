@@ -335,15 +335,15 @@ Both MCPs use the same patterns:
 ### Critical Files
 
 **Production code:**
-- `/Users/jeffreyvonrotz/Projects/security-controls-mcp/src/security_controls_mcp/`
+- `/path/to/security-controls-mcp/src/security_controls_mcp/`
 
 **Data files (1.7 MB total):**
-- `/Users/jeffreyvonrotz/Projects/security-controls-mcp/src/security_controls_mcp/data/scf-controls.json`
-- `/Users/jeffreyvonrotz/Projects/security-controls-mcp/src/security_controls_mcp/data/framework-to-scf.json`
+- `/path/to/security-controls-mcp/src/security_controls_mcp/data/scf-controls.json`
+- `/path/to/security-controls-mcp/src/security_controls_mcp/data/framework-to-scf.json`
 
 **Virtual environment:**
-- `/Users/jeffreyvonrotz/Projects/security-controls-mcp/venv/`
-- Python path: `/Users/jeffreyvonrotz/Projects/security-controls-mcp/venv/bin/python`
+- `/path/to/security-controls-mcp/venv/`
+- Python path: `/path/to/security-controls-mcp/venv/bin/python`
 
 **Source data (for updates):**
 - `/tmp/scf-repo/secure-controls-framework-scf-2025-4.xlsx` (5.3 MB)
@@ -351,7 +351,7 @@ Both MCPs use the same patterns:
 
 ### Git Repository
 
-**Local:** `/Users/jeffreyvonrotz/Projects/security-controls-mcp/`
+**Local:** `/path/to/security-controls-mcp/`
 **Commits:** 5 total (planning → implementation → bugfixes → docs)
 **Status:** Clean working tree, ready to push
 
@@ -369,7 +369,7 @@ Both MCPs use the same patterns:
 {
   "mcpServers": {
     "security-controls": {
-      "command": "/Users/jeffreyvonrotz/Projects/security-controls-mcp/venv/bin/python",
+      "command": "/path/to/security-controls-mcp/venv/bin/python",
       "args": ["-m", "security_controls_mcp"]
     }
   }
@@ -398,7 +398,7 @@ Both MCPs use the same patterns:
 **Cause:** Not using the venv Python
 **Fix:**
 ```bash
-cd /Users/jeffreyvonrotz/Projects/security-controls-mcp
+cd /path/to/security-controls-mcp
 source venv/bin/activate
 which python  # Verify path
 ```
@@ -449,12 +449,12 @@ When SCF releases new version (currently using 2025.4):
 3. **Copy to project:**
    ```bash
    cp scf-controls.json framework-to-scf.json \
-      /Users/jeffreyvonrotz/Projects/security-controls-mcp/src/security_controls_mcp/data/
+      /path/to/security-controls-mcp/src/security_controls_mcp/data/
    ```
 
 4. **Test:**
    ```bash
-   cd /Users/jeffreyvonrotz/Projects/security-controls-mcp
+   cd /path/to/security-controls-mcp
    source venv/bin/activate
    python test_server.py
    ```

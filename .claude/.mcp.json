@@ -1,6 +1,0 @@
-{
-  "security-controls": {
-    "command": "/Users/jeffreyvonrotz/Projects/security-controls-mcp/venv/bin/python",
-    "args": ["-m", "security_controls_mcp"]
-  }
-}

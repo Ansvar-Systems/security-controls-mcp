@@ -11,11 +11,13 @@ The `.claude/.mcp.json` file is already configured in this project:
 ```json
 {
   "security-controls": {
-    "command": "/Users/jeffreyvonrotz/Projects/security-controls-mcp/venv/bin/python",
+    "command": "/absolute/path/to/security-controls-mcp/venv/bin/python",
     "args": ["-m", "security_controls_mcp"]
   }
 }
 ```
+
+**Note:** Replace `/absolute/path/to/security-controls-mcp` with your actual project path.
 
 ---
 
@@ -111,7 +113,8 @@ cat .claude/.mcp.json
 
 **Check 2: Verify Python path is correct**
 ```bash
-ls -la /Users/jeffreyvonrotz/Projects/security-controls-mcp/venv/bin/python
+# Replace with your actual project path
+ls -la /absolute/path/to/security-controls-mcp/venv/bin/python
 ```
 
 **Check 3: Test server manually**

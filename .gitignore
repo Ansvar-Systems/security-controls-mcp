@@ -43,3 +43,4 @@ htmlcov/
 
 # MCP local config
 .serena/
+.claude/
