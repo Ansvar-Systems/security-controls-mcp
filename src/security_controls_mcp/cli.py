@@ -5,7 +5,7 @@ from pathlib import Path
 
 try:
     import click
-    import pdfplumber
+    import pdfplumber  # noqa: F401
 except ImportError:
     print(
         "Error: Import tools not installed. Install with:\n"
