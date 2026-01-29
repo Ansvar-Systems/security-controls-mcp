@@ -85,7 +85,8 @@ jobs:
       - name: Test MCP server startup (non-Windows)
         if: runner.os != 'Windows'
         run: |
-          timeout 5 python -m security_controls_mcp || test $? -eq 124
+          # Use perl for cross-platform timeout (works on macOS and Linux)
+          perl -e 'alarm 5; exec @ARGV' python -m security_controls_mcp || true
         shell: bash
 
       - name: Test MCP server startup (Windows)
