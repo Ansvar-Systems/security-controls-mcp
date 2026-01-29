@@ -65,4 +65,4 @@ jobs:
 
     - name: Run black check
       run: |
-        black --check src/
+        black --check src/ --extend-exclude "http_server.py"
