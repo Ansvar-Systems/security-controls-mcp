@@ -191,7 +191,14 @@ def _check_git_safety():
         if result.returncode == 0:
             # We're in a git repo - check if standards dir is ignored
             config = Config()
-            standards_dir_rel = str(config.standards_dir.relative_to(Path.cwd()))
+
+            # Check if standards dir is inside the current repo
+            try:
+                standards_dir_rel = str(config.standards_dir.relative_to(Path.cwd()))
+            except ValueError:
+                # Standards dir is outside the repo (e.g., in home directory)
+                # This is safe - can't be accidentally committed
+                return
 
             result = subprocess.run(
                 ["git", "check-ignore", "-q", standards_dir_rel],
