@@ -270,6 +270,48 @@ map_frameworks(
 
 ---
 
+### 6. `list_available_standards`
+List all available standards including built-in SCF and any purchased standards you've imported.
+
+```python
+list_available_standards()
+```
+
+**Returns:** List of available standards with metadata (type, title, import date).
+
+---
+
+### 7. `query_standard`
+Search within a specific purchased standard (requires import first).
+
+```python
+query_standard(
+  standard="iso_27001_2022",
+  query="access control",
+  limit=10
+)
+```
+
+**Returns:** Relevant clauses/sections from the purchased standard with page numbers.
+
+---
+
+### 8. `get_clause`
+Get the full text of a specific clause from a purchased standard.
+
+```python
+get_clause(
+  standard="iso_27001_2022",
+  clause_id="5.15"
+)
+```
+
+**Returns:** Complete clause text with metadata from your purchased standard.
+
+**Note:** Tools 6-8 require purchased standards to be imported first. See [PAID_STANDARDS_GUIDE.md](PAID_STANDARDS_GUIDE.md) for setup.
+
+---
+
 ## Technical Architecture
 
 **Data Pipeline:**
