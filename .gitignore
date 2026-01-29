@@ -44,3 +44,6 @@ htmlcov/
 # MCP local config
 .serena/
 .claude/
+
+# Git worktrees
+.worktrees/
