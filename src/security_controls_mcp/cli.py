@@ -8,8 +8,7 @@ try:
     import pdfplumber  # noqa: F401
 except ImportError:
     print(
-        "Error: Import tools not installed. Install with:\n"
-        "  pip install -e '.[import-tools]'",
+        "Error: Import tools not installed. Install with:\n" "  pip install -e '.[import-tools]'",
         file=sys.stderr,
     )
     sys.exit(1)
@@ -100,8 +99,7 @@ def import_standard(
     # Check if standard already exists
     if not force and standard_type in config.data.get("standards", {}):
         click.echo(
-            f"❌ Error: Standard '{standard_type}' already exists. "
-            "Use --force to overwrite.",
+            f"❌ Error: Standard '{standard_type}' already exists. " "Use --force to overwrite.",
             err=True,
         )
         sys.exit(1)

@@ -128,7 +128,10 @@ class PaidStandardProvider(StandardProvider):
 
         # Search in sections
         for section in self._iterate_sections(self.data.get("structure", {}).get("sections", [])):
-            if query_lower in section.get("content", "").lower() or query_lower in section.get("title", "").lower():
+            if (
+                query_lower in section.get("content", "").lower()
+                or query_lower in section.get("title", "").lower()
+            ):
                 results.append(
                     SearchResult(
                         standard_id=self.metadata.standard_id,

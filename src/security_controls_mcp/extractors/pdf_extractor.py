@@ -94,9 +94,7 @@ def _detect_sections(pages_text: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 
     # Common section patterns
     # Matches: "1 Title", "1.2 Title", "1.2.3 Title"
-    section_pattern = re.compile(
-        r"^(\d+(?:\.\d+)*)\s+([A-Z][^\n]{5,80})$", re.MULTILINE
-    )
+    section_pattern = re.compile(r"^(\d+(?:\.\d+)*)\s+([A-Z][^\n]{5,80})$", re.MULTILINE)
 
     for page_info in pages_text:
         page_num = page_info["page"]
@@ -149,9 +147,7 @@ def _detect_annexes(pages_text: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     annex_pattern = re.compile(r"^Annex\s+([A-Z])[:\s]+([^\n]+)$", re.MULTILINE | re.IGNORECASE)
 
     # Pattern for controls within annexes
-    control_pattern = re.compile(
-        r"^([A-Z]\.\d+(?:\.\d+)*)\s+([A-Z][^\n]{5,80})$", re.MULTILINE
-    )
+    control_pattern = re.compile(r"^([A-Z]\.\d+(?:\.\d+)*)\s+([A-Z][^\n]{5,80})$", re.MULTILINE)
 
     current_annex = None
 
@@ -250,5 +246,3 @@ def _build_hierarchy(sections: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             stack.append((section, level))
 
     return root
-
-

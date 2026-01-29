@@ -17,11 +17,11 @@ class SCFQueryTester:
 
     def __init__(self, controls_file: Path, reverse_index_file: Path):
         print("📂 Loading SCF data...")
-        with open(controls_file, 'r', encoding='utf-8') as f:
+        with open(controls_file, "r", encoding="utf-8") as f:
             data = json.load(f)
-            self.controls = {c['id']: c for c in data['controls']}
+            self.controls = {c["id"]: c for c in data["controls"]}
 
-        with open(reverse_index_file, 'r', encoding='utf-8') as f:
+        with open(reverse_index_file, "r", encoding="utf-8") as f:
             self.reverse_index = json.load(f)
 
         print(f"✅ Loaded {len(self.controls)} controls")
@@ -35,12 +35,14 @@ class SCFQueryTester:
         """Get all SCF controls that map to a framework."""
         controls = []
         for control in self.controls.values():
-            mapping = control['framework_mappings'].get(framework_key)
+            mapping = control["framework_mappings"].get(framework_key)
             if mapping:
                 controls.append(control)
         return controls
 
-    def cross_reference_frameworks(self, source_fw: str, source_control: str, target_fw: str) -> List[str]:
+    def cross_reference_frameworks(
+        self, source_fw: str, source_control: str, target_fw: str
+    ) -> List[str]:
         """
         Cross-reference: Find target framework controls that map to source framework control.
 
@@ -57,7 +59,7 @@ class SCFQueryTester:
         for scf_id in scf_controls:
             control = self.controls.get(scf_id)
             if control:
-                target_mapping = control['framework_mappings'].get(target_fw)
+                target_mapping = control["framework_mappings"].get(target_fw)
                 if target_mapping:
                     target_controls.update(target_mapping)
 
@@ -71,20 +73,20 @@ class SCFQueryTester:
         target_controls = set()
 
         for control in self.controls.values():
-            if control['framework_mappings'].get(baseline_fw):
-                baseline_controls.add(control['id'])
-            if control['framework_mappings'].get(target_fw):
-                target_controls.add(control['id'])
+            if control["framework_mappings"].get(baseline_fw):
+                baseline_controls.add(control["id"])
+            if control["framework_mappings"].get(target_fw):
+                target_controls.add(control["id"])
 
         gap = target_controls - baseline_controls
         overlap = baseline_controls & target_controls
 
         return {
-            'baseline_controls': len(baseline_controls),
-            'target_controls': len(target_controls),
-            'overlap': len(overlap),
-            'gap': len(gap),
-            'gap_controls': sorted(gap)
+            "baseline_controls": len(baseline_controls),
+            "target_controls": len(target_controls),
+            "overlap": len(overlap),
+            "gap": len(gap),
+            "gap_controls": sorted(gap),
         }
 
 
@@ -101,9 +103,9 @@ def print_control(control: Dict):
     print(f"  {control['description'][:200]}...")
     print("\nFramework Mappings:")
 
-    for fw, mappings in control['framework_mappings'].items():
+    for fw, mappings in control["framework_mappings"].items():
         if mappings:
-            fw_display = fw.replace('_', ' ').upper()
+            fw_display = fw.replace("_", " ").upper()
             print(f"  {fw_display}:")
             print(f"    {', '.join(mappings[:10])}")
             if len(mappings) > 10:
@@ -112,13 +114,15 @@ def print_control(control: Dict):
 
 def main():
     # Check if data files exist
-    controls_file = Path('scf-controls.json')
-    reverse_file = Path('framework-to-scf.json')
+    controls_file = Path("scf-controls.json")
+    reverse_file = Path("framework-to-scf.json")
 
     if not controls_file.exists() or not reverse_file.exists():
         print("❌ Error: Data files not found!")
         print("\nRun the extraction script first:")
-        print("  python scf-extract-starter.py /tmp/scf-repo/secure-controls-framework-scf-2025-4.xlsx")
+        print(
+            "  python scf-extract-starter.py /tmp/scf-repo/secure-controls-framework-scf-2025-4.xlsx"
+        )
         return
 
     print("🚀 SCF Query Tester - Demonstrating MCP Query Patterns")
@@ -131,7 +135,7 @@ def main():
     print("-" * 80)
     print("Query: What does GOV-01 require?")
 
-    control = tester.query_control('GOV-01')
+    control = tester.query_control("GOV-01")
     if control:
         print_control(control)
 
@@ -140,13 +144,13 @@ def main():
     print("-" * 80)
     print("Query: What controls are needed for DORA compliance?")
 
-    dora_controls = tester.query_framework_controls('dora')
+    dora_controls = tester.query_framework_controls("dora")
     print(f"\n✅ Found {len(dora_controls)} SCF controls that map to DORA")
 
     # Group by domain
     by_domain = {}
     for c in dora_controls:
-        domain = c['domain']
+        domain = c["domain"]
         if domain not in by_domain:
             by_domain[domain] = []
         by_domain[domain].append(c)
@@ -165,13 +169,13 @@ def main():
     print("-" * 80)
     print("Query: What ISO 27001 controls cover DORA Article 16.1(a)?")
 
-    iso_controls = tester.cross_reference_frameworks('dora', '16.1(a)', 'iso_27001_2022')
+    iso_controls = tester.cross_reference_frameworks("dora", "16.1(a)", "iso_27001_2022")
     print("\n✅ DORA 16.1(a) maps to these ISO 27001 controls:")
     for iso_ctrl in iso_controls:
         print(f"  - {iso_ctrl}")
 
     # Show the SCF controls that bridge them
-    scf_bridge = tester.reverse_index.get('dora', {}).get('16.1(a)', [])
+    scf_bridge = tester.reverse_index.get("dora", {}).get("16.1(a)", [])
     print(f"\n(Via SCF controls: {', '.join(scf_bridge)})")
 
     # Test 4: Gap Analysis
@@ -179,14 +183,14 @@ def main():
     print("-" * 80)
     print("Query: I have ISO 27001. What additional controls does DORA require?")
 
-    gap = tester.gap_analysis('iso_27001_2022', 'dora')
+    gap = tester.gap_analysis("iso_27001_2022", "dora")
     print(f"\nISO 27001 covers:        {gap['baseline_controls']} SCF controls")
     print(f"DORA requires:           {gap['target_controls']} SCF controls")
     print(f"Overlap:                 {gap['overlap']} SCF controls")
     print(f"Gap (DORA only):         {gap['gap']} SCF controls")
 
     print("\nSample gap controls (first 10):")
-    for scf_id in gap['gap_controls'][:10]:
+    for scf_id in gap["gap_controls"][:10]:
         control = tester.query_control(scf_id)
         if control:
             print(f"  - {scf_id}: {control['name']}")
@@ -196,13 +200,13 @@ def main():
     print("-" * 80)
     print("Query: What controls are needed for UK Cyber Essentials?")
 
-    ce_controls = tester.query_framework_controls('uk_cyber_essentials')
+    ce_controls = tester.query_framework_controls("uk_cyber_essentials")
     print(f"\n✅ Found {len(ce_controls)} SCF controls that map to UK Cyber Essentials")
 
     # Group by CE requirement number
     by_ce_req = {}
     for c in ce_controls:
-        ce_mapping = c['framework_mappings']['uk_cyber_essentials']
+        ce_mapping = c["framework_mappings"]["uk_cyber_essentials"]
         for ce_req in ce_mapping:
             if ce_req not in by_ce_req:
                 by_ce_req[ce_req] = []
@@ -230,5 +234,5 @@ def main():
     print("\nNext step: Build the MCP server to expose these as Claude tools!")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

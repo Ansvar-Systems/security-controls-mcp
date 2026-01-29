@@ -51,12 +51,7 @@ async def run_quality_tests():
 
     # Test 4: Search with special characters
     print("\n[TEST 4] Search with special characters")
-    queries = [
-        "access & authentication",
-        "data-at-rest",
-        "AI/ML",
-        "privacy (GDPR)"
-    ]
+    queries = ["access & authentication", "data-at-rest", "AI/ML", "privacy (GDPR)"]
     for query in queries:
         results = data.search_controls(query, limit=3)
         print(f"  '{query}': {len(results)} results - {'✓' if len(results) > 0 else '⚠️'}")
@@ -77,9 +72,13 @@ async def run_quality_tests():
     control = data.get_control("GOV-01")
     if control:
         framework_count = len(control.get("framework_mappings", {}))
-        total_mappings = sum(len(v) for v in control["framework_mappings"].values() if v is not None)
+        total_mappings = sum(
+            len(v) for v in control["framework_mappings"].values() if v is not None
+        )
         print(f"  Control: {control['id']} - {control['name'][:50]}...")
-        print(f"  Mapped to {framework_count} frameworks with {total_mappings} total control references")
+        print(
+            f"  Mapped to {framework_count} frameworks with {total_mappings} total control references"
+        )
         print("✓ PASS: Control loaded with comprehensive mappings")
     else:
         print("✗ FAIL: Could not load GOV-01")
@@ -91,7 +90,7 @@ async def run_quality_tests():
         "iso_27001_2022": 51,
         "nist_csf_2.0": 253,
         "pci_dss_4.0.1": 364,
-        "nist_800_53_r5": 777
+        "nist_800_53_r5": 777,
     }
 
     all_passed = True
@@ -168,6 +167,7 @@ async def run_quality_tests():
     print("\n" + "=" * 80)
     print("Quality Testing Complete")
     print("=" * 80)
+
 
 if __name__ == "__main__":
     asyncio.run(run_quality_tests())

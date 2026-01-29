@@ -18,7 +18,7 @@ def main():
         print(f"  ✓ {ctrl['id']}: {ctrl['name']}")
         print(f"  Domain: {ctrl['domain']}")
         print(f"  Weight: {ctrl['weight']}")
-        dora = ctrl['framework_mappings'].get('dora', [])
+        dora = ctrl["framework_mappings"].get("dora", [])
         print(f"  DORA mappings: {dora[:3] if dora else 'None'}")
     else:
         print("  ✗ Control not found")
@@ -62,6 +62,7 @@ def main():
         print(f"    - {fw_key}: {fw['controls_mapped']} controls")
 
     print("\n✓ All tests passed!")
+
 
 if __name__ == "__main__":
     main()

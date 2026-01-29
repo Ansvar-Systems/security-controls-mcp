@@ -340,13 +340,15 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
 
 async def health_check(request):
     """Health check endpoint."""
-    return JSONResponse({
-        "status": "ok",
-        "server": "security-controls-mcp",
-        "database_version": "SCF 2025.4",
-        "controls_count": len(scf_data.controls),
-        "frameworks_count": len(scf_data.frameworks),
-    })
+    return JSONResponse(
+        {
+            "status": "ok",
+            "server": "security-controls-mcp",
+            "database_version": "SCF 2025.4",
+            "controls_count": len(scf_data.controls),
+            "frameworks_count": len(scf_data.frameworks),
+        }
+    )
 
 
 async def mcp_endpoint(request):
@@ -365,18 +367,13 @@ async def mcp_endpoint(request):
                 "id": request_id,
                 "result": {
                     "protocolVersion": "2024-11-05",
-                    "capabilities": {
-                        "tools": {}
-                    },
-                    "serverInfo": {
-                        "name": "security-controls-mcp",
-                        "version": "0.1.0"
-                    }
-                }
+                    "capabilities": {"tools": {}},
+                    "serverInfo": {"name": "security-controls-mcp", "version": "0.1.0"},
+                },
             }
             return StreamingResponse(
                 iter([f"event: message\ndata: {json.dumps(response)}\n\n"]),
-                media_type="text/event-stream"
+                media_type="text/event-stream",
             )
 
         # Handle list tools
@@ -390,15 +387,15 @@ async def mcp_endpoint(request):
                         {
                             "name": tool.name,
                             "description": tool.description,
-                            "inputSchema": tool.inputSchema
+                            "inputSchema": tool.inputSchema,
                         }
                         for tool in tools
                     ]
-                }
+                },
             }
             return StreamingResponse(
                 iter([f"event: message\ndata: {json.dumps(response)}\n\n"]),
-                media_type="text/event-stream"
+                media_type="text/event-stream",
             )
 
         # Handle tool call
@@ -412,19 +409,11 @@ async def mcp_endpoint(request):
             response = {
                 "jsonrpc": "2.0",
                 "id": request_id,
-                "result": {
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": item.text
-                        }
-                        for item in result
-                    ]
-                }
+                "result": {"content": [{"type": "text", "text": item.text} for item in result]},
             }
             return StreamingResponse(
                 iter([f"event: message\ndata: {json.dumps(response)}\n\n"]),
-                media_type="text/event-stream"
+                media_type="text/event-stream",
             )
 
         else:
@@ -432,14 +421,11 @@ async def mcp_endpoint(request):
             response = {
                 "jsonrpc": "2.0",
                 "id": request_id,
-                "error": {
-                    "code": -32601,
-                    "message": f"Method not found: {method}"
-                }
+                "error": {"code": -32601, "message": f"Method not found: {method}"},
             }
             return StreamingResponse(
                 iter([f"event: message\ndata: {json.dumps(response)}\n\n"]),
-                media_type="text/event-stream"
+                media_type="text/event-stream",
             )
 
     except Exception as e:
@@ -447,15 +433,12 @@ async def mcp_endpoint(request):
         response = {
             "jsonrpc": "2.0",
             "id": 1,
-            "error": {
-                "code": -32603,
-                "message": f"Internal error: {str(e)}"
-            }
+            "error": {"code": -32603, "message": f"Internal error: {str(e)}"},
         }
         return StreamingResponse(
             iter([f"event: message\ndata: {json.dumps(response)}\n\n"]),
             media_type="text/event-stream",
-            status_code=500
+            status_code=500,
         )
 
 
@@ -477,7 +460,9 @@ def main():
     port = int(os.getenv("PORT", "3000"))
 
     print(f"\n✓ Security Controls MCP HTTP server starting on port {port}")
-    print(f"✓ Loaded {len(scf_data.controls)} controls across {len(scf_data.frameworks)} frameworks\n")
+    print(
+        f"✓ Loaded {len(scf_data.controls)} controls across {len(scf_data.frameworks)} frameworks\n"
+    )
 
     # Run server
     uvicorn.run(

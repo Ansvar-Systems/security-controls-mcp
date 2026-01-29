@@ -202,9 +202,7 @@ async def list_tools() -> list[Tool]:
                     },
                     "clause_id": {
                         "type": "string",
-                        "description": (
-                            "Clause/section identifier (e.g., '5.1.2', 'A.5.15')"
-                        ),
+                        "description": ("Clause/section identifier (e.g., '5.1.2', 'A.5.15')"),
                     },
                 },
                 "required": ["standard", "clause_id"],
@@ -276,13 +274,17 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                     clause = provider.get_clause(control_id)
                     if clause:
                         metadata = provider.get_metadata()
-                        official_texts.append({
-                            "framework": fw_key,
-                            "framework_name": scf_data.frameworks.get(fw_key, {}).get("name", fw_key),
-                            "control_id": control_id,
-                            "clause": clause,
-                            "metadata": metadata,
-                        })
+                        official_texts.append(
+                            {
+                                "framework": fw_key,
+                                "framework_name": scf_data.frameworks.get(fw_key, {}).get(
+                                    "name", fw_key
+                                ),
+                                "control_id": control_id,
+                                "clause": clause,
+                                "metadata": metadata,
+                            }
+                        )
                         break
 
             # Display official texts if we found any
@@ -296,12 +298,15 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                     text += f"**{item['clause'].title}**\n\n"
 
                     # Show content (truncate if very long)
-                    content = item['clause'].content
+                    content = item["clause"].content
                     if len(content) > 1000:
-                        content = content[:1000] + "...\n\n*[Content truncated - use get_clause for full text]*"
+                        content = (
+                            content[:1000]
+                            + "...\n\n*[Content truncated - use get_clause for full text]*"
+                        )
                     text += f"{content}\n\n"
 
-                    if item['clause'].page:
+                    if item["clause"].page:
                         text += f"📄 Page {item['clause'].page}\n"
 
                     text += f"**Source:** {item['metadata'].title} (your licensed copy)\n"
@@ -494,7 +499,9 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                                 text += f"**Source:** {metadata.title}\n\n"
 
                 text += "⚠️ Licensed content - do not redistribute\n"
-                text += "\n*Showing example from first mapping. Use get_clause for specific clauses.*\n"
+                text += (
+                    "\n*Showing example from first mapping. Use get_clause for specific clauses.*\n"
+                )
 
         return [TextContent(type="text", text=text)]
 
@@ -539,10 +546,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         results = provider.search(query, limit=limit)
 
         if not results:
-            return [TextContent(
-                type="text",
-                text=f"No results found for '{query}' in {standard}"
-            )]
+            return [TextContent(type="text", text=f"No results found for '{query}' in {standard}")]
 
         metadata = provider.get_metadata()
         text = f"**{metadata.title} - Search Results for '{query}'**\n\n"
@@ -576,10 +580,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         result = provider.get_clause(clause_id)
 
         if not result:
-            return [TextContent(
-                type="text",
-                text=f"Clause '{clause_id}' not found in {standard}"
-            )]
+            return [TextContent(type="text", text=f"Clause '{clause_id}' not found in {standard}")]
 
         metadata = provider.get_metadata()
         text = f"**{metadata.title}**\n\n"
