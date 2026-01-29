@@ -23,9 +23,22 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 ### 3. Install Package
 
+**Basic installation (SCF only):**
 ```bash
 pip install -e .
 ```
+
+**With PDF import support (optional):**
+
+If you want to import purchased standards (ISO 27001, NIST SP 800-53, etc.):
+```bash
+pip install -e '.[import-tools]'
+```
+
+This adds:
+- PDF extraction capabilities
+- `scf-mcp` CLI tool for importing standards
+- See [PAID_STANDARDS_GUIDE.md](PAID_STANDARDS_GUIDE.md) for details
 
 ### 4. Verify Installation
 
