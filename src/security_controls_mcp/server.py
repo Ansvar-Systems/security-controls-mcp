@@ -258,6 +258,55 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                     fw_name = scf_data.frameworks.get(fw_key, {}).get("name", fw_key)
                     text += f"- **{fw_name}:** {', '.join(mappings)}\n"
 
+        # Check if user has paid standards with official text for mapped frameworks
+        if include_mappings and registry.has_paid_standards():
+            official_texts = []
+
+            for fw_key, control_ids in response["framework_mappings"].items():
+                if not control_ids:
+                    continue
+
+                # Check if we have a paid standard for this framework
+                provider = registry.get_provider(fw_key)
+                if not provider:
+                    continue
+
+                # Try to get official text for the first mapped control ID
+                for control_id in control_ids[:1]:  # Just show first mapping to avoid clutter
+                    clause = provider.get_clause(control_id)
+                    if clause:
+                        metadata = provider.get_metadata()
+                        official_texts.append({
+                            "framework": fw_key,
+                            "framework_name": scf_data.frameworks.get(fw_key, {}).get("name", fw_key),
+                            "control_id": control_id,
+                            "clause": clause,
+                            "metadata": metadata,
+                        })
+                        break
+
+            # Display official texts if we found any
+            if official_texts:
+                text += "\n" + "=" * 80 + "\n"
+                text += "**📜 Official Text from Your Purchased Standards**\n"
+                text += "=" * 80 + "\n\n"
+
+                for item in official_texts:
+                    text += f"### {item['framework_name']} - {item['control_id']}\n\n"
+                    text += f"**{item['clause'].title}**\n\n"
+
+                    # Show content (truncate if very long)
+                    content = item['clause'].content
+                    if len(content) > 1000:
+                        content = content[:1000] + "...\n\n*[Content truncated - use get_clause for full text]*"
+                    text += f"{content}\n\n"
+
+                    if item['clause'].page:
+                        text += f"📄 Page {item['clause'].page}\n"
+
+                    text += f"**Source:** {item['metadata'].title} (your licensed copy)\n"
+                    text += "⚠️ Licensed content - do not redistribute\n\n"
+
         return [TextContent(type="text", text=text)]
 
     elif name == "search_controls":
@@ -393,6 +442,59 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
 
         if len(mappings) > 20:
             text += f"\n*Showing first 20 of {len(mappings)} mappings*\n"
+
+        # Check if user has paid standards for source or target frameworks
+        if registry.has_paid_standards():
+            source_provider = registry.get_provider(source_framework)
+            target_provider = registry.get_provider(target_framework)
+
+            if source_provider or target_provider:
+                text += "\n" + "=" * 80 + "\n"
+                text += "**📜 Official Text from Your Purchased Standards**\n"
+                text += "=" * 80 + "\n\n"
+
+                # Show example from first mapping
+                if mappings:
+                    example_mapping = mappings[0]
+
+                    # Show source framework official text
+                    if source_provider and example_mapping["source_controls"]:
+                        for control_id in example_mapping["source_controls"][:1]:
+                            clause = source_provider.get_clause(control_id)
+                            if clause:
+                                metadata = source_provider.get_metadata()
+                                text += f"### {source_name} - {control_id}\n\n"
+                                text += f"**{clause.title}**\n\n"
+
+                                content = clause.content
+                                if len(content) > 800:
+                                    content = content[:800] + "...\n\n*[Truncated]*"
+                                text += f"{content}\n\n"
+
+                                if clause.page:
+                                    text += f"📄 Page {clause.page} | "
+                                text += f"**Source:** {metadata.title}\n\n"
+
+                    # Show target framework official text
+                    if target_provider and example_mapping["target_controls"]:
+                        for control_id in example_mapping["target_controls"][:1]:
+                            clause = target_provider.get_clause(control_id)
+                            if clause:
+                                metadata = target_provider.get_metadata()
+                                text += f"### {target_name} - {control_id}\n\n"
+                                text += f"**{clause.title}**\n\n"
+
+                                content = clause.content
+                                if len(content) > 800:
+                                    content = content[:800] + "...\n\n*[Truncated]*"
+                                text += f"{content}\n\n"
+
+                                if clause.page:
+                                    text += f"📄 Page {clause.page} | "
+                                text += f"**Source:** {metadata.title}\n\n"
+
+                text += "⚠️ Licensed content - do not redistribute\n"
+                text += "\n*Showing example from first mapping. Use get_clause for specific clauses.*\n"
 
         return [TextContent(type="text", text=text)]
 
