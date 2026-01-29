@@ -21,6 +21,35 @@ This MCP server solves that by giving you instant **bidirectional mapping** betw
 
 ---
 
+## 🔒 Add Your Purchased Standards (Optional)
+
+**NEW:** Import your purchased ISO 27001, NIST SP 800-53, or other standards to get:
+
+✅ **Official text** from your licensed copies alongside SCF descriptions
+✅ **Full clauses** with page numbers for compliance research
+✅ **Enhanced queries** - see both SCF mappings AND official requirements
+
+Your paid content stays private in `~/.security-controls-mcp/` (never committed to git).
+
+**Quick example:**
+```bash
+# Install import tools
+pip install -e '.[import-tools]'
+
+# Import your purchased PDF
+scf-mcp import-standard \
+  --file ~/Downloads/ISO-27001-2022.pdf \
+  --type iso_27001_2022 \
+  --title "ISO/IEC 27001:2022"
+
+# Restart MCP, then query:
+# "Show me GOV-01 with official ISO 27001 text"
+```
+
+**📖 Full Guide:** [PAID_STANDARDS_GUIDE.md](PAID_STANDARDS_GUIDE.md) - Complete setup, troubleshooting, and license compliance information.
+
+---
+
 ## Quick Start
 
 ### Installation
