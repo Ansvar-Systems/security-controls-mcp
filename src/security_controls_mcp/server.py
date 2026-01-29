@@ -8,9 +8,15 @@ from mcp.types import TextContent, Tool
 
 from .data_loader import SCFData
 from .legal_notice import print_legal_notice
+from .config import Config
+from .registry import StandardRegistry
 
 # Initialize data loader
 scf_data = SCFData()
+
+# Initialize configuration and registry for paid standards
+config = Config()
+registry = StandardRegistry(config)
 
 # Create server instance
 app = Server("security-controls-mcp")
@@ -137,6 +143,71 @@ async def list_tools() -> list[Tool]:
                     },
                 },
                 "required": ["source_framework", "target_framework"],
+            },
+        ),
+        Tool(
+            name="list_available_standards",
+            description=(
+                "List all available standards including SCF (built-in) and any "
+                "purchased standards the user has imported"
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {},
+            },
+        ),
+        Tool(
+            name="query_standard",
+            description=(
+                "Search for content within a specific purchased standard. "
+                "Requires the standard to be imported first."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "standard": {
+                        "type": "string",
+                        "description": (
+                            "Standard identifier (e.g., iso_27001_2022). "
+                            "Use list_available_standards to see what's available."
+                        ),
+                    },
+                    "query": {
+                        "type": "string",
+                        "description": (
+                            "Search query (e.g., 'encryption key management', "
+                            "'access control policy')"
+                        ),
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Maximum number of results (default: 10)",
+                        "default": 10,
+                    },
+                },
+                "required": ["standard", "query"],
+            },
+        ),
+        Tool(
+            name="get_clause",
+            description=(
+                "Get the full text of a specific clause/section from a purchased standard"
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "standard": {
+                        "type": "string",
+                        "description": "Standard identifier (e.g., iso_27001_2022)",
+                    },
+                    "clause_id": {
+                        "type": "string",
+                        "description": (
+                            "Clause/section identifier (e.g., '5.1.2', 'A.5.15')"
+                        ),
+                    },
+                },
+                "required": ["standard", "clause_id"],
             },
         ),
     ]
@@ -325,6 +396,103 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
 
         return [TextContent(type="text", text=text)]
 
+    elif name == "list_available_standards":
+        standards = registry.list_standards()
+
+        text = f"**Available Standards ({len(standards)} total)**\n\n"
+
+        for std in standards:
+            if std["type"] == "built-in":
+                text += f"### {std['title']} (Built-in)\n"
+                text += f"- **License:** {std['license']}\n"
+                text += f"- **Coverage:** {std['controls']}\n\n"
+            else:
+                text += f"### {std['title']} (Purchased)\n"
+                text += f"- **ID:** `{std['standard_id']}`\n"
+                text += f"- **Version:** {std['version']}\n"
+                text += f"- **License:** {std['license']}\n"
+                text += f"- **Purchased from:** {std['purchased_from']}\n"
+                text += f"- **Purchase date:** {std['purchase_date']}\n\n"
+
+        if not registry.has_paid_standards():
+            text += "\n*No purchased standards imported yet. Purchase a standard "
+            text += "(e.g., ISO 27001 from ISO.org) and use the import tool to add it.*\n"
+
+        return [TextContent(type="text", text=text)]
+
+    elif name == "query_standard":
+        standard = arguments["standard"]
+        query = arguments["query"]
+        limit = arguments.get("limit", 10)
+
+        provider = registry.get_provider(standard)
+        if not provider:
+            available = [s["standard_id"] for s in registry.list_standards() if s["type"] == "paid"]
+            if available:
+                text = f"Standard '{standard}' not found. Available: {', '.join(available)}"
+            else:
+                text = "No purchased standards available. Import a standard first using the import tool."
+            return [TextContent(type="text", text=text)]
+
+        results = provider.search(query, limit=limit)
+
+        if not results:
+            return [TextContent(
+                type="text",
+                text=f"No results found for '{query}' in {standard}"
+            )]
+
+        metadata = provider.get_metadata()
+        text = f"**{metadata.title} - Search Results for '{query}'**\n\n"
+        text += f"Found {len(results)} result(s)\n\n"
+
+        for result in results:
+            text += f"### {result.clause_id}: {result.title}\n"
+            if result.section_type:
+                text += f"*{result.section_type}*\n"
+            text += f"{result.content[:300]}...\n"
+            if result.page:
+                text += f"📄 Page {result.page}\n"
+            text += f"\n**Source:** {metadata.title} (your licensed copy)\n"
+            text += "⚠️ Licensed content - do not redistribute\n\n"
+
+        return [TextContent(type="text", text=text)]
+
+    elif name == "get_clause":
+        standard = arguments["standard"]
+        clause_id = arguments["clause_id"]
+
+        provider = registry.get_provider(standard)
+        if not provider:
+            available = [s["standard_id"] for s in registry.list_standards() if s["type"] == "paid"]
+            if available:
+                text = f"Standard '{standard}' not found. Available: {', '.join(available)}"
+            else:
+                text = "No purchased standards available. Import a standard first using the import tool."
+            return [TextContent(type="text", text=text)]
+
+        result = provider.get_clause(clause_id)
+
+        if not result:
+            return [TextContent(
+                type="text",
+                text=f"Clause '{clause_id}' not found in {standard}"
+            )]
+
+        metadata = provider.get_metadata()
+        text = f"**{metadata.title}**\n\n"
+        text += f"## {result.clause_id}: {result.title}\n\n"
+        if result.section_type:
+            text += f"*{result.section_type}*\n\n"
+        text += f"{result.content}\n\n"
+        if result.page:
+            text += f"📄 **Page:** {result.page}\n"
+        text += f"\n**Source:** {metadata.title} (your licensed copy, purchased {metadata.purchase_date})\n"
+        text += f"**License:** {metadata.license}\n"
+        text += "⚠️ **This content is from your personally licensed copy. Do not share or redistribute.**\n"
+
+        return [TextContent(type="text", text=text)]
+
     else:
         raise ValueError(f"Unknown tool: {name}")
 
@@ -332,7 +500,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
 async def main():
     """Main entry point for the server."""
     # Display legal notice on startup
-    print_legal_notice()
+    print_legal_notice(registry)
 
     async with stdio_server() as (read_stream, write_stream):
         await app.run(read_stream, write_stream, app.create_initialization_options())
