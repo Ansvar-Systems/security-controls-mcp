@@ -56,9 +56,34 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx-json
+          output-file: sbom.spdx.json
+
+      - name: Generate CycloneDX SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: cyclonedx-json
+          output-file: sbom.cyclonedx.json
+
+      - name: Upload SBOM to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            sbom.spdx.json
+            sbom.cyclonedx.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create release summary
         run: |
-          echo "### 🚀 Release Created" >> $GITHUB_STEP_SUMMARY
+          echo "### Release Created" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Version:** ${GITHUB_REF#refs/tags/}" >> $GITHUB_STEP_SUMMARY
           echo "**URL:** https://github.com/${{ github.repository }}/releases/tag/${GITHUB_REF#refs/tags/}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**SBOM:** Software Bill of Materials attached (SPDX + CycloneDX formats)" >> $GITHUB_STEP_SUMMARY

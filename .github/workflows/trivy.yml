@@ -24,14 +24,14 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Trivy vulnerability scanner in repo mode
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
           format: 'sarif'
           output: 'trivy-results.sarif'
           severity: 'CRITICAL,HIGH,MEDIUM'
-          exit-code: '0'  # Don't fail the build, just report
+          exit-code: '1'  # Fail on CRITICAL/HIGH/MEDIUM vulnerabilities
 
       - name: Upload Trivy results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
@@ -41,7 +41,7 @@ jobs:
           category: 'trivy'
 
       - name: Run Trivy in table mode for PR comments
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.28.0
         if: github.event_name == 'pull_request'
         with:
           scan-type: 'fs'
