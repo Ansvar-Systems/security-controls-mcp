@@ -1,29 +1,33 @@
+# Dependabot configuration for automated dependency updates
+# Runs weekly on Mondays at 6 AM UTC
+
 version: 2
 updates:
-  # Enable version updates for Python dependencies
+  # Python dependencies
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "09:00"
+      time: "06:00"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "security"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
-      - "automated"
-    # Group minor and patch updates together
-    groups:
-      development-dependencies:
-        patterns:
-          - "pytest*"
-          - "black"
-          - "ruff"
-      production-dependencies:
-        patterns:
-          - "mcp"
-          - "pydantic*"
-          - "starlette"
-          - "uvicorn"
-    # Only create PRs for security updates on production dependencies
-    # This keeps the PR count manageable
-    versioning-strategy: increase
+      - "github-actions"
+    commit-message:
+      prefix: "ci"

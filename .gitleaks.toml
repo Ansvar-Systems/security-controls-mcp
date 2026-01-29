@@ -1,0 +1,38 @@
+# Gitleaks configuration
+# Customize secret detection rules and allowlists
+
+title = "Security Controls MCP - Gitleaks Config"
+
+[extend]
+# Use default Gitleaks rules as base
+useDefault = true
+
+[allowlist]
+description = "Allowlisted files and patterns"
+
+# Allowlist specific paths (e.g., test fixtures, documentation examples)
+paths = [
+  # Add paths to ignore, e.g.:
+  # '''tests/fixtures/example_secrets\.py''',
+  # '''docs/examples/.*'''
+]
+
+# Allowlist specific commit hashes (if secrets were already rotated)
+commits = [
+  # Add commit SHAs to ignore, e.g.:
+  # "abc123def456",
+]
+
+# Allowlist specific regex patterns
+regexes = [
+  # Add regex patterns to ignore, e.g.:
+  # '''example\.com''',
+]
+
+# Stop words that indicate a false positive
+stopwords = [
+  # Add stop words, e.g.:
+  # '''fake''',
+  # '''example''',
+  # '''test''',
+]
