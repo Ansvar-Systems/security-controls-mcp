@@ -28,9 +28,6 @@ Built on the [Secure Controls Framework (SCF)](https://securecontrolsframework.c
 - Control filtering by framework, domain, or keyword
 - SCF control metadata including PPTDF categories and security domain weights
 
-**Integration:**
-- Works seamlessly with [EU Regulations MCP](https://github.com/Ansvar-Systems/eu-regulations-mcp) for complete EU compliance coverage
-
 ---
 
 ## Why This Exists
@@ -38,8 +35,6 @@ Built on the [Secure Controls Framework (SCF)](https://securecontrolsframework.c
 When you're implementing security controls, you face a common problem: different frameworks describe the same security measures in different ways. ISO 27001 has one control ID, NIST CSF has another, PCI DSS has yet another — but they're all talking about the same thing.
 
 This MCP server solves that by giving you instant **bidirectional mapping** between any two frameworks via the SCF rosetta stone. Ask Claude "What DORA controls does ISO 27001 A.5.15 map to?" and get an immediate, authoritative answer backed by ComplianceForge's comprehensive framework database.
-
-**Works with:** [EU Regulations MCP](https://github.com/Ansvar-Systems/eu-regulations-mcp) for complete EU compliance coverage (DORA + NIS2 + AI Act + GDPR + more).
 
 ---
 
@@ -419,6 +414,52 @@ Based on **SCF 2025.4** released December 29, 2025.
 **Purchased Standards:** Optional standards imports (ISO, NIST) require valid licenses. You must own legitimate copies and comply with copyright restrictions. This tool does not include or distribute any copyrighted standards text.
 
 **Framework Coverage:** While SCF provides comprehensive mappings, not all controls map 1:1 across frameworks. Some controls may be interpreted, consolidated, or split during mapping. Always review official framework documentation for authoritative requirements.
+
+---
+
+## Related Projects: Complete Compliance Suite
+
+This server is part of **Ansvar's Compliance Suite** - three MCP servers that work together for end-to-end compliance coverage:
+
+### 🇪🇺 [EU Regulations MCP](https://github.com/Ansvar-Systems/EU_compliance_MCP)
+**Query 47 EU regulations directly from Claude**
+- GDPR, AI Act, DORA, NIS2, MiFID II, PSD2, eIDAS, Medical Device Regulation, and 39 more
+- Full regulatory text with article-level search
+- Cross-regulation reference and comparison
+- **Install:** `npx @ansvar/eu-regulations-mcp`
+
+### 🇺🇸 [US Regulations MCP](https://github.com/Ansvar-Systems/US_Compliance_MCP)
+**Query US federal and state compliance laws directly from Claude**
+- HIPAA, CCPA, SOX, GLBA, FERPA, COPPA, FDA 21 CFR Part 11, and 8 more
+- Federal and state privacy law comparison
+- Breach notification timeline mapping
+- **Install:** `npm install @ansvar/us-regulations-mcp`
+
+### 🔐 Security Controls MCP (This Project)
+**Query 1,451 security controls across 28 frameworks**
+- ISO 27001, NIST CSF, DORA, PCI DSS, SOC 2, CMMC, FedRAMP, and 21 more
+- Bidirectional framework mapping and gap analysis
+- Import your purchased standards for official text
+- **Install:** `pipx install security-controls-mcp`
+
+### How They Work Together
+
+**Regulations → Controls Implementation Workflow:**
+
+```
+1. "What DORA requirements apply to ICT risk management?"
+   → EU Regulations MCP returns Article 6 full text
+
+2. "What security controls satisfy DORA Article 6?"
+   → Security Controls MCP maps to ISO 27001, NIST CSF, and SCF controls
+
+3. "Show me ISO 27001 A.8.1 implementation details"
+   → Security Controls MCP returns control requirements and framework mappings
+```
+
+**Complete compliance in one chat:**
+- **EU/US Regulations MCPs** tell you WHAT compliance requirements you must meet
+- **Security Controls MCP** tells you HOW to implement controls that satisfy those requirements
 
 ---
 
