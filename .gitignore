@@ -40,3 +40,6 @@ htmlcov/
 # Temp
 *.log
 .cache/
+
+# MCP local config
+.serena/
