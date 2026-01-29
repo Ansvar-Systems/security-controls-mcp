@@ -6,7 +6,7 @@ This guide explains how to add your purchased security standards (ISO 27001, NIS
 
 ## Overview
 
-The Security Controls MCP Server includes **1,451 free SCF controls** that map across 16 frameworks. When you add your **purchased standards**, you get:
+The Security Controls MCP Server includes **1,451 free SCF controls** that map across 28 frameworks. When you add your **purchased standards**, you get:
 
 - ✅ **Official text** from your licensed copies
 - ✅ **Full clauses** with page numbers

@@ -38,6 +38,7 @@ class SCFData:
         """Build framework metadata from controls."""
         # Framework display names (keys must match actual data which uses dots in version numbers)
         framework_names = {
+            # Original 16 frameworks
             "nist_csf_2.0": "NIST Cybersecurity Framework 2.0",
             "nist_800_53_r5": "NIST SP 800-53 Revision 5",
             "iso_27001_2022": "ISO/IEC 27001:2022",
@@ -54,6 +55,22 @@ class SCFData:
             "uk_cyber_essentials": "UK Cyber Essentials",
             "fedramp_r5_moderate": "FedRAMP Revision 5 (Moderate)",
             "hipaa_security_rule": "HIPAA Security Rule",
+            # Tier 1: APAC (3 frameworks)
+            "australia_essential_8": "Australian Essential Eight",
+            "australia_ism_2024": "Australian ISM (June 2024)",
+            "singapore_mas_trm_2021": "Singapore MAS TRM 2021",
+            # Tier 1: Industry/Privacy (2 frameworks)
+            "swift_cscf_2023": "SWIFT Customer Security Framework 2023",
+            "nist_privacy_framework_1_0": "NIST Privacy Framework 1.0",
+            # Tier 2: European National (6 frameworks)
+            "netherlands": "Netherlands Cybersecurity Regulations",
+            "norway": "Norway Cybersecurity Regulations",
+            "sweden": "Sweden Cybersecurity Regulations",
+            "germany": "Germany Cybersecurity Regulations",
+            "germany_bait": "Germany BAIT (Banking IT Requirements)",
+            "germany_c5_2020": "Germany C5:2020 (Cloud Controls)",
+            # Tier 3: Cloud (1 framework)
+            "csa_ccm_4": "CSA Cloud Controls Matrix v4",
         }
 
         # Count controls per framework

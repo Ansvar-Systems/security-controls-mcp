@@ -20,7 +20,7 @@ python test_mcp_integration.py
 Expected output:
 - ✅ All tests passed!
 - No errors or tracebacks
-- Data loads correctly (1,451 controls, 16 frameworks)
+- Data loads correctly (1,451 controls, 28 frameworks)
 
 ---
 
@@ -57,7 +57,7 @@ Once configured in Claude Desktop, try these queries:
 **Query:** "List available frameworks"
 
 **Expected Response:**
-- 16 frameworks total
+- 28 frameworks total
 - NIST SP 800-53 R5: 777 controls
 - SOC 2: 412 controls
 - PCI DSS v4.0.1: 364 controls

@@ -80,8 +80,8 @@ def check_data_integrity():
         print_check("Control count (1451)", controls_ok, f"Found: {len(data.controls)}")
 
         # Check frameworks
-        frameworks_ok = len(data.frameworks) == 16
-        print_check("Framework count (16)", frameworks_ok, f"Found: {len(data.frameworks)}")
+        frameworks_ok = len(data.frameworks) == 28
+        print_check("Framework count (28)", frameworks_ok, f"Found: {len(data.frameworks)}")
 
         # Check specific high-value frameworks
         critical_frameworks = {
@@ -146,7 +146,7 @@ def check_tool_functionality():
         print_check("search_controls('encryption')", test2, f"Found {len(results)} results")
 
         # Test 3: list_frameworks
-        test3 = len(data.frameworks) == 16
+        test3 = len(data.frameworks) == 28
         print_check("list_frameworks", test3, f"{len(data.frameworks)} frameworks")
 
         # Test 4: get_framework_controls
@@ -300,7 +300,7 @@ async def main():
     """Run all verification checks."""
 
     print(f"\n{Colors.BOLD}Security Controls MCP - Production Readiness Verification{Colors.END}")
-    print(f"{Colors.BOLD}Version: 0.2.0{Colors.END}")
+    print(f"{Colors.BOLD}Version: 0.3.0{Colors.END}")
 
     results = {}
 

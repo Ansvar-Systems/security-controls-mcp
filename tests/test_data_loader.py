@@ -26,7 +26,7 @@ class TestDataLoading:
 
     def test_expected_framework_count(self, scf_data):
         """Verify expected number of frameworks loaded."""
-        assert len(scf_data.frameworks) == 16
+        assert len(scf_data.frameworks) == 28
 
     def test_controls_have_required_fields(self, scf_data):
         """Verify all controls have required fields."""

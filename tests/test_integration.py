@@ -51,7 +51,7 @@ class TestToolCalls:
         """Test list_frameworks."""
         result = await call_tool("list_frameworks", {})
         assert len(result) == 1
-        assert "16 total" in result[0].text
+        assert "28 total" in result[0].text
         assert "dora" in result[0].text.lower()
 
     @pytest.mark.asyncio

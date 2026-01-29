@@ -51,6 +51,7 @@ class TestDataFiles:
         data = SCFData()
 
         expected_frameworks = [
+            # Original 16 frameworks
             "nist_csf_2.0",
             "nist_800_53_r5",
             "iso_27001_2022",
@@ -67,6 +68,19 @@ class TestDataFiles:
             "uk_cyber_essentials",
             "fedramp_r5_moderate",
             "hipaa_security_rule",
+            # New 12 frameworks
+            "australia_essential_8",
+            "australia_ism_2024",
+            "singapore_mas_trm_2021",
+            "swift_cscf_2023",
+            "nist_privacy_framework_1_0",
+            "netherlands",
+            "norway",
+            "sweden",
+            "germany",
+            "germany_bait",
+            "germany_c5_2020",
+            "csa_ccm_4",
         ]
 
         for framework in expected_frameworks:
@@ -80,7 +94,7 @@ class TestModuleImports:
         """Can import main package."""
         import security_controls_mcp
 
-        assert security_controls_mcp.__version__ == "0.2.0"
+        assert security_controls_mcp.__version__ == "0.3.0"
 
     def test_import_server(self):
         """Can import server module."""

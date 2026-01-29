@@ -183,7 +183,7 @@ Or use a relative path (less reliable):
 User: List all available security frameworks
 
 Claude: [Uses security-controls MCP server]
-**Available Frameworks (16 total)**
+**Available Frameworks (28 total)**
 
 - **nist_800_53_r5**: NIST SP 800-53 Revision 5 (777 controls)
 - **soc_2_tsc**: SOC 2 (TSC 2017:2022) (412 controls)

@@ -9,7 +9,7 @@
 
 **The universal translator for security frameworks.**
 
-The Security Controls MCP Server is an open-source tool that makes 1,451 security controls across 16 frameworks searchable and AI-accessible directly through Claude, Cursor, or any MCP-compatible client.
+The Security Controls MCP Server is an open-source tool that makes 1,451 security controls across 28 frameworks searchable and AI-accessible directly through Claude, Cursor, or any MCP-compatible client.
 
 Built on the [Secure Controls Framework (SCF)](https://securecontrolsframework.com/) by ComplianceForge.
 
@@ -17,7 +17,7 @@ Built on the [Secure Controls Framework (SCF)](https://securecontrolsframework.c
 
 **Coverage:**
 - 1,451 security controls spanning governance, risk, compliance, and technical domains
-- 16 major frameworks including ISO 27001, NIST CSF, DORA, PCI DSS, CMMC, and more
+- 28 major frameworks including ISO 27001, NIST CSF, DORA, PCI DSS, CMMC, Australian Essential Eight, Singapore MAS TRM, SWIFT CSCF, and more
 - Bidirectional mapping between any two frameworks via SCF rosetta stone
 - Optional integration with purchased standards (ISO, NIST 800-53) for official text
 
@@ -195,37 +195,76 @@ Ask Claude these natural language questions:
 
 ---
 
-## Available Frameworks (16 Total)
+## Available Frameworks (28 Total)
 
 When you call `list_frameworks()`, you get:
 
 ```
-Available Frameworks (16 total)
+Available Frameworks (28 total)
 
 - nist_800_53_r5: NIST SP 800-53 Revision 5 (777 controls)
 - soc_2_tsc: SOC 2 (TSC 2017:2022) (412 controls)
 - pci_dss_4.0.1: PCI DSS v4.0.1 (364 controls)
 - fedramp_r5_moderate: FedRAMP Revision 5 (Moderate) (343 controls)
+- australia_ism_2024: Australian ISM (June 2024) (336 controls)
+- csa_ccm_4: CSA Cloud Controls Matrix v4 (334 controls)
 - iso_27002_2022: ISO/IEC 27002:2022 (316 controls)
 - nist_csf_2.0: NIST Cybersecurity Framework 2.0 (253 controls)
+- germany_c5_2020: Germany C5:2020 (Cloud Controls) (239 controls)
 - cis_csc_8.1: CIS Critical Security Controls v8.1 (234 controls)
+- singapore_mas_trm_2021: Singapore MAS TRM 2021 (214 controls)
 - cmmc_2.0_level_2: CMMC 2.0 Level 2 (198 controls)
+- nist_privacy_framework_1_0: NIST Privacy Framework 1.0 (187 controls)
 - hipaa_security_rule: HIPAA Security Rule (136 controls)
+- swift_cscf_2023: SWIFT Customer Security Framework 2023 (127 controls)
 - dora: Digital Operational Resilience Act (DORA) (103 controls)
+- germany_bait: Germany BAIT (Banking IT Requirements) (91 controls)
 - nis2: Network and Information Security Directive (NIS2) (68 controls)
 - ncsc_caf_4.0: NCSC Cyber Assessment Framework 4.0 (67 controls)
 - cmmc_2.0_level_1: CMMC 2.0 Level 1 (52 controls)
 - iso_27001_2022: ISO/IEC 27001:2022 (51 controls)
 - gdpr: General Data Protection Regulation (GDPR) (42 controls)
+- australia_essential_8: Australian Essential Eight (37 controls)
+- netherlands: Netherlands Cybersecurity Regulations (27 controls)
 - uk_cyber_essentials: UK Cyber Essentials (26 controls)
+- sweden: Sweden Cybersecurity Regulations (25 controls)
+- norway: Norway Cybersecurity Regulations (23 controls)
+- germany: Germany Cybersecurity Regulations (18 controls)
 ```
 
 **Framework categories:**
-- **Government:** NIST 800-53, NIST CSF, FedRAMP, CMMC
+- **US Government:** NIST 800-53, NIST CSF, NIST Privacy, FedRAMP, CMMC
 - **International Standards:** ISO 27001, ISO 27002, CIS CSC
-- **Industry:** PCI DSS, SOC 2, HIPAA
-- **EU Regulations:** DORA, NIS2, GDPR
+- **US Industry:** PCI DSS, SOC 2, HIPAA
+- **APAC:** Australia Essential Eight, Australia ISM, Singapore MAS TRM
+- **EU Regulations:** GDPR, DORA, NIS2
 - **UK Standards:** NCSC CAF, Cyber Essentials
+- **European National:** Netherlands, Norway, Sweden, Germany (general/BAIT/C5)
+- **Financial:** SWIFT CSCF
+- **Cloud:** CSA CCM
+
+---
+
+## Framework Roadmap
+
+**Not Yet Available (Waiting for SCF Coverage):**
+
+These security frameworks are not currently included because the Secure Controls Framework (SCF) doesn't provide official mappings. We maintain data quality and compliance consulting credibility by using only ComplianceForge-vetted mappings.
+
+- 🇳🇱 **Netherlands BIO** (Baseline Informatiebeveiliging Overheid) - Dutch government security baseline
+- 🇫🇮 **Finland KATAKRI** - Finnish defense forces security audit criteria
+- 🇳🇴 **Norway NSM** Grunnprinsipper - Norwegian NSA basic security principles
+- 🇸🇪 **Sweden MSB** - Swedish Civil Contingencies Agency cybersecurity frameworks
+- 🇩🇰 **Denmark CFCS** - Center for Cybersikkerhed guidelines
+- 🇧🇪 **Belgium CCB** - Centre for Cybersecurity Belgium frameworks
+- 🇫🇷 **France ANSSI** SecNumCloud - French cybersecurity agency cloud framework
+
+**Note:** The European country frameworks we DO include (Netherlands, Norway, Sweden, Germany) map to national cybersecurity **laws and regulations** (article numbers from GDPR, NIS2, etc.), not the specific security baseline frameworks listed above.
+
+**Want these frameworks?**
+
+1. **For private use:** Fork this repository and use the [paid standards import feature](PAID_STANDARDS_GUIDE.md) to add your purchased frameworks
+2. **For public benefit:** Contribute framework mappings to SCF at https://securecontrolsframework.com/contact/
 
 ---
 
@@ -238,7 +277,7 @@ Get details about a specific SCF control by ID.
 get_control(control_id="GOV-01")
 ```
 
-**Returns:** Full control details including description, domain, weight, PPTDF category, and mappings to all 16 frameworks.
+**Returns:** Full control details including description, domain, weight, PPTDF category, and mappings to all 28 frameworks.
 
 ---
 
@@ -262,7 +301,7 @@ List all available frameworks with metadata.
 list_frameworks()
 ```
 
-**Returns:** All 16 frameworks with display names and control counts.
+**Returns:** All 28 frameworks with display names and control counts.
 
 ---
 
@@ -361,7 +400,7 @@ SCF JSON → In-memory index → MCP tools → AI response
 Based on **SCF 2025.4** released December 29, 2025.
 
 - **1,451 controls** across all domains
-- **180+ framework mappings** (16 frameworks × 0-777 controls each)
+- **580+ framework mappings** (28 frameworks × 18-777 controls each)
 - Licensed under **Creative Commons** (data)
 - Source: [ComplianceForge SCF](https://securecontrolsframework.com/)
 

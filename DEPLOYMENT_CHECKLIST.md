@@ -13,7 +13,7 @@
 - [ ] Run `python test_server.py` → All 5 tools work correctly
 - [ ] Data files present: `scf-controls.json` (1.5MB), `framework-to-scf.json` (194KB)
 - [ ] All 1,451 controls loaded
-- [ ] All 16 frameworks mapped correctly
+- [ ] All 28 frameworks mapped correctly
 
 **Command:**
 ```bash
@@ -51,7 +51,7 @@ python verify_production_ready.py
 ### ✅ Local Testing
 
 - [ ] Install in your own Claude Desktop (follow QUICK_START.md)
-- [ ] Test query: "List all available security frameworks" → Returns 16 frameworks
+- [ ] Test query: "List all available security frameworks" → Returns 28 frameworks
 - [ ] Test query: "Search for encryption controls" → Returns CRY-* controls
 - [ ] Test query: "Show me GOV-01 details" → Returns full control data
 - [ ] Test query: "Map ISO 27001 5.1 to DORA" → Returns mappings
@@ -94,7 +94,7 @@ First production release of the Security Controls MCP server for Claude.
 **Tools:**
 1. `get_control` - Get details for specific controls
 2. `search_controls` - Search by keyword
-3. `list_frameworks` - List all 16 frameworks
+3. `list_frameworks` - List all 28 frameworks
 4. `get_framework_controls` - Get all controls for a framework
 5. `map_frameworks` - Map between frameworks
 
@@ -121,7 +121,7 @@ python verify_production_ready.py
 
 All tests pass:
 - ✅ 1,451 controls loaded
-- ✅ 16 frameworks mapped
+- ✅ 28 frameworks mapped
 - ✅ 5 tools functional
 - ✅ MCP protocol working
 - ✅ Claude Desktop compatible
@@ -153,7 +153,7 @@ Submit to: https://smithery.ai/submit
 
 **Submission details:**
 - Name: security-controls-mcp
-- Description: "MCP server providing 1,451 security controls across 16 frameworks (NIST, ISO, DORA, PCI DSS, SOC 2) for compliance mapping and gap analysis"
+- Description: "MCP server providing 1,451 security controls across 28 frameworks (NIST, ISO, DORA, PCI DSS, SOC 2) for compliance mapping and gap analysis"
 - Repository: https://github.com/Ansvar-Systems/security-controls-mcp
 - Installation command: See INSTALL.md
 - Category: Security / Compliance
@@ -203,7 +203,7 @@ GitHub: https://github.com/Ansvar-Systems/security-controls-mcp
 I built an MCP server that brings security/compliance framework data directly into Claude conversations.
 
 **What it does:**
-- Access 1,451 security controls from 16 frameworks
+- Access 1,451 security controls from 28 frameworks
 - Search controls by keyword
 - Map between frameworks (ISO ↔ DORA, NIST ↔ SOC 2, etc.)
 - Get control implementation details

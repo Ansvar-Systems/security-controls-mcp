@@ -59,7 +59,7 @@ python test_server.py
 You should see:
 ```
 ✓ Loaded 1451 controls
-✓ Loaded 16 frameworks
+✓ Loaded 28 frameworks
 ✓ All tests passed!
 ```
 

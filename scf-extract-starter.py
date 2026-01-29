@@ -32,6 +32,7 @@ def extract_scf_controls(excel_path: Path) -> dict:
 
     # Define framework columns to extract
     framework_columns = {
+        # Original 16 frameworks
         "nist_csf_2.0": "NIST\nCSF\n2.0",
         "nist_800_53_r5": "NIST\n800-53\nR5",
         "iso_27001_2022": "ISO\n27001\n2022",
@@ -48,6 +49,22 @@ def extract_scf_controls(excel_path: Path) -> dict:
         "uk_cyber_essentials": "EMEA\nUK\nCyber Essentials",
         "fedramp_r5_moderate": "US\nFedRAMP R5\n(moderate)",
         "hipaa_security_rule": "US\nHIPAA\nSecurity Rule / NIST SP 800-66 R2",
+        # Tier 1: APAC (3 frameworks)
+        "australia_essential_8": "APAC\nAustralia\nEssential 8",
+        "australia_ism_2024": "APAC\nAustralia\nISM\nJune 2024",
+        "singapore_mas_trm_2021": "APAC\nSingapore MAS\nTRM 2021",
+        # Tier 1: Industry/Privacy (2 frameworks)
+        "swift_cscf_2023": "SWIFT\nCSF\n2023",
+        "nist_privacy_framework_1_0": "NIST Privacy Framework\n1.0",
+        # Tier 2: European National (6 frameworks)
+        "netherlands": "EMEA\nNetherlands",
+        "norway": "EMEA\nNorway",
+        "sweden": "EMEA\nSweden",
+        "germany": "EMEA\nGermany",
+        "germany_bait": "EMEA\nGermany\nBanking Supervisory Requirements for IT (BAIT)",
+        "germany_c5_2020": "EMEA\nGermany\nC5\n2020",
+        # Tier 3: Cloud (1 framework)
+        "csa_ccm_4": "CSA\nCCM\n4",
     }
 
     # Build column index map

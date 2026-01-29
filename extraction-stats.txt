@@ -1,0 +1,74 @@
+================================================================================
+SCF Data Extraction Statistics
+================================================================================
+SCF Version: 2025.4
+Total Controls: 1451
+
+Framework Mapping Coverage:
+--------------------------------------------------------------------------------
+  NIST 800 53 R5                :  777 SCF controls mapped
+  SOC 2 TSC                     :  412 SCF controls mapped
+  PCI DSS 4.0.1                 :  364 SCF controls mapped
+  FEDRAMP R5 MODERATE           :  343 SCF controls mapped
+  AUSTRALIA ISM 2024            :  336 SCF controls mapped
+  CSA CCM 4                     :  334 SCF controls mapped
+  ISO 27002 2022                :  316 SCF controls mapped
+  NIST CSF 2.0                  :  253 SCF controls mapped
+  GERMANY C5 2020               :  239 SCF controls mapped
+  CIS CSC 8.1                   :  234 SCF controls mapped
+  SINGAPORE MAS TRM 2021        :  214 SCF controls mapped
+  CMMC 2.0 LEVEL 2              :  198 SCF controls mapped
+  NIST PRIVACY FRAMEWORK 1 0    :  187 SCF controls mapped
+  HIPAA SECURITY RULE           :  136 SCF controls mapped
+  SWIFT CSCF 2023               :  127 SCF controls mapped
+  DORA                          :  103 SCF controls mapped
+  GERMANY BAIT                  :   91 SCF controls mapped
+  NIS2                          :   68 SCF controls mapped
+  NCSC CAF 4.0                  :   67 SCF controls mapped
+  CMMC 2.0 LEVEL 1              :   52 SCF controls mapped
+  ISO 27001 2022                :   51 SCF controls mapped
+  GDPR                          :   42 SCF controls mapped
+  AUSTRALIA ESSENTIAL 8         :   37 SCF controls mapped
+  NETHERLANDS                   :   27 SCF controls mapped
+  UK CYBER ESSENTIALS           :   26 SCF controls mapped
+  SWEDEN                        :   25 SCF controls mapped
+  NORWAY                        :   23 SCF controls mapped
+  GERMANY                       :   18 SCF controls mapped
+
+Controls by Domain:
+--------------------------------------------------------------------------------
+  Artificial Intelligence & Autonomous Technologies :  156 controls
+  Asset Management                                  :   62 controls
+  Business Continuity & Disaster Recovery           :   58 controls
+  Capacity & Performance Planning                   :    6 controls
+  Change Management                                 :   19 controls
+  Cloud Security                                    :   24 controls
+  Compliance                                        :   35 controls
+  Configuration Management                          :   28 controls
+  Continuous Monitoring                             :   70 controls
+  Cryptographic Protections                         :   29 controls
+  Cybersecurity & Data Protection Governance        :   38 controls
+  Data Classification & Handling                    :   85 controls
+  Data Privacy                                      :  102 controls
+  Embedded Technology                               :   19 controls
+  Endpoint Security                                 :   47 controls
+  Human Resources Security                          :   46 controls
+  Identification & Authentication                   :  112 controls
+  Incident Response                                 :   41 controls
+  Information Assurance                             :   15 controls
+  Maintenance                                       :   28 controls
+  Mobile Device Management                          :   11 controls
+  Network Security                                  :   98 controls
+  Physical & Environmental Security                 :   51 controls
+  Project & Resource Management                     :   11 controls
+  Risk Management                                   :   32 controls
+  Secure Engineering & Architecture                 :   44 controls
+  Security Awareness & Training                     :   17 controls
+  Security Operations                               :    8 controls
+  Technology Development & Acquisition              :   70 controls
+  Third-Party Management                            :   28 controls
+  Threat Management                                 :   13 controls
+  Vulnerability & Patch Management                  :   33 controls
+  Web Security                                      :   15 controls
+
+================================================================================

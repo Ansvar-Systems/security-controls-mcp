@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-01-29
+
+### Added
+- **12 new framework mappings** from SCF 2025.4 - expanded global coverage
+  - **APAC:** Australian Essential Eight (37 controls), Australian ISM June 2024 (336 controls), Singapore MAS TRM 2021 (214 controls)
+  - **Financial:** SWIFT Customer Security Framework 2023 (127 controls)
+  - **Privacy:** NIST Privacy Framework 1.0 (187 controls)
+  - **European National:** Netherlands (27 controls), Norway (23 controls), Sweden (25 controls), Germany general (18 controls), Germany BAIT (91 controls), Germany C5:2020 (239 controls)
+  - **Cloud:** CSA Cloud Controls Matrix v4 (334 controls)
+- **Framework Roadmap** section in README documenting:
+  - All 28 available frameworks with control counts
+  - Frameworks not yet available (BIO, KATAKRI, NSM, MSB, CFCS, CCB, ANSSI)
+  - Clear guidance on maintaining data quality via SCF-only mappings
+
+### Changed
+- Total framework coverage: **16 → 28 frameworks** (+75% expansion)
+- Updated all documentation to reflect new framework count
+- Enhanced framework categories in README (added APAC, European National, Financial, Cloud)
+- Updated tests to verify 28 frameworks
+- Updated `scf-extract-starter.py` with 12 new framework column mappings
+
+### Technical
+- Re-extracted data from SCF 2025.4 Excel file with expanded framework coverage
+- Updated `src/security_controls_mcp/data_loader.py` with new framework display names
+- All existing tools automatically support new frameworks (no API changes)
+
 ## [0.2.0] - 2025-01-29
 
 ### Added
