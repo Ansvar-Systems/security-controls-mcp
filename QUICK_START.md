@@ -1,32 +1,24 @@
 # Quick Start Guide
 
-**Get security-controls-mcp running in Claude Desktop in 5 minutes.**
+**Get security-controls-mcp running in Claude Desktop in 2 minutes.**
 
-## ✅ Prerequisites Check
+## 📦 Step 1: Install
 
-Run this first:
+**Option 1: Using pipx (Recommended)**
 ```bash
-source venv/bin/activate
-python verify_production_ready.py
+pipx install security-controls-mcp
 ```
 
-You should see: `✅ PRODUCTION READY`
+**Option 2: Using pip**
+```bash
+pip install security-controls-mcp
+```
+
+**Requirements:** Python 3.10+ and pip/pipx
 
 ---
 
-## 🚀 Setup for Claude Desktop
-
-### Step 1: Get Your Python Path
-
-```bash
-cd /path/to/security-controls-mcp
-source venv/bin/activate
-which python
-```
-
-**Copy the output** (e.g., `/Users/yourname/Projects/security-controls-mcp/venv/bin/python`)
-
-### Step 2: Configure Claude Desktop
+## 🚀 Step 2: Configure Claude Desktop
 
 **macOS:**
 ```bash
@@ -46,26 +38,17 @@ If the file doesn't exist, create it. Add this configuration:
 {
   "mcpServers": {
     "security-controls": {
-      "command": "/PASTE/YOUR/PYTHON/PATH/HERE",
-      "args": ["-m", "security_controls_mcp"]
+      "command": "scf-mcp"
     }
   }
 }
 ```
 
-**Example:**
-```json
-{
-  "mcpServers": {
-    "security-controls": {
-      "command": "/Users/jeff/Projects/security-controls-mcp/venv/bin/python",
-      "args": ["-m", "security_controls_mcp"]
-    }
-  }
-}
-```
+**That's it!** The `scf-mcp` command is available globally after pip/pipx installation.
 
-### Step 4: Restart Claude Desktop
+---
+
+## 🔄 Step 3: Restart Claude Desktop
 
 1. Quit Claude Desktop completely (Cmd+Q on Mac, right-click taskbar icon on Windows)
 2. Reopen Claude Desktop

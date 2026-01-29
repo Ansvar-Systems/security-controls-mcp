@@ -74,17 +74,30 @@ scf-mcp import-standard \
 
 ## Installation & Setup
 
-### Basic Installation
+### Quick Install (Recommended)
 
+**Option 1: Using pipx (Recommended)**
+```bash
+pipx install security-controls-mcp
+```
+
+**Option 2: Using pip**
+```bash
+pip install security-controls-mcp
+```
+
+**Option 3: From Source**
 ```bash
 git clone https://github.com/Ansvar-Systems/security-controls-mcp.git
 cd security-controls-mcp
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e .
 ```
 
-### Development Setup (Optional)
+**Requirements:**
+- Python 3.10 or higher
+- pip or pipx
+
+### Development Setup (For Contributors)
 
 If you're contributing to the project, install development tools and pre-commit hooks:
 
@@ -117,17 +130,26 @@ pre-commit run black --all-files
 
 ### Claude Desktop Configuration
 
-Add to `claude_desktop_config.json`:
+After installation, add to `claude_desktop_config.json`:
 
+**If installed via pip/pipx:**
+```json
+{
+  "mcpServers": {
+    "security-controls": {
+      "command": "scf-mcp"
+    }
+  }
+}
+```
+
+**If installed from source:**
 ```json
 {
   "mcpServers": {
     "security-controls": {
       "command": "python",
-      "args": [
-        "-m",
-        "security_controls_mcp"
-      ],
+      "args": ["-m", "security_controls_mcp"],
       "cwd": "/path/to/security-controls-mcp"
     }
   }

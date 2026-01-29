@@ -3,44 +3,54 @@
 ## Prerequisites
 
 - Python 3.10 or higher
-- pip
+- pip or pipx
 
-## Installation
+---
 
-### 1. Clone the Repository
+## Quick Install (Recommended)
+
+### Option 1: Using pipx (Isolated, Recommended)
 
 ```bash
+# Install pipx if you don't have it
+pip install pipx
+
+# Install security-controls-mcp
+pipx install security-controls-mcp
+
+# With PDF import support for purchased standards
+pipx install security-controls-mcp[import-tools]
+```
+
+### Option 2: Using pip
+
+```bash
+# Basic installation
+pip install security-controls-mcp
+
+# With PDF import support for purchased standards
+pip install security-controls-mcp[import-tools]
+```
+
+### Option 3: From Source (For Development)
+
+```bash
+# Clone repository
 git clone https://github.com/Ansvar-Systems/security-controls-mcp.git
 cd security-controls-mcp
-```
 
-### 2. Create Virtual Environment
-
-```bash
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-### 3. Install Package
-
-**Basic installation (SCF only):**
-```bash
+# Install in editable mode
 pip install -e .
-```
 
-**With PDF import support (optional):**
-
-If you want to import purchased standards (ISO 27001, NIST SP 800-53, etc.):
-```bash
+# Or with import tools
 pip install -e '.[import-tools]'
 ```
 
-This adds:
-- PDF extraction capabilities
-- `scf-mcp` CLI tool for importing standards
-- See [PAID_STANDARDS_GUIDE.md](PAID_STANDARDS_GUIDE.md) for details
+**Import Tools** add support for importing purchased standards (ISO 27001, NIST SP 800-53, etc.). See [PAID_STANDARDS_GUIDE.md](PAID_STANDARDS_GUIDE.md) for details.
 
-### 4. Verify Installation
+---
+
+## Verify Installation
 
 ```bash
 python test_server.py
