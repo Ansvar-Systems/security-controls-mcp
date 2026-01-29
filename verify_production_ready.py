@@ -51,7 +51,7 @@ def check_data_files():
         
         if exists:
             try:
-                with open(filepath, 'r') as f:
+                with open(filepath, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                 size_kb = filepath.stat().st_size / 1024
                 print_check(f"{filename}", True, f"Size: {size_kb:.1f} KB")
