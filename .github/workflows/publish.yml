@@ -51,7 +51,7 @@ jobs:
           skip-existing: true
 
       - name: Publish to PyPI
-        if: github.event_name == 'release' && github.event.inputs.test_pypi != 'true'
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && github.event.inputs.test_pypi == 'false')
         uses: pypa/gh-action-pypi-publish@release/v1
 
       - name: Create release notes
