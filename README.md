@@ -10,28 +10,25 @@ Built on the [Secure Controls Framework (SCF)](https://securecontrolsframework.c
 
 ### Installation
 
+See **[INSTALL.md](INSTALL.md)** for detailed setup instructions.
+
+**Quick version:**
 ```bash
+git clone https://github.com/Ansvar-Systems/security-controls-mcp.git
+cd security-controls-mcp
+python3 -m venv venv
+source venv/bin/activate
 pip install -e .
 ```
 
-### Claude Desktop
+### Testing
 
-Add to your `claude_desktop_config.json`:
+See **[TESTING.md](TESTING.md)** for validation steps and example queries.
 
-**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
-
-```json
-{
-  "mcpServers": {
-    "security-controls": {
-      "command": "python",
-      "args": ["-m", "security_controls_mcp"]
-    }
-  }
-}
+**Quick test:**
+```bash
+python test_server.py
 ```
-
-Restart Claude Desktop.
 
 ---
 
