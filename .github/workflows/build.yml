@@ -46,7 +46,7 @@ jobs:
           python -c "import security_controls_mcp; print('Package installed successfully')"
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: python-package
           path: dist/
