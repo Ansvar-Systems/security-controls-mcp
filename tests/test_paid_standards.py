@@ -5,7 +5,6 @@ import tempfile
 from pathlib import Path
 
 import pytest
-
 from security_controls_mcp.config import Config
 from security_controls_mcp.providers import PaidStandardProvider, StandardMetadata
 from security_controls_mcp.registry import StandardRegistry

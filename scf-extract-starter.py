@@ -14,9 +14,10 @@ Output:
 
 import json
 import sys
-from pathlib import Path
-import openpyxl
 from collections import defaultdict
+from pathlib import Path
+
+import openpyxl
 
 
 def extract_scf_controls(excel_path: Path) -> dict:
@@ -189,7 +190,7 @@ def main():
         print(f"❌ Error: File not found: {excel_path}")
         sys.exit(1)
 
-    if not excel_path.suffix in ['.xlsx', '.xlsm']:
+    if excel_path.suffix not in ['.xlsx', '.xlsm']:
         print(f"❌ Error: Not an Excel file: {excel_path}")
         sys.exit(1)
 

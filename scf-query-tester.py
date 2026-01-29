@@ -9,14 +9,14 @@ Usage:
 
 import json
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 
 
 class SCFQueryTester:
     """Demonstrates the query patterns that will be in the MCP server."""
 
     def __init__(self, controls_file: Path, reverse_index_file: Path):
-        print(f"📂 Loading SCF data...")
+        print("📂 Loading SCF data...")
         with open(controls_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
             self.controls = {c['id']: c for c in data['controls']}
@@ -97,9 +97,9 @@ def print_control(control: Dict):
     print(f"Weight: {control['weight']}/10")
     print(f"PPTDF: {control['pptdf']}")
     print(f"Validation: {control['validation_cadence']}")
-    print(f"\nDescription:")
+    print("\nDescription:")
     print(f"  {control['description'][:200]}...")
-    print(f"\nFramework Mappings:")
+    print("\nFramework Mappings:")
 
     for fw, mappings in control['framework_mappings'].items():
         if mappings:
@@ -166,7 +166,7 @@ def main():
     print("Query: What ISO 27001 controls cover DORA Article 16.1(a)?")
 
     iso_controls = tester.cross_reference_frameworks('dora', '16.1(a)', 'iso_27001_2022')
-    print(f"\n✅ DORA 16.1(a) maps to these ISO 27001 controls:")
+    print("\n✅ DORA 16.1(a) maps to these ISO 27001 controls:")
     for iso_ctrl in iso_controls:
         print(f"  - {iso_ctrl}")
 
@@ -185,7 +185,7 @@ def main():
     print(f"Overlap:                 {gap['overlap']} SCF controls")
     print(f"Gap (DORA only):         {gap['gap']} SCF controls")
 
-    print(f"\nSample gap controls (first 10):")
+    print("\nSample gap controls (first 10):")
     for scf_id in gap['gap_controls'][:10]:
         control = tester.query_control(scf_id)
         if control:

@@ -3,6 +3,7 @@
 
 from security_controls_mcp.data_loader import SCFData
 
+
 def main():
     print("Loading SCF data...")
     data = SCFData()
@@ -55,7 +56,7 @@ def main():
 
     # Test 5: List frameworks
     print("Test 5: frameworks")
-    print(f"  ✓ Available frameworks:")
+    print("  ✓ Available frameworks:")
     for fw_key in list(data.frameworks.keys())[:5]:
         fw = data.frameworks[fw_key]
         print(f"    - {fw_key}: {fw['controls_mapped']} controls")

@@ -1,10 +1,9 @@
 """Registry for managing all standard providers."""
 
-from pathlib import Path
 from typing import Dict, List, Optional
 
 from .config import Config
-from .providers import StandardProvider, PaidStandardProvider, SearchResult
+from .providers import PaidStandardProvider, SearchResult, StandardProvider
 
 
 class StandardRegistry:

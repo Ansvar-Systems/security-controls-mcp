@@ -6,9 +6,9 @@ from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
+from .config import Config
 from .data_loader import SCFData
 from .legal_notice import print_legal_notice
-from .config import Config
 from .registry import StandardRegistry
 
 # Initialize data loader

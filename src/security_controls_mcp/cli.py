@@ -164,7 +164,7 @@ def import_standard(
         click.echo("Next steps:")
         click.echo("  1. Restart your MCP server")
         click.echo(f"  2. Use list_available_standards to verify '{standard_type}' is loaded")
-        click.echo(f"  3. Query the standard with query_standard or get_clause")
+        click.echo("  3. Query the standard with query_standard or get_clause")
         click.echo()
 
     except Exception as e:
@@ -212,11 +212,11 @@ def _check_git_safety():
                     err=True,
                 )
                 click.echo(
-                    f"   This could lead to accidental redistribution of licensed content.",
+                    "   This could lead to accidental redistribution of licensed content.",
                     err=True,
                 )
                 click.echo()
-                click.echo(f"   Add this to your .gitignore:", err=True)
+                click.echo("   Add this to your .gitignore:", err=True)
                 click.echo(f"   {standards_dir_rel}/", err=True)
                 click.echo()
                 if not click.confirm("Continue anyway?", default=False):
