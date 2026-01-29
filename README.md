@@ -13,9 +13,6 @@ Built on the [Secure Controls Framework (SCF)](https://securecontrolsframework.c
 
 ## Why This Exists
 
-> *"Control mappings are gold dust for anyone working in compliance."*
-> — [SwagVonYolo on Reddit](https://www.reddit.com/r/msp/comments/1hvx0rw/comment/m7i89os/)
-
 When you're implementing security controls, you face a common problem: different frameworks describe the same security measures in different ways. ISO 27001 has one control ID, NIST CSF has another, PCI DSS has yet another — but they're all talking about the same thing.
 
 This MCP server solves that by giving you instant **bidirectional mapping** between any two frameworks via the SCF rosetta stone. Ask Claude "What DORA controls does ISO 27001 A.5.15 map to?" and get an immediate, authoritative answer backed by ComplianceForge's comprehensive framework database.
