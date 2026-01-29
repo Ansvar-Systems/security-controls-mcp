@@ -7,10 +7,10 @@ These tests verify protection against common security vulnerabilities:
 - Special character handling
 """
 
-import pytest
 import sys
-import tempfile
 from pathlib import Path
+
+import pytest
 
 from security_controls_mcp.config import Config
 from security_controls_mcp.data_loader import SCFData
@@ -94,7 +94,7 @@ class TestPathTraversalPrevention:
         try:
             config.add_standard("test\x00evil", "path\x00/etc/passwd")
             # If it doesn't raise, verify the path is safe
-            standard_path = config.get_standard_path("test\x00evil")
+            _standard_path = config.get_standard_path("test\x00evil")
             # Path should not be truncated at null byte
         except (ValueError, TypeError):
             # Raising an error is also acceptable behavior
@@ -232,7 +232,7 @@ class TestConfigSecurity:
 
         # Should raise a clear error or create new config
         try:
-            config = Config(config_dir=tmp_path)
+            _config = Config(config_dir=tmp_path)
         except Exception as e:
             # Should be a JSON decode error, not a security issue
             assert "json" in str(type(e).__name__).lower() or "decode" in str(e).lower()
@@ -240,6 +240,7 @@ class TestConfigSecurity:
     def test_config_permissions_not_world_readable(self, tmp_path):
         """Verify config directory permissions (Unix only)."""
         import platform
+
         if platform.system() == "Windows":
             pytest.skip("Permission test not applicable on Windows")
 
@@ -249,8 +250,8 @@ class TestConfigSecurity:
         assert config.config_dir.exists()
 
         # Check that others don't have write permission
-        import stat
-        mode = config.config_dir.stat().st_mode
+
+        _mode = config.config_dir.stat().st_mode
         # This is informational - we're not enforcing specific permissions
         # but documenting what they are
 

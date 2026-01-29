@@ -37,6 +37,9 @@ wheels/
 htmlcov/
 .tox/
 
+# Pre-commit
+.pre-commit-cache/
+
 # Temp
 *.log
 .cache/

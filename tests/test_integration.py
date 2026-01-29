@@ -6,6 +6,7 @@ import subprocess
 import sys
 
 import pytest
+
 from security_controls_mcp.server import call_tool
 
 

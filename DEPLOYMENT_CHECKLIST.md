@@ -313,7 +313,7 @@ If critical issues arise post-deployment:
 
 ## Sign-Off
 
-**Deployment readiness:** 
+**Deployment readiness:**
 
 - [ ] All technical checks pass
 - [ ] All documentation complete

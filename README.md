@@ -84,6 +84,37 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e .
 ```
 
+### Development Setup (Optional)
+
+If you're contributing to the project, install development tools and pre-commit hooks:
+
+```bash
+# Install development dependencies
+pip install -e '.[dev]'
+
+# Install pre-commit hooks (runs tests/linting before each commit)
+pre-commit install
+```
+
+Pre-commit hooks automatically run before each commit:
+- **Code formatting** - black, ruff (auto-fixes)
+- **Linting** - ruff check, YAML/JSON validation
+- **Tests** - pytest, smoke tests, server startup test
+
+**Bypass hooks (emergencies only):**
+```bash
+git commit --no-verify
+```
+
+**Run hooks manually:**
+```bash
+# All hooks on all files
+pre-commit run --all-files
+
+# Specific hook
+pre-commit run black --all-files
+```
+
 ### Claude Desktop Configuration
 
 Add to `claude_desktop_config.json`:

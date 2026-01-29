@@ -223,7 +223,7 @@ async def check_mcp_protocol():
         response = json.loads(response_line.decode())
 
         tools = response.get("result", {}).get("tools", [])
-        tools_ok = len(tools) == 5
+        tools_ok = len(tools) == 8
         print_check("MCP tools/list", tools_ok, f"Found {len(tools)} tools")
 
         # Cleanup
@@ -237,7 +237,7 @@ async def check_mcp_protocol():
         try:
             process.terminate()
             await process.wait()
-        except:
+        except Exception:
             pass
         return False
 

@@ -196,7 +196,7 @@ This repository implements a defense-in-depth security strategy using 9 free sec
 
 **Configuration:** `pyproject.toml` and test files in `tests/`
 
-**Runs:** 
+**Runs:**
 - Every test execution
 - CI/CD pipeline
 - Pre-commit hooks (optional)

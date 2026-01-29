@@ -36,14 +36,14 @@ jobs:
         run: |
           PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)
           CURRENT_TAG=${GITHUB_REF#refs/tags/}
-          
+
           echo "## What's Changed" > CHANGELOG.md
           echo "" >> CHANGELOG.md
           git log $PREVIOUS_TAG..HEAD --pretty=format:"- %s (%h)" >> CHANGELOG.md
           echo "" >> CHANGELOG.md
           echo "" >> CHANGELOG.md
           echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/$PREVIOUS_TAG...$CURRENT_TAG" >> CHANGELOG.md
-          
+
           cat CHANGELOG.md >> $GITHUB_STEP_SUMMARY
 
       - name: Create GitHub Release

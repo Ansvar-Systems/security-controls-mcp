@@ -5,6 +5,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
+
 from security_controls_mcp.config import Config
 from security_controls_mcp.providers import PaidStandardProvider, StandardMetadata
 from security_controls_mcp.registry import StandardRegistry
@@ -97,45 +98,45 @@ class TestPaidStandardProvider:
             full_text = {
                 "structure": {
                     "sections": [
-                    {
-                        "id": "1",
-                        "title": "Introduction",
-                        "page": 1,
-                        "content": "This is the introduction section.",
-                        "subsections": [
-                            {
-                                "id": "1.1",
-                                "title": "Purpose",
-                                "page": 1,
-                                "content": "The purpose of this standard is...",
-                                "subsections": [],
-                            }
-                        ],
-                    },
-                    {
-                        "id": "2",
-                        "title": "Requirements",
-                        "page": 5,
-                        "content": "The requirements are...",
-                        "subsections": [],
-                    },
-                ],
-                "annexes": [
-                    {
-                        "id": "A",
-                        "title": "Controls",
-                        "page": 8,
-                        "controls": [
-                            {
-                                "id": "A.1",
-                                "title": "Access Control",
-                                "content": "Access control requirements...",
-                                "page": 8,
-                                "category": "Annex A",
-                                "type": "normative",
-                            }
-                        ],
-                    }
+                        {
+                            "id": "1",
+                            "title": "Introduction",
+                            "page": 1,
+                            "content": "This is the introduction section.",
+                            "subsections": [
+                                {
+                                    "id": "1.1",
+                                    "title": "Purpose",
+                                    "page": 1,
+                                    "content": "The purpose of this standard is...",
+                                    "subsections": [],
+                                }
+                            ],
+                        },
+                        {
+                            "id": "2",
+                            "title": "Requirements",
+                            "page": 5,
+                            "content": "The requirements are...",
+                            "subsections": [],
+                        },
+                    ],
+                    "annexes": [
+                        {
+                            "id": "A",
+                            "title": "Controls",
+                            "page": 8,
+                            "controls": [
+                                {
+                                    "id": "A.1",
+                                    "title": "Access Control",
+                                    "content": "Access control requirements...",
+                                    "page": 8,
+                                    "category": "Annex A",
+                                    "type": "normative",
+                                }
+                            ],
+                        }
                     ],
                 }
             }
