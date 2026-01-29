@@ -5,9 +5,31 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
 [![SCF](https://img.shields.io/badge/SCF-2025.4-orange.svg)](https://securecontrolsframework.com/)
 
-Query **1,451 security controls** across **16 frameworks** — from ISO 27001 and NIST CSF to DORA, PCI DSS, and more — directly from Claude, Cursor, or any MCP-compatible client.
+## Overview
+
+**The universal translator for security frameworks.**
+
+The Security Controls MCP Server is an open-source tool that makes 1,451 security controls across 16 frameworks searchable and AI-accessible directly through Claude, Cursor, or any MCP-compatible client.
 
 Built on the [Secure Controls Framework (SCF)](https://securecontrolsframework.com/) by ComplianceForge.
+
+## Key Features
+
+**Coverage:**
+- 1,451 security controls spanning governance, risk, compliance, and technical domains
+- 16 major frameworks including ISO 27001, NIST CSF, DORA, PCI DSS, CMMC, and more
+- Bidirectional mapping between any two frameworks via SCF rosetta stone
+- Optional integration with purchased standards (ISO, NIST 800-53) for official text
+
+**Capabilities:**
+- Full-text search across all control descriptions and names
+- Natural language queries instead of framework-specific control IDs
+- Cross-framework requirement comparison (e.g., "What DORA controls does ISO 27001 A.5.15 map to?")
+- Control filtering by framework, domain, or keyword
+- SCF control metadata including PPTDF categories and security domain weights
+
+**Integration:**
+- Works seamlessly with [EU Regulations MCP](https://github.com/Ansvar-Systems/eu-regulations-mcp) for complete EU compliance coverage
 
 ---
 
@@ -50,13 +72,10 @@ scf-mcp import-standard \
 
 ---
 
-## Quick Start
+## Installation & Setup
 
-### Installation
+### Basic Installation
 
-See **[INSTALL.md](INSTALL.md)** for detailed setup instructions.
-
-**Quick version:**
 ```bash
 git clone https://github.com/Ansvar-Systems/security-controls-mcp.git
 cd security-controls-mcp
@@ -65,11 +84,35 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e .
 ```
 
+### Claude Desktop Configuration
+
+Add to `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "security-controls": {
+      "command": "python",
+      "args": [
+        "-m",
+        "security_controls_mcp"
+      ],
+      "cwd": "/path/to/security-controls-mcp"
+    }
+  }
+}
+```
+
+**Config file location:**
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+
+### Cursor / VS Code Configuration
+
+Same configuration under `"mcp.servers"` instead of `"mcpServers"` in your settings.
+
 ### Testing
 
-See **[TESTING.md](TESTING.md)** for validation steps and example queries.
-
-**Quick test:**
 ```bash
 # Run all tests
 pytest tests/ -v
@@ -77,6 +120,11 @@ pytest tests/ -v
 # Or run quick validation
 python test_server.py
 ```
+
+**📖 Full Documentation:**
+- **[INSTALL.md](INSTALL.md)** - Detailed setup instructions
+- **[TESTING.md](TESTING.md)** - Validation steps and example queries
+- **[PAID_STANDARDS_GUIDE.md](PAID_STANDARDS_GUIDE.md)** - Import purchased standards for official text
 
 ---
 
@@ -191,6 +239,28 @@ map_frameworks(
 
 ---
 
+## Technical Architecture
+
+**Data Pipeline:**
+SCF JSON → In-memory index → MCP tools → AI response
+
+**Key Principles:**
+- All control text returns verbatim from SCF source data with zero LLM paraphrasing
+- Framework mappings use ComplianceForge's authoritative control crosswalks
+- Optional purchased standards stored locally in `~/.security-controls-mcp/` (never committed)
+
+**Context Management:**
+- Search results optimized for AI context windows
+- Full control retrieval includes all framework mappings
+- Cross-framework queries use bidirectional SCF mapping indices
+
+**Data Integrity:**
+- SCF version locked to 2025.4 for consistency
+- Optional standards imported from user-purchased PDFs (with license compliance)
+- All mappings sourced from official SCF framework crosswalks
+
+---
+
 ## Data Source
 
 Based on **SCF 2025.4** released December 29, 2025.
@@ -206,15 +276,32 @@ Based on **SCF 2025.4** released December 29, 2025.
 
 ---
 
-## Disclaimer
+## Important Disclaimers
 
-This tool provides technical control mappings based on the SCF framework. It is **not legal advice** and should not be used as the sole basis for compliance decisions. Always consult with qualified compliance professionals and auditors for your specific regulatory requirements.
+**Not Legal or Compliance Advice:** Control text is sourced directly from official SCF data, but framework mappings and control interpretations are provided for research purposes only. This tool should not be used as the sole basis for compliance decisions. Always verify against official framework sources and consult qualified compliance professionals and auditors for your specific regulatory requirements.
+
+**AI Content Restrictions:** The SCF license explicitly prohibits using AI systems to generate derivative content such as policies, standards, procedures, metrics, risks, or threats based on SCF data. You may query and analyze controls, but not generate derivative compliance artifacts.
+
+**Purchased Standards:** Optional standards imports (ISO, NIST) require valid licenses. You must own legitimate copies and comply with copyright restrictions. This tool does not include or distribute any copyrighted standards text.
+
+**Framework Coverage:** While SCF provides comprehensive mappings, not all controls map 1:1 across frameworks. Some controls may be interpreted, consolidated, or split during mapping. Always review official framework documentation for authoritative requirements.
 
 ---
 
-## Related Projects
+## Developer Information
 
-- **[EU Regulations MCP](https://github.com/Ansvar-Systems/eu-regulations-mcp)** - Query EU AI Act, DORA, NIS2, DSA, DMA, and more alongside these security controls for complete EU compliance coverage.
+**Built by:** [Ansvar Systems](https://ansvar.eu) (Stockholm, Sweden) — specializes in AI-accelerated threat modeling and compliance tools
+
+**License:** Apache License 2.0 (code) / CC BY-ND 4.0 (data)
+
+**Documentation:**
+- [INSTALL.md](INSTALL.md) - Complete installation guide for all platforms
+- [TESTING.md](TESTING.md) - Validation steps and example queries
+- [PAID_STANDARDS_GUIDE.md](PAID_STANDARDS_GUIDE.md) - Import purchased standards
+- [LEGAL_COMPLIANCE.md](LEGAL_COMPLIANCE.md) - License requirements and restrictions
+
+**Related Projects:**
+- **[EU Regulations MCP](https://github.com/Ansvar-Systems/eu-regulations-mcp)** - Query 37 EU regulations (AI Act, DORA, NIS2, GDPR, etc.) for complete EU compliance coverage
 
 ---
 
@@ -249,7 +336,3 @@ The SCF license **explicitly prohibits** using AI systems (including Claude) to 
 - Remove or modify control definitions
 
 For complete terms and conditions, see: [SCF Terms & Conditions](https://securecontrolsframework.com/terms-conditions/)
-
----
-
-Built by [Ansvar Systems](https://ansvar.eu) — Stockholm, Sweden
