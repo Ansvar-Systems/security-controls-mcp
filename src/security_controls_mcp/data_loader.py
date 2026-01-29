@@ -58,9 +58,7 @@ class SCFData:
 
         # Count controls per framework
         for fw_key, fw_name in framework_names.items():
-            count = sum(
-                1 for ctrl in self.controls if ctrl["framework_mappings"].get(fw_key)
-            )
+            count = sum(1 for ctrl in self.controls if ctrl["framework_mappings"].get(fw_key))
             self.frameworks[fw_key] = {
                 "key": fw_key,
                 "name": fw_name,
@@ -86,17 +84,13 @@ class SCFData:
             if query_lower in name_lower or query_lower in desc_lower:
                 # Filter by frameworks if specified
                 if frameworks:
-                    has_mapping = any(
-                        ctrl["framework_mappings"].get(fw) for fw in frameworks
-                    )
+                    has_mapping = any(ctrl["framework_mappings"].get(fw) for fw in frameworks)
                     if not has_mapping:
                         continue
 
                 # Get mapped frameworks for response
                 mapped_frameworks = [
-                    fw
-                    for fw, mappings in ctrl["framework_mappings"].items()
-                    if mappings
+                    fw for fw, mappings in ctrl["framework_mappings"].items() if mappings
                 ]
 
                 # Create snippet (simple version - first 150 chars with highlight)

@@ -163,16 +163,20 @@ class TestMapFrameworks:
 class TestCriticalFrameworks:
     """Test critical framework data integrity."""
 
-    @pytest.mark.parametrize("framework_key,expected_count", [
-        ("nist_800_53_r5", 777),
-        ("soc_2_tsc", 412),
-        ("pci_dss_4.0.1", 364),
-        ("dora", 103),
-        ("iso_27001_2022", 51),
-        ("nist_csf_2.0", 253),
-    ])
+    @pytest.mark.parametrize(
+        "framework_key,expected_count",
+        [
+            ("nist_800_53_r5", 777),
+            ("soc_2_tsc", 412),
+            ("pci_dss_4.0.1", 364),
+            ("dora", 103),
+            ("iso_27001_2022", 51),
+            ("nist_csf_2.0", 253),
+        ],
+    )
     def test_critical_framework_counts(self, scf_data, framework_key, expected_count):
         """Verify critical frameworks have expected control counts."""
         controls = scf_data.get_framework_controls(framework_key)
-        assert len(controls) == expected_count, \
-            f"{framework_key} should have {expected_count} controls, got {len(controls)}"
+        assert (
+            len(controls) == expected_count
+        ), f"{framework_key} should have {expected_count} controls, got {len(controls)}"

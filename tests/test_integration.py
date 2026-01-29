@@ -2,8 +2,9 @@
 
 import asyncio
 import json
-import sys
 import subprocess
+import sys
+
 import pytest
 from security_controls_mcp.server import call_tool
 
@@ -38,8 +39,7 @@ class TestToolCalls:
     async def test_search_controls_with_framework_filter(self):
         """Test search with framework filter."""
         result = await call_tool(
-            "search_controls",
-            {"query": "access control", "frameworks": ["dora"], "limit": 3}
+            "search_controls", {"query": "access control", "frameworks": ["dora"], "limit": 3}
         )
         assert len(result) == 1
         # Should either find results or say no results
@@ -75,8 +75,8 @@ class TestToolCalls:
             {
                 "source_framework": "iso_27001_2022",
                 "target_framework": "dora",
-                "source_control": "5.1"
-            }
+                "source_control": "5.1",
+            },
         )
         assert len(result) == 1
         assert "Mapping" in result[0].text
@@ -85,8 +85,7 @@ class TestToolCalls:
     async def test_map_frameworks_invalid_source(self):
         """Test map_frameworks with invalid source framework."""
         result = await call_tool(
-            "map_frameworks",
-            {"source_framework": "fake_framework", "target_framework": "dora"}
+            "map_frameworks", {"source_framework": "fake_framework", "target_framework": "dora"}
         )
         assert len(result) == 1
         assert "not found" in result[0].text
@@ -106,10 +105,12 @@ class TestMCPProtocol:
         # Start MCP server as subprocess using safe create_subprocess_exec
         # This does NOT use shell=True, preventing command injection
         process = await asyncio.create_subprocess_exec(
-            sys.executable, "-m", "security_controls_mcp",
+            sys.executable,
+            "-m",
+            "security_controls_mcp",
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+            stderr=subprocess.PIPE,
         )
 
         try:
@@ -124,8 +125,8 @@ class TestMCPProtocol:
                 "params": {
                     "protocolVersion": "2024-11-05",
                     "capabilities": {},
-                    "clientInfo": {"name": "test-client", "version": "1.0.0"}
-                }
+                    "clientInfo": {"name": "test-client", "version": "1.0.0"},
+                },
             }
 
             process.stdin.write((json.dumps(init_request) + "\n").encode())
@@ -138,12 +139,7 @@ class TestMCPProtocol:
             assert response["result"]["serverInfo"]["name"] == "security-controls-mcp"
 
             # Test tools/list
-            list_request = {
-                "jsonrpc": "2.0",
-                "id": 2,
-                "method": "tools/list",
-                "params": {}
-            }
+            list_request = {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}}
 
             process.stdin.write((json.dumps(list_request) + "\n").encode())
             await process.stdin.drain()
@@ -159,10 +155,7 @@ class TestMCPProtocol:
                 "jsonrpc": "2.0",
                 "id": 3,
                 "method": "tools/call",
-                "params": {
-                    "name": "get_control",
-                    "arguments": {"control_id": "GOV-01"}
-                }
+                "params": {"name": "get_control", "arguments": {"control_id": "GOV-01"}},
             }
 
             process.stdin.write((json.dumps(call_request) + "\n").encode())

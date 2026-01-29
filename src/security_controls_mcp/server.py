@@ -1,12 +1,13 @@
 """MCP server for security controls framework queries."""
 
 import asyncio
+
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent
+from mcp.types import TextContent, Tool
 
 from .data_loader import SCFData
-
+from .legal_notice import print_legal_notice
 
 # Initialize data loader
 scf_data = SCFData()
@@ -40,18 +41,26 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="search_controls",
-            description="Search for controls by keyword in name or description. Returns relevant controls with snippets.",
+            description=(
+                "Search for controls by keyword in name or description. "
+                "Returns relevant controls with snippets."
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
                     "query": {
                         "type": "string",
-                        "description": "Search query (e.g., 'encryption', 'access control', 'incident response')",
+                        "description": (
+                            "Search query (e.g., 'encryption', 'access control', "
+                            "'incident response')"
+                        ),
                     },
                     "frameworks": {
                         "type": "array",
                         "items": {"type": "string"},
-                        "description": "Optional: filter to controls that map to specific frameworks",
+                        "description": (
+                            "Optional: filter to controls that map to specific frameworks"
+                        ),
                     },
                     "limit": {
                         "type": "integer",
@@ -88,7 +97,10 @@ async def list_tools() -> list[Tool]:
                     },
                     "include_descriptions": {
                         "type": "boolean",
-                        "description": "Include control descriptions (increases token usage, default: false)",
+                        "description": (
+                            "Include control descriptions "
+                            "(increases token usage, default: false)"
+                        ),
                         "default": False,
                     },
                 },
@@ -97,21 +109,31 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="map_frameworks",
-            description="Map controls between two frameworks via SCF. Shows which target framework requirements are satisfied by source framework controls.",
+            description=(
+                "Map controls between two frameworks via SCF. Shows which target "
+                "framework requirements are satisfied by source framework controls."
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
                     "source_framework": {
                         "type": "string",
-                        "description": "Source framework key (what you HAVE, e.g., iso_27001_2022)",
+                        "description": (
+                            "Source framework key (what you HAVE, e.g., iso_27001_2022)"
+                        ),
                     },
                     "source_control": {
                         "type": "string",
-                        "description": "Optional: specific source control ID (e.g., A.5.15) to filter results",
+                        "description": (
+                            "Optional: specific source control ID (e.g., A.5.15) "
+                            "to filter results"
+                        ),
                     },
                     "target_framework": {
                         "type": "string",
-                        "description": "Target framework key (what you want to SATISFY, e.g., dora)",
+                        "description": (
+                            "Target framework key (what you want to SATISFY, e.g., dora)"
+                        ),
                     },
                 },
                 "required": ["source_framework", "target_framework"],
@@ -267,9 +289,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                 )
             ]
 
-        mappings = scf_data.map_frameworks(
-            source_framework, target_framework, source_control
-        )
+        mappings = scf_data.map_frameworks(source_framework, target_framework, source_control)
 
         if not mappings:
             return [
@@ -288,7 +308,9 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         text += f"**Found {len(mappings)} SCF controls**\n\n"
 
         for mapping in mappings[:20]:  # Limit for readability
-            text += f"**{mapping['scf_id']}: {mapping['scf_name']}** (weight: {mapping['weight']})\n"
+            text += (
+                f"**{mapping['scf_id']}: {mapping['scf_name']}** (weight: {mapping['weight']})\n"
+            )
             text += f"- Source ({source_framework}): {', '.join(mapping['source_controls'][:5])}\n"
             if mapping["target_controls"]:
                 text += (
@@ -309,6 +331,9 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
 
 async def main():
     """Main entry point for the server."""
+    # Display legal notice on startup
+    print_legal_notice()
+
     async with stdio_server() as (read_stream, write_stream):
         await app.run(read_stream, write_stream, app.create_initialization_options())
 

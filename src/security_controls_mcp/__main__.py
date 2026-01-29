@@ -1,6 +1,7 @@
 """Entry point for the MCP server."""
 
 import asyncio
+
 from .server import main
 
 if __name__ == "__main__":

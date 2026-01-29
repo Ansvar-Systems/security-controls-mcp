@@ -191,8 +191,35 @@ This tool provides technical control mappings based on the SCF framework. It is 
 
 ## License
 
-- **Code:** Apache License 2.0 (see [LICENSE](LICENSE))
-- **Data:** Creative Commons (SCF by ComplianceForge)
+### Code License
+
+The source code in this repository is licensed under the **Apache License 2.0** (see [LICENSE](LICENSE)).
+
+### Data License
+
+The SCF control data (`scf-controls.json`, `framework-to-scf.json`) is licensed under the **Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)** by ComplianceForge.
+
+- **Source:** [Secure Controls Framework (SCF)](https://securecontrolsframework.com/)
+- **License:** [CC BY-ND 4.0](https://creativecommons.org/licenses/by-nd/4.0/)
+- **Copyright:** ComplianceForge
+- **Version:** SCF 2025.4 (Released December 29, 2025)
+
+#### ⚠️ Important: AI Derivative Content Restriction
+
+The SCF license **explicitly prohibits** using AI systems (including Claude) to generate derivative content such as policies, standards, procedures, metrics, risks, or threats based on SCF data.
+
+**You MAY:**
+- Query and analyze SCF controls
+- Map between frameworks (e.g., "What DORA controls does ISO 27001 A.5.15 map to?")
+- Reference controls in your own work (with proper attribution)
+- Use this MCP server to understand control requirements
+
+**You MAY NOT:**
+- Ask Claude (or any AI) to generate policies or procedures based on SCF controls
+- Create derivative frameworks or modified versions for distribution
+- Remove or modify control definitions
+
+For complete terms and conditions, see: [SCF Terms & Conditions](https://securecontrolsframework.com/terms-conditions/)
 
 ---
 

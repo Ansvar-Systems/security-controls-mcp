@@ -2,7 +2,6 @@
 
 import json
 from pathlib import Path
-import pytest
 
 
 class TestDataFiles:
@@ -48,6 +47,7 @@ class TestDataFiles:
     def test_all_frameworks_present(self):
         """Verify all expected frameworks are present in data."""
         from security_controls_mcp.data_loader import SCFData
+
         data = SCFData()
 
         expected_frameworks = [
@@ -79,16 +79,19 @@ class TestModuleImports:
     def test_import_main_package(self):
         """Can import main package."""
         import security_controls_mcp
+
         assert security_controls_mcp.__version__ == "0.1.0"
 
     def test_import_server(self):
         """Can import server module."""
         from security_controls_mcp import server
-        assert hasattr(server, 'app')
+
+        assert hasattr(server, "app")
 
     def test_import_data_loader(self):
         """Can import data loader."""
         from security_controls_mcp.data_loader import SCFData
+
         assert SCFData is not None
 
 
@@ -98,6 +101,7 @@ class TestPackageMetadata:
     def test_version_defined(self):
         """Package version is defined."""
         from security_controls_mcp import __version__
+
         assert __version__ is not None
         assert isinstance(__version__, str)
 
