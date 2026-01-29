@@ -36,21 +36,21 @@ class SCFData:
 
     def _build_framework_metadata(self):
         """Build framework metadata from controls."""
-        # Framework display names
+        # Framework display names (keys must match actual data which uses dots in version numbers)
         framework_names = {
-            "nist_csf_2_0": "NIST Cybersecurity Framework 2.0",
+            "nist_csf_2.0": "NIST Cybersecurity Framework 2.0",
             "nist_800_53_r5": "NIST SP 800-53 Revision 5",
             "iso_27001_2022": "ISO/IEC 27001:2022",
             "iso_27002_2022": "ISO/IEC 27002:2022",
-            "cis_csc_8_1": "CIS Critical Security Controls v8.1",
-            "pci_dss_4_0_1": "PCI DSS v4.0.1",
-            "cmmc_2_0_level_1": "CMMC 2.0 Level 1",
-            "cmmc_2_0_level_2": "CMMC 2.0 Level 2",
+            "cis_csc_8.1": "CIS Critical Security Controls v8.1",
+            "pci_dss_4.0.1": "PCI DSS v4.0.1",
+            "cmmc_2.0_level_1": "CMMC 2.0 Level 1",
+            "cmmc_2.0_level_2": "CMMC 2.0 Level 2",
             "soc_2_tsc": "SOC 2 (TSC 2017:2022)",
             "dora": "Digital Operational Resilience Act (DORA)",
             "nis2": "Network and Information Security Directive (NIS2)",
             "gdpr": "General Data Protection Regulation (GDPR)",
-            "ncsc_caf_4_0": "NCSC Cyber Assessment Framework 4.0",
+            "ncsc_caf_4.0": "NCSC Cyber Assessment Framework 4.0",
             "uk_cyber_essentials": "UK Cyber Essentials",
             "fedramp_r5_moderate": "FedRAMP Revision 5 (Moderate)",
             "hipaa_security_rule": "HIPAA Security Rule",
@@ -74,15 +74,16 @@ class SCFData:
     def search_controls(
         self, query: str, frameworks: list[str] | None = None, limit: int = 10
     ) -> list[dict[str, Any]]:
-        """Search controls by description. Simple string matching for v1."""
+        """Search controls by description. Case-insensitive string matching for v1."""
         query_lower = query.lower()
         results = []
 
         for ctrl in self.controls:
-            # Check if query matches name or description
-            if query_lower in ctrl["name"].lower() or query_lower in ctrl[
-                "description"
-            ].lower():
+            # Check if query matches name or description (case-insensitive)
+            name_lower = ctrl["name"].lower() if ctrl["name"] else ""
+            desc_lower = ctrl["description"].lower() if ctrl["description"] else ""
+
+            if query_lower in name_lower or query_lower in desc_lower:
                 # Filter by frameworks if specified
                 if frameworks:
                     has_mapping = any(
