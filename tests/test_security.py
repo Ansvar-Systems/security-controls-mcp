@@ -8,6 +8,7 @@ These tests verify protection against common security vulnerabilities:
 """
 
 import pytest
+import sys
 import tempfile
 from pathlib import Path
 
@@ -21,14 +22,21 @@ class TestPathTraversalPrevention:
     def test_standard_path_with_parent_directory_traversal(self, tmp_path):
         """Ensure path traversal via ../ stays within the config directory tree.
 
-        Note: pathlib's / operator joins paths, so ../../../etc/passwd becomes
-        standards_dir/../../../etc/passwd. When resolved from a temp directory,
+        Note: pathlib's / operator joins paths, so ../../python becomes
+        standards_dir/../../python. When resolved from a temp directory,
         this may still be safe, but the code should ideally validate paths.
         """
         config = Config(config_dir=tmp_path)
 
+        # Use Python executable as a platform-agnostic system file reference
+        system_file = Path(sys.executable)
+
+        # Calculate relative path to reach the system file from tmp_path
+        # We'll try to traverse up and reach the executable
+        traversal_path = "../" * 10 + str(system_file.name)
+
         # Add a standard with path traversal attempt
-        config.add_standard("malicious", "../../../etc/passwd")
+        config.add_standard("malicious", traversal_path)
 
         # Get the resolved path
         standard_path = config.get_standard_path("malicious")
@@ -36,30 +44,30 @@ class TestPathTraversalPrevention:
         # The path should exist (as a Path object)
         assert standard_path is not None
 
-        # Verify it doesn't resolve to the ACTUAL system /etc/passwd
+        # Verify it doesn't resolve to the ACTUAL system Python executable
         resolved = standard_path.resolve()
-        # System /etc/passwd would be exactly "/etc/passwd"
-        assert resolved != Path("/etc/passwd"), "Path traversal escaped to system /etc/passwd!"
+        assert resolved != system_file, f"Path traversal escaped to system file {system_file}!"
 
-        # The resolved path should NOT be /etc/passwd (the real system file)
-        # It may contain "etc/passwd" as a substring if tmp_path is shallow,
-        # but it should be a non-existent path within the temp tree
-        if resolved == Path("/etc/passwd"):
+        # The resolved path should NOT be the Python executable (the real system file)
+        if resolved == system_file:
             pytest.fail("Critical: Path traversal attack succeeded!")
 
     def test_standard_path_with_absolute_path_injection(self, tmp_path):
         """Ensure absolute paths don't bypass the standards directory."""
         config = Config(config_dir=tmp_path)
 
-        # Attempt to use absolute path
-        config.add_standard("absolute", "/etc/passwd")
+        # Use Python executable as a platform-agnostic system file
+        system_file = Path(sys.executable)
+
+        # Attempt to use absolute path to system file
+        config.add_standard("absolute", str(system_file))
 
         standard_path = config.get_standard_path("absolute")
 
         # Should be joined with standards_dir, not used directly
         assert standard_path is not None
-        # The actual file at /etc/passwd should not be accessible
-        # (the path will be standards_dir / "/etc/passwd" which is invalid)
+        # The actual system file should not be accessible
+        # (the path will be standards_dir / system_file which creates an invalid path)
 
     def test_standard_id_with_path_separators(self, tmp_path):
         """Ensure standard_id with path separators doesn't cause issues."""

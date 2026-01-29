@@ -367,7 +367,7 @@ Complete continuous integration and deployment pipeline with 11 automated workfl
 **Outputs:**
 - SARIF to Security tab
 - Table format for PRs
-- Non-blocking (reports only)
+- Blocking on CRITICAL/HIGH/MEDIUM vulnerabilities
 
 **Scheduled:**
 - Daily 3 AM scan for continuous monitoring

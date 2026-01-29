@@ -95,7 +95,7 @@ This repository implements a defense-in-depth security strategy using 9 free sec
 - SARIF format uploaded to GitHub Security tab
 - Table format for PR comments
 
-**Exit behavior:** Non-blocking (reports findings without failing builds)
+**Exit behavior:** Blocking on CRITICAL/HIGH/MEDIUM vulnerabilities (fails builds to enforce security standards)
 
 ---
 
