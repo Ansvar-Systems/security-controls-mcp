@@ -3,6 +3,7 @@ include *.md
 include *.toml
 include LICENSE
 include .gitleaks.toml
+include Dockerfile
 
 # Include test files
 recursive-include tests *.py

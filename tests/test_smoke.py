@@ -23,7 +23,7 @@ class TestDataFiles:
         """Verify scf-controls.json is valid JSON."""
         data_dir = Path(__file__).parent.parent / "src" / "security_controls_mcp" / "data"
         controls_file = data_dir / "scf-controls.json"
-        with open(controls_file, "r") as f:
+        with open(controls_file, "r", encoding="utf-8") as f:
             data = json.load(f)
         assert "controls" in data
         assert isinstance(data["controls"], list)
@@ -32,7 +32,7 @@ class TestDataFiles:
         """Verify framework-to-scf.json is valid JSON."""
         data_dir = Path(__file__).parent.parent / "src" / "security_controls_mcp" / "data"
         framework_file = data_dir / "framework-to-scf.json"
-        with open(framework_file, "r") as f:
+        with open(framework_file, "r", encoding="utf-8") as f:
             data = json.load(f)
         assert isinstance(data, dict)
 
@@ -40,7 +40,7 @@ class TestDataFiles:
         """Verify controls data is populated."""
         data_dir = Path(__file__).parent.parent / "src" / "security_controls_mcp" / "data"
         controls_file = data_dir / "scf-controls.json"
-        with open(controls_file, "r") as f:
+        with open(controls_file, "r", encoding="utf-8") as f:
             data = json.load(f)
         assert len(data["controls"]) == 1451, "Expected 1451 controls"
 
