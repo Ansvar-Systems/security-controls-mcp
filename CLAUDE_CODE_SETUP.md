@@ -205,7 +205,7 @@ Claude: [Uses search_controls tool]
 - **QUICK_START.md** - Setup for Claude Desktop (GUI)
 - **INSTALL.md** - Detailed installation guide
 - **TESTING.md** - Test queries and examples
-- **PRODUCTION_SUMMARY.md** - Complete project status
+- **README.md** - Complete project overview and status
 
 ---
 

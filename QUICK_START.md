@@ -182,5 +182,5 @@ Once it's working, see [TESTING.md](TESTING.md) for:
 ## 🆘 Need Help?
 
 1. Check [INSTALL.md](INSTALL.md) for detailed installation instructions
-2. Check [HANDOVER.md](HANDOVER.md) for technical architecture
+2. Check [README.md](README.md) for technical architecture and features
 3. Report issues: https://github.com/Ansvar-Systems/security-controls-mcp/issues

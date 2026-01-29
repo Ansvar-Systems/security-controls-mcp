@@ -278,7 +278,6 @@ def check_documentation():
         "README.md": "Project overview",
         "INSTALL.md": "Installation instructions",
         "TESTING.md": "Testing guide",
-        "HANDOVER.md": "Technical handover",
         "LICENSE": "License file",
     }
 
