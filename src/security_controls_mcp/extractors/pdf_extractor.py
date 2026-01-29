@@ -154,7 +154,6 @@ def _detect_annexes(pages_text: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     )
 
     current_annex = None
-    annex_page = None
 
     for page_info in pages_text:
         page_num = page_info["page"]
@@ -176,7 +175,6 @@ def _detect_annexes(pages_text: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
                 "page": page_num,
                 "controls": [],
             }
-            annex_page = page_num
 
         # If we're in an annex, look for controls
         if current_annex:

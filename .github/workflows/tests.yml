@@ -40,6 +40,8 @@ jobs:
     - name: Test server startup
       run: |
         python test_server.py
+      env:
+        PYTHONIOENCODING: utf-8  # Fix Windows Unicode print issues
 
   lint:
     runs-on: ubuntu-latest
