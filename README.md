@@ -45,6 +45,10 @@ See **[TESTING.md](TESTING.md)** for validation steps and example queries.
 
 **Quick test:**
 ```bash
+# Run all tests
+pytest tests/ -v
+
+# Or run quick validation
 python test_server.py
 ```
 
