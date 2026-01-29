@@ -71,3 +71,4 @@ target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
+ignore = ["E501"]  # Ignore line length (allow > 100 chars)
