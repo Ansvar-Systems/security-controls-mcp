@@ -1,0 +1,19 @@
+# Include documentation
+include *.md
+include *.toml
+include LICENSE
+include .gitleaks.toml
+include Dockerfile
+
+# Include test files
+recursive-include tests *.py
+recursive-include tests *.md
+
+# Include scripts
+include *.py
+
+# Exclude compiled Python files
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *.so
+global-exclude .DS_Store

@@ -1,0 +1,74 @@
+[project]
+name = "security-controls-mcp"
+version = "0.3.2"
+description = "MCP server for querying security framework controls (SCF) - map between ISO 27001, NIST CSF, DORA, PCI DSS, and more"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+authors = [
+    {name = "Ansvar Systems", email = "hello@ansvar.eu"}
+]
+keywords = ["mcp", "security", "compliance", "iso27001", "nist", "dora", "pci-dss"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "mcp>=0.9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "pre-commit>=3.0.0",
+]
+import-tools = [
+    "pdfplumber>=0.11.0",  # PDF text extraction
+    "Pillow>=10.0.0",      # Image processing (for PDF rendering)
+    "click>=8.0.0",        # CLI framework
+]
+
+[project.scripts]
+scf-mcp = "security_controls_mcp.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Ansvar-Systems/security-controls-mcp"
+Repository = "https://github.com/Ansvar-Systems/security-controls-mcp"
+Issues = "https://github.com/Ansvar-Systems/security-controls-mcp/issues"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+security_controls_mcp = ["data/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]  # Ignore line length (allow > 100 chars)
