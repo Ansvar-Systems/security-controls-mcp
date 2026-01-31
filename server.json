@@ -1,8 +1,8 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.ansvar-systems/security-controls",
-  "description": "Access 1,451 security controls across 28 frameworks (ISO 27001, NIST CSF, DORA, PCI DSS). Bidirectional framework mapping via SCF rosetta stone.",
-  "version": "0.3.3",
+  "name": "io.github.Ansvar-Systems/security-controls",
+  "description": "Security controls for 28 frameworks (ISO 27001, NIST, DORA, PCI DSS) with bidirectional mapping",
+  "version": "0.3.4",
   "homepage": "https://github.com/Ansvar-Systems/security-controls-mcp",
   "license": "Apache-2.0",
   "tags": [
@@ -23,7 +23,7 @@
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "security-controls-mcp",
-      "version": "0.3.3",
+      "version": "0.3.4",
       "transport": {
         "type": "stdio"
       },

@@ -67,3 +67,4 @@ standards/
 # IDE
 .vscode/
 .idea/
+.mcpregistry_*

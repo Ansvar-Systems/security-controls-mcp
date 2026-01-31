@@ -1,6 +1,6 @@
 # Security Controls MCP Server
 
-<!-- mcp-name: security-controls -->
+<!-- mcp-name: io.github.Ansvar-Systems/security-controls -->
 
 [![MCP](https://img.shields.io/badge/MCP-0.9.0+-blue.svg)](https://modelcontextprotocol.io)
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org)
