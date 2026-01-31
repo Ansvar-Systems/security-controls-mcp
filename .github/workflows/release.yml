@@ -22,12 +22,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # v6
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6
         with:
           python-version: "3.11"
 
@@ -47,7 +47,7 @@ jobs:
           cat CHANGELOG.md >> $GITHUB_STEP_SUMMARY
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@26994186c0ac3ef5cae75ac16aa32e8153525f77  # v1
         with:
           body_path: CHANGELOG.md
           draft: false
@@ -57,21 +57,21 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate SBOM
-        uses: anchore/sbom-action@v0
+        uses: anchore/sbom-action@99c09fe975337306107572b4fdf4db224cf8e2f2  # v0
         with:
           path: .
           format: spdx-json
           output-file: sbom.spdx.json
 
       - name: Generate CycloneDX SBOM
-        uses: anchore/sbom-action@v0
+        uses: anchore/sbom-action@99c09fe975337306107572b4fdf4db224cf8e2f2  # v0
         with:
           path: .
           format: cyclonedx-json
           output-file: sbom.cyclonedx.json
 
       - name: Upload SBOM to Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@26994186c0ac3ef5cae75ac16aa32e8153525f77  # v1
         with:
           files: |
             sbom.spdx.json

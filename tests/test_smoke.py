@@ -92,21 +92,24 @@ class TestModuleImports:
 
     def test_import_main_package(self):
         """Can import main package."""
-        import security_controls_mcp
+        import importlib
 
-        assert security_controls_mcp.__version__ == "0.3.3"
+        pkg = importlib.import_module("security_controls_mcp")
+        assert pkg.__version__ == "0.3.4"
 
     def test_import_server(self):
         """Can import server module."""
-        from security_controls_mcp import server
+        import importlib
 
+        server = importlib.import_module("security_controls_mcp.server")
         assert hasattr(server, "app")
 
     def test_import_data_loader(self):
         """Can import data loader."""
-        from security_controls_mcp.data_loader import SCFData
+        import importlib
 
-        assert SCFData is not None
+        data_loader = importlib.import_module("security_controls_mcp.data_loader")
+        assert hasattr(data_loader, "SCFData")
 
 
 class TestPackageMetadata:
@@ -114,10 +117,11 @@ class TestPackageMetadata:
 
     def test_version_defined(self):
         """Package version is defined."""
-        from security_controls_mcp import __version__
+        import importlib
 
-        assert __version__ is not None
-        assert isinstance(__version__, str)
+        pkg = importlib.import_module("security_controls_mcp")
+        assert pkg.__version__ is not None
+        assert isinstance(pkg.__version__, str)
 
     def test_pyproject_toml_exists(self):
         """pyproject.toml exists."""

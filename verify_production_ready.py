@@ -237,7 +237,8 @@ async def check_mcp_protocol():
         try:
             process.terminate()
             await process.wait()
-        except Exception:
+        except (ProcessLookupError, OSError):
+            # Process already terminated or not accessible - safe to ignore
             pass
         return False
 
@@ -298,7 +299,7 @@ async def main():
     """Run all verification checks."""
 
     print(f"\n{Colors.BOLD}Security Controls MCP - Production Readiness Verification{Colors.END}")
-    print(f"{Colors.BOLD}Version: 0.3.3{Colors.END}")
+    print(f"{Colors.BOLD}Version: 0.3.4{Colors.END}")
 
     results = {}
 
