@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.3] - 2026-01-31
+
+### Changed
+- Repository cleanup: Removed LLM-generated documentation bloat
+- Simplified documentation from 18 to 6 essential files
+- Cleaned up README (524→256 lines), removed excessive emojis and verbosity
+- Simplified PAID_STANDARDS_GUIDE (342→251 lines)
+- Updated .gitignore to exclude Claude artifacts (.claude/, .serena/, test_venv/)
+
+### Removed
+- 11 redundant documentation files (CLAUDE_CODE_SETUP.md, DEPLOYMENT_CHECKLIST.md, CI-CD-PIPELINE.md, QUICK_START.md, INSTALL.md, TESTING.md, SECURITY-TOOLS.md, LEGAL_COMPLIANCE.md, RELEASE_NOTES_v0.3.1.md)
+- 7 development files from root (duplicate data files, test scripts)
+
+### Technical
+- No functional changes to MCP server or controls data
+- All 103 tests passing
+- Production readiness: 7/7 checks passed
+
 ## [0.3.2] - 2026-01-31
 
 ### Changed

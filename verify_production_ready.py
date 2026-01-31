@@ -298,7 +298,7 @@ async def main():
     """Run all verification checks."""
 
     print(f"\n{Colors.BOLD}Security Controls MCP - Production Readiness Verification{Colors.END}")
-    print(f"{Colors.BOLD}Version: 0.3.0{Colors.END}")
+    print(f"{Colors.BOLD}Version: 0.3.3{Colors.END}")
 
     results = {}
 

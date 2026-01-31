@@ -94,7 +94,7 @@ class TestModuleImports:
         """Can import main package."""
         import security_controls_mcp
 
-        assert security_controls_mcp.__version__ == "0.3.2"
+        assert security_controls_mcp.__version__ == "0.3.3"
 
     def test_import_server(self):
         """Can import server module."""
