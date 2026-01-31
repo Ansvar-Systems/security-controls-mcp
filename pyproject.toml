@@ -1,18 +1,17 @@
 [project]
 name = "security-controls-mcp"
-version = "0.2.1"
+version = "0.3.1"
 description = "MCP server for querying security framework controls (SCF) - map between ISO 27001, NIST CSF, DORA, PCI DSS, and more"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
 authors = [
     {name = "Ansvar Systems", email = "hello@ansvar.eu"}
 ]
 keywords = ["mcp", "security", "compliance", "iso27001", "nist", "dora", "pci-dss"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
