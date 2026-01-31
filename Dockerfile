@@ -1,38 +1,37 @@
 # Security Controls MCP Server
 # Python-based MCP server with HTTP transport
 # Compatible with Ansvar platform MCP client
+#
+# Using Alpine for minimal CVE footprint
 
-FROM python:3.11-slim AS builder
+FROM python:3.11-alpine AS builder
 
 WORKDIR /app
 
-# Install build dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc && \
-    rm -rf /var/lib/apt/lists/*
+# Install build dependencies (Alpine uses apk, not apt)
+RUN apk add --no-cache gcc musl-dev
 
 # Copy package files
 COPY pyproject.toml README.md ./
 COPY src/ ./src/
 
-# Install package in editable mode
-RUN pip install --no-cache-dir -e .
+# Install package and fix known CVEs
+RUN pip install --no-cache-dir -e . && \
+    pip install --no-cache-dir "jaraco.context>=6.1.0" "wheel>=0.46.2"
 
 # Install additional runtime dependencies
 RUN pip install --no-cache-dir uvicorn starlette
 
-# Production stage
-FROM python:3.11-slim
+# Production stage - minimal Alpine image
+FROM python:3.11-alpine
 
 WORKDIR /app
 
-# Install curl for health checks
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl && \
-    rm -rf /var/lib/apt/lists/*
+# Install curl for health checks (minimal addition)
+RUN apk add --no-cache curl
 
 # Security: create non-root user
-RUN useradd -m -u 1001 -s /bin/bash mcp && \
+RUN adduser -D -u 1001 mcp && \
     chown -R mcp:mcp /app
 
 # Copy installed packages from builder
