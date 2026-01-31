@@ -29,11 +29,11 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # v6
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@c299e40c65443455700f0fdfc63efafe5b349051  # v3
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f  # v3
 
       - name: Log in to Container Registry
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@ca052bb54ab0790a636c9b5f226502c73d547a25  # v3
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9  # v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -41,7 +41,7 @@ jobs:
 
       - name: Extract metadata
         id: meta
-        uses: docker/metadata-action@c94ce9fb468520275223c153574b00df6fe4bcc9  # v5
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051  # v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
@@ -54,7 +54,7 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238  # v5
+        uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25  # v5
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
