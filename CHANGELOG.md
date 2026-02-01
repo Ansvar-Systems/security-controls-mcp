@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.5] - 2026-02-01
+
+### Fixed
+- **Critical:** Fixed entry point so `scf-mcp` runs the MCP server (was incorrectly pointing to CLI tools)
+- macOS users: Added documentation about using full path since GUI apps don't inherit shell PATH
+
+### Changed
+- Split commands: `scf-mcp` runs MCP server, `scf-mcp-import` runs import CLI
+- Updated all docs to reflect new command structure
+- Fixed install instructions to use `pip install security-controls-mcp[import-tools]` instead of editable install
+
 ## [0.3.3] - 2026-01-31
 
 ### Changed

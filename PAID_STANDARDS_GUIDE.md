@@ -18,7 +18,7 @@ Your paid content stays private in `~/.security-controls-mcp/` (never committed 
 ### 1. Install Import Tools
 
 ```bash
-pip install -e '.[import-tools]'
+pip install security-controls-mcp[import-tools]
 ```
 
 Installs PDF extraction dependencies (pdfplumber, Pillow, Click).
@@ -36,7 +36,7 @@ Download the PDF.
 ### 3. Import the Standard
 
 ```bash
-scf-mcp import-standard \
+scf-mcp-import import-standard \
   --file ~/Downloads/ISO-IEC-27001-2022.pdf \
   --type iso_27001_2022 \
   --title "ISO/IEC 27001:2022" \
@@ -113,12 +113,12 @@ IDs should match SCF framework keys for automatic integration.
 
 **List imported standards:**
 ```bash
-scf-mcp list-standards
+scf-mcp-import list-standards
 ```
 
 **Re-import (overwrite):**
 ```bash
-scf-mcp import-standard --file new-version.pdf --type iso_27001_2022 --force
+scf-mcp-import import-standard --file new-version.pdf --type iso_27001_2022 --force
 ```
 
 **Disable a standard:**
@@ -202,10 +202,10 @@ git commit -m "Gitignore paid standards directory"
 # 1. Buy ISO 27001 from ISO.org (download PDF)
 
 # 2. Install import tools
-pip install -e '.[import-tools]'
+pip install security-controls-mcp[import-tools]
 
 # 3. Import the PDF
-scf-mcp import-standard \
+scf-mcp-import import-standard \
   --file ~/Downloads/ISO-IEC-27001-2022.pdf \
   --type iso_27001_2022 \
   --title "ISO/IEC 27001:2022" \

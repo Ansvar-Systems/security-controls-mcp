@@ -138,10 +138,10 @@ Import your purchased ISO 27001, NIST SP 800-53, or other standards to get offic
 
 ```bash
 # Install import tools
-pip install -e '.[import-tools]'
+pip install security-controls-mcp[import-tools]
 
 # Import purchased PDF
-scf-mcp import-standard \
+scf-mcp-import import-standard \
   --file ~/Downloads/ISO-27001-2022.pdf \
   --type iso_27001_2022 \
   --title "ISO/IEC 27001:2022"
