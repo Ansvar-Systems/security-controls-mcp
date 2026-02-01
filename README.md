@@ -58,6 +58,18 @@ Add to `claude_desktop_config.json`:
 }
 ```
 
+**macOS users:** GUI apps don't inherit your shell's PATH. Use the full path instead:
+```json
+{
+  "mcpServers": {
+    "security-controls": {
+      "command": "/Users/YOUR_USERNAME/.local/bin/scf-mcp"
+    }
+  }
+}
+```
+Find your path with: `which scf-mcp`
+
 **Config location:**
 - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`

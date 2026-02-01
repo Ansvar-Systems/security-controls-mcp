@@ -29,16 +29,17 @@ MCP server providing access to 1,451 security controls across 28 frameworks. Use
 pipx install security-controls-mcp
 
 # Verify
-security-controls-mcp --version
+scf-mcp --version
 
-# Claude Desktop config
+# Claude Desktop config (use full path for GUI apps)
 {
   "mcpServers": {
     "security-controls": {
-      "command": "security-controls-mcp"
+      "command": "/full/path/to/scf-mcp"
     }
   }
 }
+# Find your path with: which scf-mcp
 ```
 
 ## Project Structure
