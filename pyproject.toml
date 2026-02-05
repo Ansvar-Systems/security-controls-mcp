@@ -76,5 +76,6 @@ ignore = ["E501"]  # Ignore line length (allow > 100 chars)
 
 [dependency-groups]
 dev = [
-    "openpyxl (>=3.1.5,<4.0.0)"
+    "openpyxl (>=3.1.5,<4.0.0)",
+    "ruff (>=0.15.0,<0.16.0)"
 ]
