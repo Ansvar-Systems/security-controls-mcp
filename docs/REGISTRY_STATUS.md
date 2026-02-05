@@ -1,181 +1,114 @@
-# MCP Registry Status & Submission Plan
+# Registry & Distribution Status
 
-## Current Status
-
-### ✅ Already Published Packages
-
-**1. EU Regulations MCP**
-- **npm:** `@ansvar/eu-regulations-mcp` ✅ Published
-- **mcpName:** `io.github.Ansvar-Systems/eu-regulations-mcp` ✅ Configured
-- **Keywords:** Includes "mcp" ✅
-- **README:** Mentions MCP ✅
-- **Auto-Discovery:** Should be discoverable by registry
-
-**2. US Regulations MCP**
-- **npm:** `@ansvar/us-regulations-mcp` ✅ Published
-- **mcpName:** `us.ansvar/us-regulations-mcp` ✅ Configured
-- **Keywords:** Includes "mcp" ✅
-- **README:** Mentions MCP ✅
-- **Auto-Discovery:** Should be discoverable by registry
-
-**3. Security Controls MCP**
-- **PyPI:** `security-controls-mcp` v0.2.1 ✅ Published
-- **Keywords:** Includes "mcp" ✅
-- **README:** Mentions MCP ✅
-- **Auto-Discovery:** Should be discoverable by registry (Python packages don't support mcpName field)
+**Last Updated:** 2026-02-05
+**Current Version:** v0.4.0
 
 ---
 
-## Registry Discovery
+## Distribution Status
 
-The MCP Registry at https://registry.modelcontextprotocol.io/ **auto-discovers** packages from npm and PyPI that meet these criteria:
-
-1. ✅ Package contains "mcp" in keywords
-2. ✅ README mentions Model Context Protocol
-3. ✅ (Optional) Has mcpName field for namespacing
-
-**All three packages meet these criteria!**
-
----
-
-## What Happens Next
-
-### Automatic Discovery (Current Approach)
-
-The registry should automatically discover all three servers within 24-48 hours of publication. No manual submission needed.
-
-**Check if they're live:**
-1. Visit https://registry.modelcontextprotocol.io/
-2. Search for "ansvar" or "eu-regulations" or "us-regulations" or "security-controls"
-3. If not found after 48 hours, proceed to manual submission
-
-### Manual Submission (If Needed)
-
-If auto-discovery doesn't work after 48 hours:
-
-**Option 1: Contact MCP Team**
-- Open issue: https://github.com/modelcontextprotocol/registry/issues
-- Provide package URLs and metadata
-- Request manual indexing
-
-**Option 2: GitHub MCP Registry (Community)**
-- Some community registries track MCP servers
-- Submit via PR to community lists
+| Registry | Status | Link |
+|----------|--------|------|
+| **PyPI** | ✅ Published | [security-controls-mcp](https://pypi.org/project/security-controls-mcp/) |
+| **GitHub Release** | ✅ Published | [v0.4.0](https://github.com/Ansvar-Systems/security-controls-mcp/releases/tag/v0.4.0) |
+| **Docker Hub** | ✅ Published | [ansvar/security-controls-mcp](https://hub.docker.com/r/ansvar/security-controls-mcp) |
+| **MCP Registry** | ⏳ Pending submission | See below |
+| **awesome-mcp-servers** | ⏳ Pending PR | See below |
 
 ---
 
-## Cross-Promotion Strategy
+## Action Items: Registry Submissions
 
-### 1. Link All Three Repos
+### 1. Official MCP Registry
 
-**Update each README with a "Related Projects" section:**
+**Namespace:** `io.github.Ansvar-Systems/security-controls`
+
+**Steps to submit:**
+
+```bash
+# 1. Clone the registry repo
+git clone https://github.com/modelcontextprotocol/registry
+cd registry
+
+# 2. Build the publisher CLI
+make publisher
+
+# 3. Authenticate with GitHub
+./bin/mcp-publisher login
+
+# 4. Publish using the server.json in this repo
+./bin/mcp-publisher publish ../security-controls-mcp/server.json
+```
+
+**Alternative: Manual submission**
+- Open issue at https://github.com/modelcontextprotocol/registry/issues
+- Request indexing of `security-controls-mcp` from PyPI
+
+---
+
+### 2. awesome-mcp-servers List
+
+**Repository:** https://github.com/wong2/awesome-mcp-servers
+
+**Steps to submit:**
+
+1. Fork the repository
+2. Add entry under appropriate category (Security/Compliance):
 
 ```markdown
-## Related Projects by Ansvar Systems
+### Security & Compliance
 
-**Complete Compliance Suite:**
-
-1. **[EU Regulations MCP](https://github.com/Ansvar-Systems/EU_compliance_MCP)** - Query 47 EU regulations (GDPR, AI Act, DORA, NIS2, etc.)
-2. **[US Regulations MCP](https://github.com/Ansvar-Systems/US_Compliance_MCP)** - Query US federal and state compliance laws (HIPAA, CCPA, SOX, etc.)
-3. **[Security Controls MCP](https://github.com/Ansvar-Systems/security-controls-mcp)** - Query 1,451 security controls across 28 frameworks (ISO 27001, NIST, DORA, etc.)
-
-**How They Work Together:**
-- EU/US MCPs tell you WHAT compliance requirements you must meet
-- Security Controls MCP tells you HOW to implement controls that satisfy those requirements
+- [security-controls-mcp](https://github.com/Ansvar-Systems/security-controls-mcp) - 1,451 security controls across 261 frameworks (ISO 27001, NIST, DORA, ISO 42001, EU AI Act) with bidirectional mapping. `Python` `Apache-2.0`
 ```
 
-### 2. Social Media Announcement
-
-**Draft Announcement:**
-
-```
-🚀 Launched: Compliance Suite for Claude
-
-Three MCP servers that work together for complete compliance coverage:
-
-🇪🇺 EU Regulations MCP - 47 EU regulations (GDPR, AI Act, DORA, NIS2...)
-📦 npm: @ansvar/eu-regulations-mcp
-
-🇺🇸 US Regulations MCP - 15 US laws (HIPAA, CCPA, SOX, GLBA...)
-📦 npm: @ansvar/us-regulations-mcp
-
-🔐 Security Controls MCP - 1,451 controls across 28 frameworks
-📦 pypi: security-controls-mcp
-
-Ask Claude: "What DORA requirements apply?" → Get exact article → Map to ISO 27001 controls
-
-All open source (Apache 2.0) | Built by @Ansvar-Systems
-
-#MCP #Compliance #AI #GDPR #HIPAA #ISO27001
-```
-
-**Post to:**
-- Reddit: r/cybersecurity, r/netsec, r/compliance
-- Hacker News: "Show HN: Compliance Suite for Claude - Query EU regs, US laws, and security controls"
-- LinkedIn: Tag #Compliance #Cybersecurity #AI #MCP
-- X/Twitter: Tag @AnthropicAI, use #MCP hashtag
-
-### 3. Documentation Cross-Links
-
-Add to each project's README:
-
-**Example workflow across all three:**
-```
-User: "What are DORA's ICT risk management requirements?"
-→ EU Regulations MCP: Returns DORA Article 6 full text
-
-User: "What security controls satisfy DORA Article 6?"
-→ Security Controls MCP: Maps to ISO 27001, NIST CSF, and SCF controls
-
-User: "Show me ISO 27001 A.8.1 requirements"
-→ Security Controls MCP: Returns control details and framework mappings
-```
+3. Submit PR with title: "Add security-controls-mcp (261 framework coverage)"
 
 ---
 
-## Action Items
+## Package Metadata
 
-### Immediate (Next 24 Hours)
+### PyPI Keywords
+```
+mcp, model-context-protocol, security, compliance, ISO-27001, NIST,
+DORA, PCI-DSS, SOC-2, HIPAA, GDPR, ISO-42001, AI-governance,
+NIST-AI-RMF, EU-AI-Act, SCF, framework-mapping
+```
 
-- [ ] **Wait for auto-discovery** - Check registry.modelcontextprotocol.io in 24-48 hours
-- [ ] **Cross-link READMEs** - Add "Related Projects" section to all three repos
-- [ ] **Prepare social announcement** - Draft posts for Reddit, HN, LinkedIn, Twitter
-
-### Follow-Up (48 Hours)
-
-- [ ] **Verify registry listing** - Confirm all three appear on https://registry.modelcontextprotocol.io/
-- [ ] **If not listed:** Submit manual request to registry team
-- [ ] **Post announcements** - Share on social media channels
-
-### Long-Term
-
-- [ ] **Monitor GitHub stars/usage** - Track community adoption
-- [ ] **Respond to issues** - Engage with users and add requested features
-- [ ] **Consider Docker registry** - Submit to Docker MCP Registry for container-based deployment
+### server.json (MCP Registry)
+- **Name:** `io.github.Ansvar-Systems/security-controls`
+- **Version:** `0.4.0`
+- **Tags:** security, compliance, governance, ISO-27001, ISO-42001, NIST, NIST-AI-RMF, DORA, PCI-DSS, SOC-2, HIPAA, GDPR, EU-AI-Act, AI-governance, framework-mapping, SCF
 
 ---
 
-## Success Metrics
+## Cross-Promotion
 
-**Week 1:**
-- All three servers appear on MCP Registry
-- 50+ GitHub stars combined
-- 10+ social media mentions
+### Related Ansvar MCP Servers
 
-**Month 1:**
-- 500+ PyPI downloads for security-controls-mcp
-- 1,000+ npm downloads for EU/US regulation servers
-- Featured in at least one compliance/security blog
+| Server | Registry | Status |
+|--------|----------|--------|
+| EU Regulations MCP | npm | ✅ `@ansvar/eu-regulations-mcp` |
+| US Regulations MCP | npm | ✅ `@ansvar/us-regulations-mcp` |
+| OT Security MCP | npm | ✅ `@ansvar/ot-security-mcp` |
+| Automotive MCP | npm | ✅ `@ansvar/automotive-cybersecurity-mcp` |
+| Sanctions MCP | PyPI | ✅ `ansvar-sanctions-mcp` |
 
 ---
 
-## Contact & Support
+## Verification Checklist
 
+After submission, verify:
+
+- [ ] Package appears on https://registry.modelcontextprotocol.io/
+- [ ] Search for "security-controls" returns the package
+- [ ] Package metadata shows 261 frameworks
+- [ ] Install command works: `pipx install security-controls-mcp`
+- [ ] Listed on awesome-mcp-servers README
+
+---
+
+## Support
+
+- **Issues:** https://github.com/Ansvar-Systems/security-controls-mcp/issues
 - **Website:** https://ansvar.eu
-- **GitHub:** https://github.com/Ansvar-Systems
-- **Issues:** Open on respective repos
-
----
-
-**Last Updated:** 2026-01-29
-**Status:** ✅ All packages published, awaiting registry auto-discovery
+- **Email:** hello@ansvar.eu
