@@ -1,8 +1,8 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Ansvar-Systems/security-controls",
-  "description": "Security controls for 28 frameworks (ISO 27001, NIST, DORA, PCI DSS) with bidirectional mapping",
-  "version": "0.3.4",
+  "description": "THE definitive MCP server for security framework mapping. 1,451 controls across 261 frameworks including ISO 27001, NIST CSF, DORA, PCI DSS, ISO 42001 (AI), NIST AI RMF, and EU AI Act. Bidirectional mapping between any frameworks.",
+  "version": "0.4.0",
   "homepage": "https://github.com/Ansvar-Systems/security-controls-mcp",
   "license": "Apache-2.0",
   "tags": [
@@ -10,20 +10,25 @@
     "compliance",
     "governance",
     "ISO-27001",
+    "ISO-42001",
     "NIST",
+    "NIST-AI-RMF",
     "DORA",
     "PCI-DSS",
     "SOC-2",
     "HIPAA",
     "GDPR",
-    "framework-mapping"
+    "EU-AI-Act",
+    "AI-governance",
+    "framework-mapping",
+    "SCF"
   ],
   "packages": [
     {
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "security-controls-mcp",
-      "version": "0.3.4",
+      "version": "0.4.0",
       "transport": {
         "type": "stdio"
       },
