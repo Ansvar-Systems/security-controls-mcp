@@ -9,13 +9,14 @@
 
 ## Overview
 
-Universal translator for security frameworks. Makes 1,451 security controls across 28 frameworks searchable and AI-accessible through Claude, Cursor, or any MCP-compatible client.
+**THE definitive MCP server for security framework mapping.** Makes 1,451 security controls across **261 frameworks** searchable and AI-accessible through Claude, Cursor, or any MCP-compatible client.
 
 Built on the [Secure Controls Framework (SCF)](https://securecontrolsframework.com/) by ComplianceForge.
 
 **Key capabilities:**
 - 1,451 security controls across governance, risk, compliance, and technical domains
-- 28 major frameworks including ISO 27001, NIST CSF, DORA, PCI DSS, CMMC, and more
+- **261 frameworks** including ISO 27001, NIST CSF, DORA, PCI DSS, CMMC, and 256 more
+- **AI Governance:** ISO 42001, NIST AI RMF, EU AI Act, Cyber Resilience Act
 - Bidirectional mapping between frameworks via SCF rosetta stone
 - Optional integration with purchased standards (ISO, NIST 800-53) for official text
 - Full-text search across all control descriptions
@@ -86,27 +87,46 @@ Same configuration under `"mcp.servers"` in your settings.
 - "List all controls needed for PCI DSS compliance"
 - "Which DORA requirements does ISO 27001 A.5.15 satisfy?"
 - "Show me all NIST CSF 2.0 controls related to incident response"
+- **NEW:** "What ISO 42001 controls map to NIST AI RMF?"
+- **NEW:** "Show me EU AI Act requirements for high-risk AI systems"
 
-## Available Frameworks (28)
+## Available Frameworks (261)
 
-- **US Government:** NIST 800-53 (777), NIST CSF 2.0 (253), FedRAMP (343), CMMC 2.0 (198/52)
-- **International Standards:** ISO 27001 (51), ISO 27002 (316), CIS CSC v8.1 (234)
-- **US Industry:** PCI DSS v4.0.1 (364), SOC 2 (412), HIPAA (136)
-- **APAC:** Australia Essential Eight (37), Australia ISM (336), Singapore MAS TRM (214)
-- **EU Regulations:** GDPR (42), DORA (103), NIS2 (68)
-- **UK Standards:** NCSC CAF 4.0 (67), Cyber Essentials (26)
-- **European National:** Netherlands (27), Norway (23), Sweden (25), Germany (18/91/239)
-- **Financial:** SWIFT CSCF 2023 (127)
-- **Cloud:** CSA CCM v4 (334)
+### AI Governance (NEW in v0.4.0)
+- **ISO 42001:2023** (149) - AI Management System
+- **NIST AI RMF 1.0** (158) - AI Risk Management Framework
+- **NIST AI 600-1** (139) - Generative AI Profile
+- **EU AI Act** (119) - Regulation 2024/1689
+- **EU Cyber Resilience Act** (18)
+
+### Core Frameworks
+- **US Government:** NIST 800-53 R5 (777), NIST CSF 2.0 (253), FedRAMP R5 (423), CMMC 2.0 (198/52)
+- **International Standards:** ISO 27001 (51), ISO 27002 (316), ISO 27017 (119), ISO 27018 (70), ISO 27701 (187), ISO 22301 (52)
+- **US Industry:** PCI DSS v4.0.1 (364), SOC 2 (412), HIPAA (136), SOX (2)
+- **Financial:** SWIFT CSCF 2023 (127), FFIEC (231), GLBA (108), DORA (103)
+- **Cloud:** CSA CCM v4 (334), Germany C5 (239)
+
+### Regional Coverage (50+ countries)
+- **APAC:** Australia ISM/Essential 8, Singapore MAS TRM, Japan ISMAP, China Cybersecurity Law, India DPDPA
+- **EU:** GDPR (42), NIS2 (68), PSD2 (61), plus 20+ national frameworks
+- **Americas:** US state laws (CA, NY, TX, etc.), Brazil LGPD, Canada PIPEDA
+- **Middle East/Africa:** Saudi SAMA, UAE NIAF, South Africa POPIA
+
+### Specialized
+- **Industrial/OT:** IEC 62443 (197), NERC CIP (224), NIST 800-82
+- **Automotive:** ISO/SAE 21434, TISAX, UN R155
+- **Healthcare:** HIPAA, HITRUST, CMS MARS-E
+
+See [docs/coverage.md](docs/coverage.md) for the complete list of 261 frameworks.
 
 ## Tools
 
 ### Core Tools
 
-**`list_frameworks()`** - List all 28 frameworks with control counts
+**`list_frameworks()`** - List all 261 frameworks with control counts
 
 **`get_control(control_id)`** - Get full details for a specific SCF control
-- Returns description, domain, weight, PPTDF category, and mappings to all 28 frameworks
+- Returns description, domain, weight, PPTDF category, and mappings to all 261 frameworks
 
 **`search_controls(query, frameworks=[], limit=10)`** - Search controls by keyword
 - Optional framework filtering
@@ -174,7 +194,7 @@ SCF JSON → In-memory index → MCP tools → AI response
 Based on **SCF 2025.4** (released December 29, 2025)
 
 - 1,451 controls across all domains
-- 580+ framework mappings (28 frameworks)
+- **261 frameworks** with full mapping coverage
 - Licensed under Creative Commons (data)
 - Source: [ComplianceForge SCF](https://securecontrolsframework.com/)
 

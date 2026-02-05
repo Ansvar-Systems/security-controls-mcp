@@ -4,11 +4,12 @@
 
 ## Project Overview
 
-MCP server providing access to 1,451 security controls across 28 frameworks. Uses SCF (Secure Controls Framework) as a rosetta stone for bidirectional framework mapping.
+MCP server providing access to 1,451 security controls across **261 frameworks**. Uses SCF (Secure Controls Framework) as a rosetta stone for bidirectional framework mapping.
 
 ## Key Features
 
-- **28 Frameworks**: ISO 27001, NIST CSF, DORA, PCI DSS, SOC 2, CMMC, FedRAMP, and 21 more
+- **261 Frameworks**: ISO 27001, NIST CSF, DORA, PCI DSS, SOC 2, CMMC, FedRAMP, and 254 more
+- **AI Governance**: ISO 42001, NIST AI RMF, EU AI Act, Cyber Resilience Act
 - **1,451 Controls**: Complete control catalog with descriptions
 - **Bidirectional Mapping**: Map any framework to any other framework
 - **Gap Analysis**: Compare control coverage between frameworks
@@ -157,14 +158,16 @@ poetry run pytest tests/test_map_frameworks.py -v
 
 ## Current Statistics
 
-- **Frameworks**: 28 (expanded from 16 in v0.2.1)
+- **Frameworks**: 261 (expanded from 28 in v0.4.0)
 - **Controls**: 1,451 unique controls
-- **Mappings**: 15,000+ bidirectional relationships
-- **Database Size**: ~8MB (SQLite)
-- **Tests**: 100% passing
+- **Mappings**: 50,000+ bidirectional relationships
+- **Database Size**: ~7MB (JSON)
+- **Tests**: 127 passing
 
 ## Version History
 
+- **v0.4.0** (2026-02-05): Major framework expansion (28→261), AI governance support
+- **v0.3.5** (2026-02-01): Entry point fix
 - **v0.2.1** (2026-01-29): Framework expansion (16→28 frameworks)
 - **v0.2.0**: Initial public release with 16 frameworks
 - **v0.1.0**: Internal beta
