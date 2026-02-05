@@ -46,26 +46,21 @@ class SCFData:
             "eu_ai_act": "EU AI Act (Regulation 2024/1689)",
             "eu_cyber_resilience_act": "EU Cyber Resilience Act",
             "eu_cra_annexes": "EU Cyber Resilience Act Annexes",
-
             # === CORE FRAMEWORKS ===
             # SOC 2 / Audit
             "soc_2_tsc": "AICPA TSC 2017:2022 (SOC 2)",
-
             # CIS Controls
             "cis_csc_8.1": "CIS Critical Security Controls v8.1",
             "cis_csc_8.1_ig1": "CIS CSC v8.1 Implementation Group 1",
             "cis_csc_8.1_ig2": "CIS CSC v8.1 Implementation Group 2",
             "cis_csc_8.1_ig3": "CIS CSC v8.1 Implementation Group 3",
-
             # Governance
             "cobit_2019": "COBIT 2019",
             "coso_2017": "COSO 2017",
-
             # === CLOUD SECURITY ===
             "csa_ccm_4": "CSA Cloud Controls Matrix v4",
             "csa_iot_scf_2": "CSA IoT Security Controls Framework 2",
             "germany_c5_2020": "Germany C5:2020 (Cloud)",
-
             # === ISO STANDARDS ===
             "iso_27001_2022": "ISO/IEC 27001:2022",
             "iso_27002_2022": "ISO/IEC 27002:2022",
@@ -77,7 +72,6 @@ class SCFData:
             "iso_31000_2009": "ISO 31000:2009 (Risk Management)",
             "iso_31010_2009": "ISO 31010:2009 (Risk Assessment)",
             "iso_sae_21434_2021": "ISO/SAE 21434:2021 (Automotive Cybersecurity)",
-
             # === INDUSTRIAL / OT ===
             "iec_62443_4_2_2019": "IEC 62443-4-2:2019 (Industrial Security)",
             "iec_tr_60601_4_5_2021": "IEC TR 60601-4-5:2021 (Medical IT)",
@@ -86,7 +80,6 @@ class SCFData:
             "nist_800_82_r3_moderate": "NIST SP 800-82 R3 OT Overlay (Moderate)",
             "nist_800_82_r3_high": "NIST SP 800-82 R3 OT Overlay (High)",
             "imo_maritime_cyber": "IMO Maritime Cyber Risk Management",
-
             # === PRIVACY FRAMEWORKS ===
             "gdpr": "General Data Protection Regulation (GDPR)",
             "nist_privacy_framework_1.0": "NIST Privacy Framework 1.0",
@@ -94,7 +87,6 @@ class SCFData:
             "gapp": "Generally Accepted Privacy Principles (GAPP)",
             "oecd_privacy": "OECD Privacy Principles",
             "us_dpf": "US Data Privacy Framework",
-
             # === NIST FRAMEWORKS ===
             "nist_csf_2.0": "NIST Cybersecurity Framework 2.0",
             "nist_800_37_r2": "NIST SP 800-37 R2 (Risk Management Framework)",
@@ -124,7 +116,6 @@ class SCFData:
             "nist_800_172": "NIST SP 800-172 (Enhanced CUI)",
             "nist_800_207": "NIST SP 800-207 (Zero Trust)",
             "nist_800_218": "NIST SP 800-218 (SSDF)",
-
             # === FEDRAMP ===
             "fedramp_r4": "FedRAMP R4",
             "fedramp_r4_low": "FedRAMP R4 (Low)",
@@ -136,20 +127,17 @@ class SCFData:
             "fedramp_r5_moderate": "FedRAMP R5 (Moderate)",
             "fedramp_r5_high": "FedRAMP R5 (High)",
             "fedramp_r5_lisaas": "FedRAMP R5 (LI-SaaS)",
-
             # === GOVRAMP / STATERAMP ===
             "govramp_core": "GovRAMP Core",
             "govramp_low": "GovRAMP Low",
             "govramp_low_plus": "GovRAMP Low+",
             "govramp_moderate": "GovRAMP Moderate",
             "govramp_high": "GovRAMP High",
-
             # === CMMC ===
             "cmmc_2.0_level_1": "CMMC 2.0 Level 1",
             "cmmc_2.0_level_1_aos": "CMMC 2.0 Level 1 AOs",
             "cmmc_2.0_level_2": "CMMC 2.0 Level 2",
             "cmmc_2.0_level_3": "CMMC 2.0 Level 3",
-
             # === PCI DSS ===
             "pci_dss_4.0.1": "PCI DSS v4.0.1",
             "pci_dss_4.0.1_saq_a": "PCI DSS v4.0.1 SAQ A",
@@ -161,7 +149,6 @@ class SCFData:
             "pci_dss_4.0.1_saq_d_merchant": "PCI DSS v4.0.1 SAQ D (Merchant)",
             "pci_dss_4.0.1_saq_d_sp": "PCI DSS v4.0.1 SAQ D (Service Provider)",
             "pci_dss_4.0.1_saq_p2pe": "PCI DSS v4.0.1 SAQ P2PE",
-
             # === HEALTHCARE ===
             "hipaa_security_rule": "HIPAA Security Rule / NIST SP 800-66 R2",
             "hipaa_admin_2013": "HIPAA Administrative Simplification 2013",
@@ -170,7 +157,6 @@ class SCFData:
             "hipaa_hicp_large": "HIPAA HICP Large Practice",
             "cms_mars_e_2.0": "CMS MARS-E 2.0 (Healthcare Exchanges)",
             "hhs_45_cfr_155_260": "HHS 45 CFR 155.260",
-
             # === US FINANCIAL ===
             "sox": "Sarbanes-Oxley Act (SOX)",
             "glba_cfr_314_2023": "GLBA CFR 314 (Dec 2023)",
@@ -181,7 +167,6 @@ class SCFData:
             "ftc_act": "FTC Act",
             "naic_mdl_668": "NAIC Insurance Data Security Model Law (MDL-668)",
             "fca_crm": "FCA CRM",
-
             # === US FEDERAL / DEFENSE ===
             "cjis_5.9.3": "CJIS Security Policy v5.9.3",
             "irs_1075": "IRS Publication 1075",
@@ -208,7 +193,6 @@ class SCFData:
             "fda_21_cfr_part_11": "FDA 21 CFR Part 11 (Electronic Records)",
             "tsa_dhs_1580_82_2022": "TSA/DHS 1580/82-2022-01",
             "ssa_eiesr_8.0": "SSA EIESR 8.0",
-
             # === US STATE LAWS ===
             "us_ca_ccpa_2025": "California CCPA/CPRA 2025",
             "us_ca_sb327": "California SB327 (IoT)",
@@ -235,14 +219,12 @@ class SCFData:
             "us_nv_sb220": "Nevada SB220",
             "us_ak_pipa": "Alaska PIPA",
             "us_vt_act_171": "Vermont Act 171 of 2018",
-
             # === EU REGULATIONS ===
             "dora": "Digital Operational Resilience Act (DORA)",
             "nis2": "NIS2 Directive",
             "nis2_annex": "NIS2 Directive Annex",
             "psd2": "PSD2 (Payment Services Directive)",
             "eu_eba_gl_2019_04": "EU EBA GL/2019/04",
-
             # === EMEA NATIONAL ===
             "uk_caf_4.0": "UK Cyber Assessment Framework 4.0",
             "uk_cyber_essentials": "UK Cyber Essentials",
@@ -271,7 +253,6 @@ class SCFData:
             "russia": "Russia Cybersecurity",
             "serbia_87_2018": "Serbia 87/2018",
             "enisa_2.0": "ENISA 2.0",
-
             # === MIDDLE EAST / AFRICA ===
             "israel": "Israel Cybersecurity",
             "israel_cdmo_1.0": "Israel CDMO 1.0",
@@ -287,7 +268,6 @@ class SCFData:
             "south_africa": "South Africa (POPIA)",
             "kenya_dpa_2019": "Kenya DPA 2019",
             "nigeria_dpr_2019": "Nigeria DPR 2019",
-
             # === APAC ===
             "australia_essential_8": "Australian Essential Eight",
             "australia_ism_2024": "Australian ISM (June 2024)",
@@ -317,7 +297,6 @@ class SCFData:
             "nz_hisf_suppliers_2023": "New Zealand HISF Suppliers 2023",
             "nz_nzism_3.6": "New Zealand NZISM 3.6",
             "nz_privacy_act_2020": "New Zealand Privacy Act 2020",
-
             # === AMERICAS (non-US) ===
             "canada_pipeda": "Canada PIPEDA",
             "canada_csag": "Canada CSAG",
@@ -334,13 +313,11 @@ class SCFData:
             "uruguay": "Uruguay Cybersecurity",
             "bahamas": "Bahamas Cybersecurity",
             "bermuda_bmaccc": "Bermuda BMACCC",
-
             # === AUTOMOTIVE ===
             "tisax_isa_6": "TISAX ISA 6 (Automotive)",
             "un_r155": "UN R155 (Vehicle Cybersecurity)",
             "un_ece_wp29": "UN ECE WP.29 (Automotive)",
             "ul_2900_1_2017": "UL 2900-1:2017 (Software Cybersecurity)",
-
             # === OTHER INDUSTRY ===
             "swift_cscf_2023": "SWIFT Customer Security Framework 2023",
             "shared_assessments_sig_2025": "Shared Assessments SIG 2025",
@@ -353,37 +330,60 @@ class SCFData:
         # Framework categories for filtering
         self.framework_categories = {
             "ai_governance": [
-                "iso_42001_2023", "nist_ai_rmf_1.0", "nist_ai_600_1",
-                "eu_ai_act", "eu_cyber_resilience_act"
+                "iso_42001_2023",
+                "nist_ai_rmf_1.0",
+                "nist_ai_600_1",
+                "eu_ai_act",
+                "eu_cyber_resilience_act",
             ],
             "cloud_security": [
-                "iso_27017_2015", "iso_27018_2014", "csa_ccm_4",
-                "csa_iot_scf_2", "germany_c5_2020"
+                "iso_27017_2015",
+                "iso_27018_2014",
+                "csa_ccm_4",
+                "csa_iot_scf_2",
+                "germany_c5_2020",
             ],
             "privacy": [
-                "gdpr", "iso_27701_2025", "nist_privacy_framework_1.0",
-                "us_ca_ccpa_2025", "brazil_lgpd", "india_dpdpa_2023",
-                "china_privacy_law", "apec_privacy_2015"
+                "gdpr",
+                "iso_27701_2025",
+                "nist_privacy_framework_1.0",
+                "us_ca_ccpa_2025",
+                "brazil_lgpd",
+                "india_dpdpa_2023",
+                "china_privacy_law",
+                "apec_privacy_2015",
             ],
             "us_federal": [
-                "nist_csf_2.0", "nist_800_53_r5", "fedramp_r5_moderate",
-                "fedramp_r5_high", "cmmc_2.0_level_2", "cjis_5.9.3"
+                "nist_csf_2.0",
+                "nist_800_53_r5",
+                "fedramp_r5_moderate",
+                "fedramp_r5_high",
+                "cmmc_2.0_level_2",
+                "cjis_5.9.3",
             ],
             "financial": [
-                "pci_dss_4.0.1", "sox", "glba_cfr_314_2023", "ffiec",
-                "dora", "psd2", "swift_cscf_2023"
+                "pci_dss_4.0.1",
+                "sox",
+                "glba_cfr_314_2023",
+                "ffiec",
+                "dora",
+                "psd2",
+                "swift_cscf_2023",
             ],
             "healthcare": [
-                "hipaa_security_rule", "hipaa_hicp_small", "hipaa_hicp_medium",
-                "hipaa_hicp_large", "cms_mars_e_2.0"
+                "hipaa_security_rule",
+                "hipaa_hicp_small",
+                "hipaa_hicp_medium",
+                "hipaa_hicp_large",
+                "cms_mars_e_2.0",
             ],
             "industrial_ot": [
-                "iec_62443_4_2_2019", "nerc_cip_2024",
-                "nist_800_82_r3_moderate", "nist_800_82_r3_high"
+                "iec_62443_4_2_2019",
+                "nerc_cip_2024",
+                "nist_800_82_r3_moderate",
+                "nist_800_82_r3_high",
             ],
-            "automotive": [
-                "iso_sae_21434_2021", "tisax_isa_6", "un_r155", "un_ece_wp29"
-            ],
+            "automotive": ["iso_sae_21434_2021", "tisax_isa_6", "un_r155", "un_ece_wp29"],
         }
 
         # Count controls per framework (only for frameworks that have mappings)
