@@ -1,6 +1,6 @@
 [project]
 name = "security-controls-mcp"
-version = "0.3.5"
+version = "0.4.0"
 description = "MCP server for querying security framework controls (SCF) - map between ISO 27001, NIST CSF, DORA, PCI DSS, and more"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -73,3 +73,8 @@ target-version = "py310"
 [tool.ruff.lint]
 select = ["E", "F", "I"]
 ignore = ["E501"]  # Ignore line length (allow > 100 chars)
+
+[dependency-groups]
+dev = [
+    "openpyxl (>=3.1.5,<4.0.0)"
+]

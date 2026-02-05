@@ -51,7 +51,7 @@ class TestToolCalls:
         """Test list_frameworks."""
         result = await call_tool("list_frameworks", {})
         assert len(result) == 1
-        assert "28 total" in result[0].text
+        assert "total" in result[0].text and "261" in result[0].text  # SCF 2025.4 has 261 frameworks
         assert "dora" in result[0].text.lower()
 
     @pytest.mark.asyncio

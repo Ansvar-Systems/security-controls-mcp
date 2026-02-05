@@ -64,7 +64,7 @@ class TestDataFiles:
             "dora",
             "nis2",
             "gdpr",
-            "ncsc_caf_4.0",
+            "uk_caf_4.0",  # Renamed from ncsc_caf_4.0 in SCF 2025.4
             "uk_cyber_essentials",
             "fedramp_r5_moderate",
             "hipaa_security_rule",
@@ -73,7 +73,7 @@ class TestDataFiles:
             "australia_ism_2024",
             "singapore_mas_trm_2021",
             "swift_cscf_2023",
-            "nist_privacy_framework_1_0",
+            "nist_privacy_framework_1.0",  # Uses dot in SCF 2025.4
             "netherlands",
             "norway",
             "sweden",
@@ -95,7 +95,7 @@ class TestModuleImports:
         import importlib
 
         pkg = importlib.import_module("security_controls_mcp")
-        assert pkg.__version__ == "0.3.4"
+        assert pkg.__version__ == "0.4.0"
 
     def test_import_server(self):
         """Can import server module."""
