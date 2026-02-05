@@ -4,7 +4,7 @@ Import your purchased security standards (ISO 27001, NIST SP 800-53, etc.) to ge
 
 ## Overview
 
-The Security Controls MCP Server includes 1,451 free SCF controls that map across 28 frameworks. When you add purchased standards:
+The Security Controls MCP Server includes 1,451 free SCF controls that map across **261 frameworks**. When you add purchased standards:
 
 - Get official text from your licensed copies
 - See full clauses with page numbers
@@ -86,12 +86,18 @@ Use these IDs for the `--type` parameter:
 |----------|-----|-----------------|
 | ISO/IEC 27001:2022 | `iso_27001_2022` | A.5.15 |
 | ISO/IEC 27002:2022 | `iso_27002_2022` | 5.1 |
+| ISO/IEC 27017:2015 | `iso_27017_2015` | CLD.6.3 |
+| ISO/IEC 27018:2014 | `iso_27018_2014` | A.1.1 |
+| ISO/IEC 27701:2025 | `iso_27701_2025` | 5.2.1 |
+| ISO/IEC 42001:2023 | `iso_42001_2023` | 6.1.1 |
+| ISO/IEC 22301:2019 | `iso_22301_2019` | 8.4.1 |
 | NIST SP 800-53 Rev 5 | `nist_800_53_r5` | AC-1, SC-7 |
+| NIST AI RMF 1.0 | `nist_ai_rmf_1.0` | GOVERN 1.1 |
 | PCI DSS v4.0.1 | `pci_dss_4.0.1` | Req 3.4 |
 | NIST CSF 2.0 | `nist_csf_2.0` | PR.DS-2 |
 | SOC 2 (TSC) | `soc_2_tsc` | CC6.1 |
 
-IDs should match SCF framework keys for automatic integration.
+IDs should match SCF framework keys for automatic integration. See [docs/coverage.md](docs/coverage.md) for the complete list of 261 framework IDs.
 
 ## Directory Structure
 
