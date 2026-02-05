@@ -1,9 +1,18 @@
 # Include documentation
 include *.md
 include *.toml
+include *.json
+include *.yaml
+include *.lock
 include LICENSE
 include .gitleaks.toml
+include .pre-commit-config.yaml
 include Dockerfile
+include server.json
+include poetry.lock
+
+# Include docs directory
+recursive-include docs *.md
 
 # Include test files
 recursive-include tests *.py
@@ -11,6 +20,9 @@ recursive-include tests *.md
 
 # Include scripts
 include *.py
+recursive-include scripts *.py
+recursive-include scripts *.json
+recursive-include scripts *.xlsx
 
 # Exclude compiled Python files
 global-exclude __pycache__
