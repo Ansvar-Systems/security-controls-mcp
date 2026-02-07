@@ -515,7 +515,11 @@ async def mcp_endpoint(request):
 
         # Handle notifications (no response needed per JSON-RPC)
         elif method == "notifications/initialized":
-            return JSONResponse({"jsonrpc": "2.0", "id": request_id, "result": {}})
+            response = {"jsonrpc": "2.0", "id": request_id, "result": {}}
+            return StreamingResponse(
+                iter([f"event: message\ndata: {json.dumps(response)}\n\n"]),
+                media_type="text/event-stream",
+            )
 
         # Handle ping
         elif method == "ping":
