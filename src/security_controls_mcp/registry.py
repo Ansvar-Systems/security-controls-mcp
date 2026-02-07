@@ -1,9 +1,12 @@
 """Registry for managing all standard providers."""
 
+import logging
 from typing import Dict, List, Optional
 
 from .config import Config
 from .providers import PaidStandardProvider, SearchResult, StandardProvider
+
+logger = logging.getLogger(__name__)
 
 
 class StandardRegistry:
@@ -33,7 +36,7 @@ class StandardRegistry:
                     self.providers[standard_id] = provider
             except Exception as e:
                 # Log error but don't fail - just skip this standard
-                print(f"Warning: Could not load standard '{standard_id}': {e}")
+                logger.error(f"Could not load standard '{standard_id}': {e}")
 
     def get_provider(self, standard_id: str) -> Optional[StandardProvider]:
         """Get a provider by standard ID.

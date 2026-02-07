@@ -223,8 +223,8 @@ async def check_mcp_protocol():
         response = json.loads(response_line.decode())
 
         tools = response.get("result", {}).get("tools", [])
-        tools_ok = len(tools) == 8
-        print_check("MCP tools/list", tools_ok, f"Found {len(tools)} tools")
+        tools_ok = len(tools) == 9
+        print_check("MCP tools/list", tools_ok, f"Found {len(tools)} tools (expected 9)")
 
         # Cleanup
         process.terminate()
@@ -299,7 +299,7 @@ async def main():
     """Run all verification checks."""
 
     print(f"\n{Colors.BOLD}Security Controls MCP - Production Readiness Verification{Colors.END}")
-    print(f"{Colors.BOLD}Version: 0.3.4{Colors.END}")
+    print(f"{Colors.BOLD}Version: 0.4.1{Colors.END}")
 
     results = {}
 

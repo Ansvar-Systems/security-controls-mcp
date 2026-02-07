@@ -11,7 +11,6 @@ import sys
 from pathlib import Path
 
 import pytest
-
 from security_controls_mcp.config import Config
 from security_controls_mcp.data_loader import SCFData
 
@@ -38,17 +37,11 @@ class TestPathTraversalPrevention:
         # Add a standard with path traversal attempt
         config.add_standard("malicious", traversal_path)
 
-        # Get the resolved path
+        # Get the resolved path - should return None due to path traversal protection
         standard_path = config.get_standard_path("malicious")
 
-        # The path should exist (as a Path object)
-        assert standard_path is not None
-
-        # Verify it doesn't resolve to the ACTUAL system Python executable
-        resolved = standard_path.resolve()
-        assert resolved != system_file, f"Path traversal escaped to system file {system_file}!"
-
-        # The assertion above already verified this - no redundant check needed
+        # Path traversal should be blocked (returns None)
+        assert standard_path is None, "Path traversal should be blocked by returning None"
 
     def test_standard_path_with_absolute_path_injection(self, tmp_path):
         """Ensure absolute paths don't bypass the standards directory."""
@@ -62,10 +55,8 @@ class TestPathTraversalPrevention:
 
         standard_path = config.get_standard_path("absolute")
 
-        # Should be joined with standards_dir, not used directly
-        assert standard_path is not None
-        # The actual system file should not be accessible
-        # (the path will be standards_dir / system_file which creates an invalid path)
+        # Absolute path injection should be blocked (returns None)
+        assert standard_path is None, "Absolute path injection should be blocked by returning None"
 
     def test_standard_id_with_path_separators(self, tmp_path):
         """Ensure standard_id with path separators doesn't cause issues."""

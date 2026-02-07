@@ -121,7 +121,17 @@ class Config:
         if not standard_config:
             return None
 
-        return self.standards_dir / standard_config["path"]
+        # Resolve the path and ensure it's within standards_dir (prevent path traversal)
+        candidate_path = (self.standards_dir / standard_config["path"]).resolve()
+        standards_dir_resolved = self.standards_dir.resolve()
+
+        # Check if the resolved path is within the standards directory
+        try:
+            candidate_path.relative_to(standards_dir_resolved)
+            return candidate_path
+        except ValueError:
+            # Path is outside standards_dir - security violation
+            return None
 
     def acknowledge_legal_notices(self) -> None:
         """Mark legal notices as acknowledged."""

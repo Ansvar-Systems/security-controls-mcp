@@ -5,6 +5,7 @@ This provides HTTP transport (Server-Sent Events) for remote MCP clients.
 Compatible with Ansvar platform's HTTP MCP client.
 """
 import json
+import logging
 import os
 from datetime import datetime, timezone
 from typing import Dict
@@ -19,7 +20,9 @@ from starlette.routing import Route
 from .data_loader import SCFData
 from .legal_notice import print_legal_notice
 
-SERVER_VERSION = "0.4.0"
+logger = logging.getLogger(__name__)
+
+SERVER_VERSION = "0.4.1"
 
 # Initialize data loader
 scf_data = SCFData()
@@ -178,7 +181,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         )[:10]
 
         text = f"**Security Controls MCP Server v{SERVER_VERSION}**\n\n"
-        text += f"**Database:** SCF 2025.4\n"
+        text += "**Database:** SCF 2025.4\n"
         text += f"**Controls:** {len(scf_data.controls)} unique controls\n"
         text += f"**Frameworks:** {len(scf_data.frameworks)} supported\n\n"
         text += "**Top 10 Frameworks by Coverage:**\n"
@@ -408,7 +411,8 @@ async def api_search_controls(request):
             "results": results
         })
     except Exception as e:
-        return JSONResponse({"error": "Internal Server Error", "message": str(e)}, status_code=500)
+        logger.error(f"Error in api_search_controls: {e}", exc_info=True)
+        return JSONResponse({"error": "Internal Server Error", "message": "An error occurred while processing your search"}, status_code=500)
 
 
 async def api_get_control(request):
@@ -469,7 +473,8 @@ async def api_map_frameworks(request):
             "mappings": mappings
         })
     except Exception as e:
-        return JSONResponse({"error": "Internal Server Error", "message": str(e)}, status_code=500)
+        logger.error(f"Error in api_map_frameworks: {e}", exc_info=True)
+        return JSONResponse({"error": "Internal Server Error", "message": "An error occurred while mapping frameworks"}, status_code=500)
 
 
 async def api_root(request):
@@ -582,10 +587,11 @@ async def mcp_endpoint(request):
 
     except Exception as e:
         # Error response
+        logger.error(f"Error in mcp_sse_endpoint: {e}", exc_info=True)
         response = {
             "jsonrpc": "2.0",
             "id": 1,
-            "error": {"code": -32603, "message": f"Internal error: {str(e)}"},
+            "error": {"code": -32603, "message": "Internal server error"},
         }
         return StreamingResponse(
             iter([f"event: message\ndata: {json.dumps(response)}\n\n"]),

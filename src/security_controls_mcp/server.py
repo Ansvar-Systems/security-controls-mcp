@@ -22,7 +22,7 @@ registry = StandardRegistry(config)
 app = Server("security-controls-mcp")
 
 
-SERVER_VERSION = "0.4.0"
+SERVER_VERSION = "0.4.1"
 
 
 @app.list_tools()
@@ -237,7 +237,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         )[:10]
 
         text = f"**Security Controls MCP Server v{SERVER_VERSION}**\n\n"
-        text += f"**Database:** SCF 2025.4\n"
+        text += "**Database:** SCF 2025.4\n"
         text += f"**Controls:** {len(scf_data.controls)} unique controls\n"
         text += f"**Frameworks:** {len(scf_data.frameworks)} supported\n\n"
         text += "**Top 10 Frameworks by Coverage:**\n"

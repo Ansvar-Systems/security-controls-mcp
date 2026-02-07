@@ -1,7 +1,6 @@
 """Tests for Tier 0 AI Governance frameworks."""
 
 import pytest
-
 from security_controls_mcp.data_loader import SCFData
 
 

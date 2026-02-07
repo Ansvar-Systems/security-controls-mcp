@@ -6,7 +6,6 @@ production-ready for public release.
 """
 
 import pytest
-
 from security_controls_mcp.data_loader import SCFData
 
 
