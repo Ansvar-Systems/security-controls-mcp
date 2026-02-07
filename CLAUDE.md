@@ -48,44 +48,53 @@ scf-mcp --version
 ```
 security-controls-mcp/
 ├── src/security_controls_mcp/
-│   ├── server.py              # MCP server entry point
-│   ├── data/
-│   │   ├── scf-controls.json      # 1,451 controls with mappings
-│   │   └── framework-to-scf.json  # Framework → SCF mappings
-│   ├── data_loader.py         # SCF data loading logic
-│   └── tools/                 # MCP tool implementations
-│       ├── version_info.py
-│       ├── list_frameworks.py
-│       ├── get_control.py
-│       ├── search_controls.py
-│       ├── get_framework_controls.py
-│       └── map_frameworks.py
-├── tests/                     # Comprehensive test suite
+│   ├── __main__.py            # Entry point (stdio transport)
+│   ├── server.py              # MCP server with 9 tools (stdio)
+│   ├── http_server.py         # HTTP/SSE server for Ansvar AI
+│   ├── data_loader.py         # SCF data loading & search logic
+│   ├── config.py              # User config & paid standards paths
+│   ├── registry.py            # Standard provider registry
+│   ├── providers.py           # Paid standard providers
+│   ├── legal_notice.py        # License compliance notices
+│   ├── cli.py                 # PDF import CLI (optional)
+│   └── data/
+│       ├── scf-controls.json      # 1,451 controls with mappings
+│       └── framework-to-scf.json  # Framework → SCF reverse index
+├── tests/                     # 127 tests
 ├── docs/
 │   ├── ANSVAR_MCP_ARCHITECTURE.md  # **Central architecture doc**
 │   └── coverage.md            # Framework coverage details
-└── pyproject.toml             # Poetry configuration
+└── pyproject.toml             # Package configuration
 ```
 
 ## Available Tools
 
 ### 1. `version_info`
-Get MCP server version and statistics
+Get MCP server version, statistics, and database info
 
-### 2. `list_frameworks`
-List all 28 supported frameworks with control counts
+### 2. `get_control`
+Retrieve a specific control by ID (e.g., GOV-01)
 
-### 3. `get_control`
-Retrieve a specific control by ID from any framework
+### 3. `search_controls`
+Full-text search across all controls by keyword
 
-### 4. `search_controls`
-Full-text search across all controls
+### 4. `list_frameworks`
+List all 261 supported frameworks with control counts
 
 ### 5. `get_framework_controls`
 Get all controls for a specific framework
 
 ### 6. `map_frameworks`
 Map controls between any two frameworks (bidirectional)
+
+### 7. `list_available_standards`
+List all available standards (SCF built-in + purchased)
+
+### 8. `query_standard`
+Search within a purchased standard's official text
+
+### 9. `get_clause`
+Get full text of a specific clause from a purchased standard
 
 ## Framework IDs
 
@@ -162,6 +171,7 @@ poetry run pytest tests/test_map_frameworks.py -v
 - **Controls**: 1,451 unique controls
 - **Mappings**: 50,000+ bidirectional relationships
 - **Database Size**: ~7MB (JSON)
+- **Tools**: 9 (6 core + 3 paid standards)
 - **Tests**: 127 passing
 
 ## Version History

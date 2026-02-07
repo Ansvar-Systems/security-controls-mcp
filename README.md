@@ -123,6 +123,9 @@ See [docs/coverage.md](docs/coverage.md) for the complete list of 261 frameworks
 
 ### Core Tools
 
+**`version_info()`** - Get server version, statistics, and top frameworks
+- Call this first to understand what data is available
+
 **`list_frameworks()`** - List all 261 frameworks with control counts
 
 **`get_control(control_id)`** - Get full details for a specific SCF control

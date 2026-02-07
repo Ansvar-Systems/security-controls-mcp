@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-02-05
+
+### Added
+- **Major framework expansion: 28 → 261 frameworks** (+832% increase)
+- **AI Governance frameworks:** ISO 42001:2023, NIST AI RMF 1.0, NIST AI 600-1, EU AI Act, EU Cyber Resilience Act
+- **Cloud security:** CSA STAR, StateRAMP, GovRAMP, TX-RAMP
+- **Industrial/OT:** IEC 62443, NERC CIP, NIST 800-82 R3 overlays
+- **Automotive:** ISO/SAE 21434, TISAX, UN R155/R156
+- **Privacy:** 20+ national privacy frameworks worldwide
+- **Regional:** 50+ country-specific frameworks (APAC, EU, Middle East, Americas)
+- New `version_info` tool for agents to discover server capabilities
+- HTTP server (`http_server.py`) with REST API and MCP-over-SSE transport
+- Framework categories for filtering (ai_governance, cloud_security, privacy, etc.)
+
+### Changed
+- Tool count increased from 8 to 9 (added `version_info`)
+- Updated framework metadata with 261 display names
+- HTTP server version corrected to 0.4.0
+- Added `notifications/initialized` and `ping` handlers to HTTP MCP endpoint
+
+### Technical
+- All 127 tests passing
+- HTTP server supports both MCP JSON-RPC and REST API endpoints
+- Proper `datetime.now(timezone.utc)` usage (replaces deprecated `utcnow()`)
+
 ## [0.3.5] - 2026-02-01
 
 ### Fixed

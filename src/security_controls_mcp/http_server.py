@@ -6,6 +6,7 @@ Compatible with Ansvar platform's HTTP MCP client.
 """
 import json
 import os
+from datetime import datetime, timezone
 from typing import Dict
 
 import uvicorn
@@ -18,6 +19,8 @@ from starlette.routing import Route
 from .data_loader import SCFData
 from .legal_notice import print_legal_notice
 
+SERVER_VERSION = "0.4.0"
+
 # Initialize data loader
 scf_data = SCFData()
 
@@ -29,6 +32,17 @@ mcp_server = Server("security-controls-mcp")
 async def list_tools() -> list[Tool]:
     """List available tools."""
     return [
+        Tool(
+            name="version_info",
+            description=(
+                "Get server version, statistics, and database info. "
+                "Call this first to understand what data is available."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {},
+            },
+        ),
         Tool(
             name="get_control",
             description="Get details about a specific SCF control by its ID (e.g., GOV-01, IAC-05)",
@@ -155,7 +169,29 @@ async def list_tools() -> list[Tool]:
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     """Handle tool calls."""
 
-    if name == "get_control":
+    if name == "version_info":
+        # Collect framework categories for summary
+        top_frameworks = sorted(
+            scf_data.frameworks.values(),
+            key=lambda x: x["controls_mapped"],
+            reverse=True,
+        )[:10]
+
+        text = f"**Security Controls MCP Server v{SERVER_VERSION}**\n\n"
+        text += f"**Database:** SCF 2025.4\n"
+        text += f"**Controls:** {len(scf_data.controls)} unique controls\n"
+        text += f"**Frameworks:** {len(scf_data.frameworks)} supported\n\n"
+        text += "**Top 10 Frameworks by Coverage:**\n"
+        for fw in top_frameworks:
+            text += f"- `{fw['key']}`: {fw['name']} ({fw['controls_mapped']} controls)\n"
+        text += (
+            "\n*Use `list_frameworks` for the complete list, "
+            "`search_controls` to find controls by keyword, "
+            "and `map_frameworks` to map between any two frameworks.*"
+        )
+        return [TextContent(type="text", text=text)]
+
+    elif name == "get_control":
         control_id = arguments["control_id"]
         include_mappings = arguments.get("include_mappings", True)
 
@@ -342,13 +378,114 @@ async def health_check(request):
     """Health check endpoint."""
     return JSONResponse(
         {
-            "status": "ok",
-            "server": "security-controls-mcp",
-            "database_version": "SCF 2025.4",
+            "status": "healthy",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "database": {"connected": True, "type": "json", "version": "SCF 2025.4"},
+            "service": "security-controls-api",
             "controls_count": len(scf_data.controls),
             "frameworks_count": len(scf_data.frameworks),
         }
     )
+
+
+# ============== REST API ENDPOINTS ==============
+
+async def api_search_controls(request):
+    """REST API: Search controls by keyword."""
+    try:
+        body = await request.json()
+        query = body.get("query", "")
+        frameworks = body.get("frameworks")
+        limit = body.get("limit", 10)
+
+        if not query:
+            return JSONResponse({"error": "Bad Request", "message": "Query is required"}, status_code=400)
+
+        results = scf_data.search_controls(query, frameworks, limit)
+        return JSONResponse({
+            "query": query,
+            "count": len(results),
+            "results": results
+        })
+    except Exception as e:
+        return JSONResponse({"error": "Internal Server Error", "message": str(e)}, status_code=500)
+
+
+async def api_get_control(request):
+    """REST API: Get specific control by ID."""
+    control_id = request.path_params["control_id"]
+    include_mappings = request.query_params.get("include_mappings", "true").lower() == "true"
+
+    control = scf_data.get_control(control_id)
+    if not control:
+        return JSONResponse({"error": "Not Found", "message": f"Control {control_id} not found"}, status_code=404)
+
+    response = {
+        "id": control["id"],
+        "domain": control["domain"],
+        "name": control["name"],
+        "description": control["description"],
+        "weight": control["weight"],
+        "pptdf": control["pptdf"],
+        "validation_cadence": control["validation_cadence"],
+    }
+    if include_mappings:
+        response["framework_mappings"] = control["framework_mappings"]
+
+    return JSONResponse(response)
+
+
+async def api_list_frameworks(request):
+    """REST API: List all frameworks."""
+    frameworks = list(scf_data.frameworks.values())
+    frameworks.sort(key=lambda x: x["controls_mapped"], reverse=True)
+    return JSONResponse({
+        "count": len(frameworks),
+        "frameworks": frameworks
+    })
+
+
+async def api_map_frameworks(request):
+    """REST API: Map controls between frameworks."""
+    try:
+        body = await request.json()
+        source_framework = body.get("source_framework")
+        target_framework = body.get("target_framework")
+        source_control = body.get("source_control")
+
+        if not source_framework or not target_framework:
+            return JSONResponse({"error": "Bad Request", "message": "source_framework and target_framework required"}, status_code=400)
+
+        if source_framework not in scf_data.frameworks:
+            return JSONResponse({"error": "Not Found", "message": f"Framework {source_framework} not found"}, status_code=404)
+        if target_framework not in scf_data.frameworks:
+            return JSONResponse({"error": "Not Found", "message": f"Framework {target_framework} not found"}, status_code=404)
+
+        mappings = scf_data.map_frameworks(source_framework, target_framework, source_control)
+        return JSONResponse({
+            "source_framework": source_framework,
+            "target_framework": target_framework,
+            "count": len(mappings),
+            "mappings": mappings
+        })
+    except Exception as e:
+        return JSONResponse({"error": "Internal Server Error", "message": str(e)}, status_code=500)
+
+
+async def api_root(request):
+    """REST API: Root endpoint."""
+    return JSONResponse({
+        "service": "security-controls-api",
+        "version": SERVER_VERSION,
+        "database": "SCF 2025.4",
+        "endpoints": {
+            "health": "/health",
+            "search": "POST /api/search",
+            "control": "GET /api/controls/{control_id}",
+            "frameworks": "GET /api/frameworks",
+            "map": "POST /api/map"
+        }
+    })
 
 
 async def mcp_endpoint(request):
@@ -368,11 +505,22 @@ async def mcp_endpoint(request):
                 "result": {
                     "protocolVersion": "2024-11-05",
                     "capabilities": {"tools": {}},
-                    "serverInfo": {"name": "security-controls-mcp", "version": "0.1.0"},
+                    "serverInfo": {"name": "security-controls-mcp", "version": SERVER_VERSION},
                 },
             }
             return StreamingResponse(
                 iter([f"event: message\ndata: {json.dumps(response)}\n\n"]),
+                media_type="text/event-stream",
+            )
+
+        # Handle notifications (no response needed per JSON-RPC)
+        elif method == "notifications/initialized":
+            return JSONResponse({"jsonrpc": "2.0", "id": request_id, "result": {}})
+
+        # Handle ping
+        elif method == "ping":
+            return StreamingResponse(
+                iter([f"event: message\ndata: {json.dumps({'jsonrpc': '2.0', 'id': request_id, 'result': {}})}\n\n"]),
                 media_type="text/event-stream",
             )
 
@@ -442,11 +590,19 @@ async def mcp_endpoint(request):
         )
 
 
-# Starlette app
+# Starlette app - serves both MCP and REST API
 app = Starlette(
     routes=[
+        # Health & root
         Route("/health", health_check),
+        Route("/", api_root),
+        # MCP protocol endpoint
         Route("/mcp", mcp_endpoint, methods=["POST"]),
+        # REST API endpoints
+        Route("/api/search", api_search_controls, methods=["POST"]),
+        Route("/api/controls/{control_id}", api_get_control),
+        Route("/api/frameworks", api_list_frameworks),
+        Route("/api/map", api_map_frameworks, methods=["POST"]),
     ],
 )
 

@@ -22,10 +22,24 @@ registry = StandardRegistry(config)
 app = Server("security-controls-mcp")
 
 
+SERVER_VERSION = "0.4.0"
+
+
 @app.list_tools()
 async def list_tools() -> list[Tool]:
     """List available tools."""
     return [
+        Tool(
+            name="version_info",
+            description=(
+                "Get server version, statistics, and database info. "
+                "Call this first to understand what data is available."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {},
+            },
+        ),
         Tool(
             name="get_control",
             description="Get details about a specific SCF control by its ID (e.g., GOV-01, IAC-05)",
@@ -215,7 +229,37 @@ async def list_tools() -> list[Tool]:
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     """Handle tool calls."""
 
-    if name == "get_control":
+    if name == "version_info":
+        top_frameworks = sorted(
+            scf_data.frameworks.values(),
+            key=lambda x: x["controls_mapped"],
+            reverse=True,
+        )[:10]
+
+        text = f"**Security Controls MCP Server v{SERVER_VERSION}**\n\n"
+        text += f"**Database:** SCF 2025.4\n"
+        text += f"**Controls:** {len(scf_data.controls)} unique controls\n"
+        text += f"**Frameworks:** {len(scf_data.frameworks)} supported\n\n"
+        text += "**Top 10 Frameworks by Coverage:**\n"
+        for fw in top_frameworks:
+            text += f"- `{fw['key']}`: {fw['name']} ({fw['controls_mapped']} controls)\n"
+        text += (
+            "\n*Use `list_frameworks` for the complete list, "
+            "`search_controls` to find controls by keyword, "
+            "and `map_frameworks` to map between any two frameworks.*"
+        )
+
+        if registry.has_paid_standards():
+            standards = registry.list_standards()
+            paid = [s for s in standards if s["type"] == "paid"]
+            if paid:
+                text += f"\n\n**Paid Standards Loaded:** {len(paid)}\n"
+                for s in paid:
+                    text += f"- {s['title']} (`{s['standard_id']}`)\n"
+
+        return [TextContent(type="text", text=text)]
+
+    elif name == "get_control":
         control_id = arguments["control_id"]
         include_mappings = arguments.get("include_mappings", True)
 
