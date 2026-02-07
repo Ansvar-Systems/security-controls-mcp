@@ -6,8 +6,9 @@ We release security updates for the following versions:
 
 | Version | Supported |
 | ------- | --------- |
+| 0.4.x   | Yes       |
 | 0.3.x   | Yes       |
-| 0.2.x   | Yes       |
+| 0.2.x   | No        |
 | 0.1.x   | No        |
 
 ## Reporting a Vulnerability
@@ -57,6 +58,62 @@ This MCP server:
 - **Does NOT require authentication** or API keys
 - **Operates entirely offline** using bundled JSON data
 
+### Deployment Modes
+
+This server supports two deployment modes with different security profiles:
+
+#### 1. Stdio Mode (Default - Local Only)
+
+**Recommended for:** Claude Desktop, Claude Code, local development
+
+**Security characteristics:**
+- ✅ No network exposure (stdio transport only)
+- ✅ Process isolation via operating system
+- ✅ No authentication needed (local IPC)
+- ✅ Minimal file writes (optional user config at `~/.security-controls-mcp/`)
+
+**Usage:**
+```bash
+# Install with pipx
+pipx install security-controls-mcp
+
+# Add to Claude Desktop config
+{
+  "mcpServers": {
+    "security-controls": {
+      "command": "scf-mcp"
+    }
+  }
+}
+```
+
+#### 2. HTTP Mode (Docker - Remote Access)
+
+**Recommended for:** Ansvar AI platform, internal deployments, CI/CD integrations
+
+**Security characteristics:**
+- ⚠️ **Network exposed** (binds to `0.0.0.0:3000` in container)
+- ⚠️ **No built-in authentication** (relies on network isolation)
+- ⚠️ **Requires security controls:** firewall, VPN, reverse proxy, or private network
+- ✅ Runs as non-root user (UID 1001)
+- ✅ Alpine-based minimal container
+- ✅ Health check endpoint (`/health`)
+
+**Usage:**
+```bash
+# Run with Docker
+docker run -p 3000:3000 security-controls-mcp
+
+# IMPORTANT: Only expose on trusted networks
+# Use with reverse proxy (nginx, Caddy) for TLS + auth
+```
+
+**Production deployment requirements:**
+1. **Network Isolation:** Deploy behind firewall or VPN
+2. **TLS Termination:** Use reverse proxy (nginx, Caddy, Traefik)
+3. **Authentication:** Implement at reverse proxy level (OAuth, mTLS, API keys)
+4. **Monitoring:** Enable container health checks and logging
+
 ### Safe Usage
 
 1. **Verify Package Integrity**
@@ -86,20 +143,30 @@ This MCP server:
    ```
 
 4. **Review Configuration**
-   - Only add this server to your Claude Desktop/Code configuration
-   - Do not expose the server over a network
-   - The server uses stdio communication only (local only)
+   - For stdio mode: Only add to Claude Desktop/Code (local only)
+   - For HTTP mode: Deploy behind firewall/VPN with authentication
+   - Never expose HTTP mode directly to the public internet without authentication
 
 ### Known Safe Operations
 
 The following are **intentionally designed** and safe:
-- Reading bundled JSON data files
-- In-memory data indexing
-- Local stdio communication with MCP clients
-- No file writes (read-only operation)
-- No network requests
+
+**Both modes:**
+- Reading bundled JSON data files (14 MB SCF controls)
+- In-memory data indexing and full-text search
+- No external API calls (fully offline)
 - No subprocess execution
 - No dynamic code evaluation
+
+**Stdio mode specific:**
+- Local stdio communication only
+- Optional config file writes (`~/.security-controls-mcp/config.json`)
+- No network exposure
+
+**HTTP mode specific:**
+- HTTP/SSE transport for MCP protocol
+- Network binding (requires proper deployment security)
+- Health check endpoint for monitoring
 
 ## Security Considerations
 
@@ -113,27 +180,44 @@ This project bundles data from the [Secure Controls Framework (SCF)](https://sec
 
 ### Dependencies
 
-Runtime dependencies are minimal:
+**Stdio mode (minimal):**
 - `mcp>=0.9.0` (Model Context Protocol SDK)
 
-Development dependencies:
-- `pytest`, `pytest-asyncio` (testing only)
-- `black`, `ruff` (code quality only)
+**HTTP mode (adds):**
+- `uvicorn` (ASGI server)
+- `starlette` (web framework)
+
+**Development only:**
+- `pytest`, `pytest-asyncio` (testing)
+- `black`, `ruff` (code quality)
 
 ### Attack Surface
 
-**Minimal attack surface:**
-- No network exposure (stdio only)
-- No external API calls
-- No file system writes
-- No user authentication
-- No dynamic code execution
-- No subprocess spawning
+**Stdio mode (minimal attack surface):**
+- ✅ No network exposure
+- ✅ Process isolation via OS
+- ✅ Optional config file writes only
+- ⚠️ Trusts local MCP client (Claude Desktop/Code)
+
+**HTTP mode (expanded attack surface):**
+- ⚠️ Network exposed (port 3000)
+- ⚠️ No built-in authentication
+- ⚠️ HTTP headers/cookies accepted
+- ✅ No file uploads accepted
+- ✅ Read-only data operations
+- ✅ Runs as non-root in container
+
+**Common to both modes:**
+- ✅ No external API calls
+- ✅ No dynamic code execution
+- ✅ No subprocess spawning
+- ✅ Bundled data only (14 MB SCF controls)
 
 **Potential risks (and mitigations):**
-1. **Malicious data files** → Verified checksums, read-only access
-2. **Dependency vulnerabilities** → Dependabot monitoring, minimal deps
-3. **MCP protocol issues** → Uses official MCP SDK, stdio isolation
+1. **Malicious data files** → SHA256 verification, read-only bundled data
+2. **Dependency vulnerabilities** → Dependabot monitoring, minimal dependencies
+3. **HTTP mode exposure** → Deploy behind auth, use network isolation
+4. **MCP protocol issues** → Uses official MCP SDK (v0.9.0+)
 
 ## Security Updates
 
@@ -164,5 +248,5 @@ For general issues, use: [GitHub Issues](https://github.com/Ansvar-Systems/secur
 
 ---
 
-**Last Updated**: 2026-01-29
-**Policy Version**: 1.0
+**Last Updated**: 2026-02-07
+**Policy Version**: 2.0
