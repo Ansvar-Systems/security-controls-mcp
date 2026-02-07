@@ -22,7 +22,7 @@ registry = StandardRegistry(config)
 app = Server("security-controls-mcp")
 
 
-SERVER_VERSION = "0.4.1"
+SERVER_VERSION = "0.4.2"
 
 
 @app.list_tools()

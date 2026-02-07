@@ -22,7 +22,7 @@ from .legal_notice import print_legal_notice
 
 logger = logging.getLogger(__name__)
 
-SERVER_VERSION = "0.4.1"
+SERVER_VERSION = "0.4.2"
 
 # Initialize data loader
 scf_data = SCFData()
