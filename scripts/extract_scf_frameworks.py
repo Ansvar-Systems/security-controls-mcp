@@ -508,7 +508,6 @@ def main():
     sorted_stats = sorted(stats.items(), key=lambda x: x[1], reverse=True)
     print("\nTop 20 frameworks by control count:")
     for fw_id, count in sorted_stats[:20]:
-        fw_name = next((v[1] for v in FRAMEWORK_COLUMNS.values() if v[0] == fw_id), fw_id)
         print(f"  {fw_id}: {count} controls")
 
     # Tier 0 stats

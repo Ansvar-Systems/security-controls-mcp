@@ -101,10 +101,10 @@ Get full text of a specific clause from a purchased standard
 ```python
 # Use these IDs with the tools
 FRAMEWORKS = [
-    "iso_27001_2022", "iso_27002_2022", "nist_csf_2_0",
-    "nist_800_53_r5", "dora", "pci_dss_4_0", "soc_2",
-    "cmmc_2_0", "fedramp_high", "cis_controls_v8",
-    # ... 18 more (see docs/coverage.md)
+    "iso_27001_2022", "iso_27002_2022", "nist_csf_2.0",
+    "nist_800_53_r5", "dora", "pci_dss_4.0.1", "soc_2_tsc",
+    "cmmc_2.0_level_2", "fedramp_r5_high", "cis_csc_8.1",
+    # ... 251 more (use list_frameworks tool to see all)
 ]
 ```
 

@@ -116,7 +116,7 @@ async def list_tools() -> list[Tool]:
                 "properties": {
                     "framework": {
                         "type": "string",
-                        "description": "Framework key (e.g., dora, iso_27001_2022, nist_csf_2_0)",
+                        "description": "Framework key (e.g., dora, iso_27001_2022, nist_csf_2.0)",
                     },
                     "include_descriptions": {
                         "type": "boolean",

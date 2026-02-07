@@ -4,7 +4,7 @@
 #
 # Using Alpine for minimal CVE footprint
 
-FROM python:3.11-alpine AS builder
+FROM python:3.11-alpine@sha256:6ce68f8bfbb40866c43b271be97d7fccc4f700c0af2a07d2ef3c7c7da93e1f8a AS builder
 
 WORKDIR /app
 
@@ -15,15 +15,16 @@ RUN apk add --no-cache gcc musl-dev
 COPY pyproject.toml README.md ./
 COPY src/ ./src/
 
-# Install package and fix known CVEs
-RUN pip install --no-cache-dir -e . && \
+# Upgrade pip to fix CVE-2026-1703, install package, and fix known CVEs
+RUN pip install --no-cache-dir "pip>=26.0" && \
+    pip install --no-cache-dir -e . && \
     pip install --no-cache-dir "jaraco.context>=6.1.0" "wheel>=0.46.2"
 
 # Install additional runtime dependencies
 RUN pip install --no-cache-dir uvicorn starlette
 
 # Production stage - minimal Alpine image
-FROM python:3.11-alpine
+FROM python:3.11-alpine@sha256:6ce68f8bfbb40866c43b271be97d7fccc4f700c0af2a07d2ef3c7c7da93e1f8a
 
 WORKDIR /app
 

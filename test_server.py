@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Test server startup to verify all imports and initialization work correctly."""
 
-import asyncio
 import sys
 
 
