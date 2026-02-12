@@ -6,6 +6,7 @@ from typing import Optional
 import pytest
 
 from security_controls_mcp.extractors.base import (
+    BaseExtractor,
     Control,
     ExtractionComparison,
     ExtractionResult,
@@ -237,3 +238,101 @@ def test_extraction_comparison_generic_better():
 
     assert comparison.recommendation == "use_generic"
     assert len(comparison.unique_to_generic) == 1
+
+
+# ============================================================================
+# BaseExtractor Tests
+# ============================================================================
+
+
+def test_base_extractor_cannot_instantiate():
+    """Test that BaseExtractor cannot be instantiated directly (is abstract)."""
+    with pytest.raises(TypeError) as exc_info:
+        BaseExtractor()  # type: ignore
+
+    # Should complain about abstract methods
+    assert "abstract" in str(exc_info.value).lower()
+
+
+def test_base_extractor_requires_extract_method():
+    """Test that subclasses must implement extract() method."""
+
+    # Missing extract() method
+    class IncompleteExtractor(BaseExtractor):
+        pass
+
+    with pytest.raises(TypeError) as exc_info:
+        IncompleteExtractor()  # type: ignore
+
+    # Should mention the missing abstract method
+    assert "extract" in str(exc_info.value).lower()
+
+
+def test_base_extractor_correct_implementation():
+    """Test that a correct implementation can be instantiated."""
+
+    class ConcreteExtractor(BaseExtractor):
+        def extract(self, pdf_bytes: bytes) -> ExtractionResult:
+            """Minimal implementation."""
+            return ExtractionResult(
+                standard_id="test_standard",
+                version="1.0",
+                version_detection=VersionDetection.DETECTED,
+                version_evidence=["Test evidence"],
+                controls=[],
+                expected_control_ids=None,
+                missing_control_ids=None,
+                confidence_score=1.0,
+                extraction_method="test",
+                extraction_duration_seconds=0.0,
+                warnings=[],
+            )
+
+    # Should be able to instantiate
+    extractor = ConcreteExtractor()
+    assert isinstance(extractor, BaseExtractor)
+
+    # Should be able to call extract
+    result = extractor.extract(b"fake pdf bytes")
+    assert isinstance(result, ExtractionResult)
+    assert result.standard_id == "test_standard"
+
+
+def test_base_extractor_extract_signature():
+    """Test that extract method has correct signature."""
+
+    class TestExtractor(BaseExtractor):
+        def extract(self, pdf_bytes: bytes) -> ExtractionResult:
+            """Test implementation."""
+            return ExtractionResult(
+                standard_id="test",
+                version="1.0",
+                version_detection=VersionDetection.DETECTED,
+                version_evidence=[],
+                controls=[],
+                expected_control_ids=None,
+                missing_control_ids=None,
+                confidence_score=1.0,
+                extraction_method="test",
+                extraction_duration_seconds=0.0,
+                warnings=[],
+            )
+
+    extractor = TestExtractor()
+
+    # Method should accept bytes
+    pdf_data = b"%PDF-1.4 fake content"
+    result = extractor.extract(pdf_data)
+
+    # Should return ExtractionResult
+    assert isinstance(result, ExtractionResult)
+
+    # Verify it's callable with bytes
+    import inspect
+
+    sig = inspect.signature(extractor.extract)
+    params = list(sig.parameters.values())
+
+    # Should have one parameter: pdf_bytes
+    assert len(params) == 1
+    assert params[0].name == "pdf_bytes"

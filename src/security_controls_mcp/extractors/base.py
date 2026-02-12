@@ -1,5 +1,6 @@
 """Base dataclasses for security standard extraction."""
 
+import abc
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional
@@ -52,3 +53,29 @@ class ExtractionComparison:
     unique_to_specialized: List[str]
     unique_to_generic: List[str]
     recommendation: str
+
+
+class BaseExtractor(abc.ABC):
+    """Abstract base class for all security standard extractors.
+
+    All specialized extractors (ISO 27001, NIST 800-53, etc.) and the generic
+    extractor must inherit from this class and implement the extract() method.
+
+    This ensures a consistent interface for all extractors.
+    """
+
+    @abc.abstractmethod
+    def extract(self, pdf_bytes: bytes) -> ExtractionResult:
+        """Extract controls from a PDF document.
+
+        Args:
+            pdf_bytes: Raw bytes of the PDF document to extract from.
+
+        Returns:
+            ExtractionResult containing extracted controls, version info,
+            and metadata about the extraction process.
+
+        Raises:
+            Exception: May raise various exceptions during PDF processing.
+        """
+        pass
