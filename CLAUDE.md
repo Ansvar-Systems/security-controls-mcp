@@ -50,22 +50,99 @@ security-controls-mcp/
 ├── src/security_controls_mcp/
 │   ├── __main__.py            # Entry point (stdio transport)
 │   ├── server.py              # MCP server with 9 tools (stdio)
-│   ├── http_server.py         # HTTP/SSE server for Ansvar AI
+│   ├── http_server.py         # HTTP/SSE server with web UI for standards import
 │   ├── data_loader.py         # SCF data loading & search logic
 │   ├── config.py              # User config & paid standards paths
 │   ├── registry.py            # Standard provider registry
 │   ├── providers.py           # Paid standard providers
 │   ├── legal_notice.py        # License compliance notices
 │   ├── cli.py                 # PDF import CLI (optional)
+│   ├── extractors/            # **NEW: Standards extraction framework**
+│   │   ├── base.py            # Base classes & data structures
+│   │   ├── registry.py        # Extractor registry & auto-discovery
+│   │   └── specialized/       # 12 specialized extractors
+│   │       ├── iso_27001.py   # ISO 27001 (2022 & 2013)
+│   │       ├── nist_800_53.py # NIST 800-53 R5
+│   │       ├── iso_21434.py   # Automotive cybersecurity
+│   │       ├── soc2.py        # SOC 2 Trust Services
+│   │       ├── pci_dss.py     # PCI DSS 4.0/3.2.1
+│   │       ├── iec_62443.py   # Industrial/OT security
+│   │       ├── cis_controls.py# CIS Controls v8
+│   │       ├── iso_27701.py   # Privacy management
+│   │       ├── iso_42001.py   # AI management
+│   │       ├── nist_ai_rmf.py # NIST AI RMF
+│   │       ├── gdpr.py        # EU GDPR
+│   │       └── ccpa.py        # California CCPA/CPRA
 │   └── data/
 │       ├── scf-controls.json      # 1,451 controls with mappings
 │       └── framework-to-scf.json  # Framework → SCF reverse index
-├── tests/                     # 127 tests
+├── tests/                     # 242 tests (all passing)
 ├── docs/
 │   ├── ANSVAR_MCP_ARCHITECTURE.md  # **Central architecture doc**
-│   └── coverage.md            # Framework coverage details
+│   ├── coverage.md            # Framework coverage details
+│   └── plans/                 # Implementation plans
 └── pyproject.toml             # Package configuration
 ```
+
+## Standards Import Feature (NEW in v0.5.0)
+
+### Web UI for Standards Upload
+Business users can upload purchased standards (ISO, NIST, etc.) via a web interface:
+
+```bash
+# Start HTTP server with web UI
+python -m security_controls_mcp.http_server --port 8000
+
+# Open browser to http://localhost:8000/standards/upload
+# Upload PDF → See extracted controls with confidence scoring
+```
+
+### 12 Specialized Extractors
+
+Automatically extracts controls from diverse standard types:
+
+**IT/Cloud Security:**
+- ISO 27001 (2022: 93 controls, 2013: 114 controls)
+- NIST 800-53 (R5: 320 controls across 20 families)
+- SOC 2 (Trust Services Criteria with 5 categories)
+- PCI DSS (v4.0/v3.2.1 with 12 requirements)
+- CIS Controls (v8: 18 controls, 153 safeguards)
+
+**OT/ICS:** IEC 62443 (Industrial cybersecurity)
+
+**Automotive:** ISO 21434 (Automotive cybersecurity)
+
+**Privacy:**
+- ISO 27701 (Privacy management system)
+- GDPR (EU Regulation 2016/679, 99 articles)
+- CCPA/CPRA (California privacy law)
+
+**AI Governance:**
+- ISO 42001 (AI management system)
+- NIST AI RMF (AI Risk Management Framework)
+
+### Extractor Features
+- **Version Detection**: Automatic version identification with confidence scoring
+- **Hierarchical Structure**: Parent-child relationships preserved
+- **Category Assignment**: Automatic categorization by standard structure
+- **Missing Control Detection**: Validates extraction completeness
+- **Evidence-Based Confidence**: Clear indicators of extraction quality
+
+### Adding New Extractors
+Create a new file in `src/security_controls_mcp/extractors/specialized/`:
+
+```python
+from ..base import BaseExtractor, Control, ExtractionResult, VersionDetection
+from ..registry import register_extractor
+
+@register_extractor("my_standard")
+class MyStandardExtractor(BaseExtractor):
+    def extract(self, pdf_bytes: bytes) -> ExtractionResult:
+        # Implement extraction logic
+        pass
+```
+
+The extractor auto-registers and becomes available immediately.
 
 ## Available Tools
 
@@ -172,10 +249,17 @@ poetry run pytest tests/test_map_frameworks.py -v
 - **Mappings**: 50,000+ bidirectional relationships
 - **Database Size**: ~7MB (JSON)
 - **Tools**: 9 (6 core + 3 paid standards)
-- **Tests**: 127 passing
+- **Tests**: 242 passing (100% pass rate)
+- **Specialized Extractors**: 12 (NEW in v0.5.0)
+  - IT/Cloud: ISO 27001, NIST 800-53, SOC 2, PCI DSS, CIS Controls
+  - OT/ICS: IEC 62443
+  - Automotive: ISO 21434
+  - Privacy: ISO 27701, GDPR, CCPA
+  - AI: ISO 42001, NIST AI RMF
 
 ## Version History
 
+- **v0.5.0** (2026-02-12): Standards import feature with 12 specialized extractors, web UI, auto-discovery registry
 - **v0.4.0** (2026-02-05): Major framework expansion (28→261), AI governance support
 - **v0.3.5** (2026-02-01): Entry point fix
 - **v0.2.1** (2026-01-29): Framework expansion (16→28 frameworks)

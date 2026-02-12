@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-02-12
+
+### Added
+- **Standards Import Feature** - Web UI and API for uploading purchased standards (ISO, NIST, etc.)
+- **12 Specialized Extractors** with automatic control extraction:
+  - **IT/Cloud:** ISO 27001 (2022 & 2013), NIST 800-53 R5, SOC 2, PCI DSS (4.0/3.2.1), CIS Controls v8
+  - **OT/ICS:** IEC 62443 (industrial cybersecurity)
+  - **Automotive:** ISO/SAE 21434:2021
+  - **Privacy:** ISO 27701, GDPR (EU 2016/679), CCPA/CPRA
+  - **AI Governance:** ISO 42001:2023, NIST AI RMF 1.0
+- **Web Upload Interface** at `/standards/upload` with:
+  - Drag-and-drop PDF upload
+  - Real-time extraction with confidence scoring
+  - Control categorization and validation
+  - Missing control detection
+- **Auto-Discovery Registry** - New extractors self-register via decorator pattern
+- **Version Detection** - Automatic identification of standard versions with evidence
+- **Hierarchical Extraction** - Parent-child relationships preserved
+- **Multi-Version Support** - ISO 27001 (2022: 93 controls, 2013: 114 controls), PCI DSS (4.0/3.2.1)
+
+### Technical
+- Added `extractors/` framework with base classes and registry pattern
+- 115 new tests for extractors (242 total, 100% pass rate)
+- Security hardening: File size limits, magic byte validation, CSP headers
+- Evidence-based confidence scoring for extraction quality
+- TDD approach throughout implementation
+
+### Changed
+- HTTP server now includes standards import web UI
+- Test count increased from 127 to 242
+- Enhanced project structure with extractors module
+
 ## [0.4.0] - 2026-02-05
 
 ### Added
