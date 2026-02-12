@@ -50,8 +50,11 @@ def test_iso27001_extractor_has_versions():
     assert hasattr(extractor_class, "VERSIONS")
     versions = extractor_class.VERSIONS
     assert isinstance(versions, dict)
-    assert versions.get(2022) == 93
-    assert versions.get(2013) == 114
+    # Check that version configs exist and have count
+    assert 2022 in versions
+    assert 2013 in versions
+    assert versions[2022]["count"] == 93
+    assert versions[2013]["count"] == 114
 
 
 def test_iso27001_extractor_has_extract_method():
@@ -78,3 +81,41 @@ def test_iso27001_extractor_extract_returns_extraction_result():
     assert hasattr(result, "version")
     assert hasattr(result, "version_detection")
     assert hasattr(result, "warnings")
+
+
+def test_iso27001_2022_has_expected_ids():
+    """Test that VERSIONS[2022] contains expected_ids list with all 93 control IDs."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+
+    # Check structure
+    assert 2022 in extractor_class.VERSIONS
+    version_config = extractor_class.VERSIONS[2022]
+    assert isinstance(version_config, dict), "VERSIONS[2022] should be a dict"
+    assert "expected_ids" in version_config, "VERSIONS[2022] should have expected_ids"
+
+    # Check expected_ids is a list
+    expected_ids = version_config["expected_ids"]
+    assert isinstance(expected_ids, list), "expected_ids should be a list"
+
+    # Check count
+    assert len(expected_ids) == 93, f"Expected 93 control IDs, got {len(expected_ids)}"
+
+    # Check all IDs follow the pattern A.X.Y
+    for control_id in expected_ids:
+        assert isinstance(control_id, str), f"Control ID should be string: {control_id}"
+        assert control_id.startswith("A."), f"Control ID should start with A.: {control_id}"
+
+    # Check specific categories are present
+    organizational = [cid for cid in expected_ids if cid.startswith("A.5.")]
+    people = [cid for cid in expected_ids if cid.startswith("A.6.")]
+    physical = [cid for cid in expected_ids if cid.startswith("A.7.")]
+    technological = [cid for cid in expected_ids if cid.startswith("A.8.")]
+
+    assert len(organizational) == 37, f"Expected 37 A.5.x controls, got {len(organizational)}"
+    assert len(people) == 8, f"Expected 8 A.6.x controls, got {len(people)}"
+    assert len(physical) == 14, f"Expected 14 A.7.x controls, got {len(physical)}"
+    assert len(technological) == 34, f"Expected 34 A.8.x controls, got {len(technological)}"
+
+    # Check that all IDs are unique
+    assert len(expected_ids) == len(set(expected_ids)), "All control IDs should be unique"
