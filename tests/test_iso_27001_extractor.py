@@ -712,3 +712,233 @@ def test_extract_metadata_fields():
     assert result.extraction_duration_seconds >= 0.0
     assert result.warnings is not None
     assert isinstance(result.warnings, list)
+
+
+# ============================================================================
+# ISO 27001:2013 Tests
+# ============================================================================
+
+
+def test_iso27001_2013_has_expected_ids():
+    """Test that VERSIONS[2013] contains expected_ids list with all 114 control IDs."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+
+    # Check structure
+    assert 2013 in extractor_class.VERSIONS
+    version_config = extractor_class.VERSIONS[2013]
+    assert isinstance(version_config, dict), "VERSIONS[2013] should be a dict"
+    assert "expected_ids" in version_config, "VERSIONS[2013] should have expected_ids"
+
+    # Check expected_ids is a list
+    expected_ids = version_config["expected_ids"]
+    assert isinstance(expected_ids, list), "expected_ids should be a list"
+
+    # Check count
+    assert len(expected_ids) == 114, f"Expected 114 control IDs, got {len(expected_ids)}"
+
+    # Check all IDs follow the pattern A.X.Y
+    for control_id in expected_ids:
+        assert isinstance(control_id, str), f"Control ID should be string: {control_id}"
+        assert control_id.startswith("A."), f"Control ID should start with A.: {control_id}"
+
+    # Check that all IDs are unique
+    assert len(expected_ids) == len(set(expected_ids)), "All control IDs should be unique"
+
+    # Check specific categories exist (spot check)
+    a5_controls = [cid for cid in expected_ids if cid.startswith("A.5.")]
+    a9_controls = [cid for cid in expected_ids if cid.startswith("A.9.")]
+    a18_controls = [cid for cid in expected_ids if cid.startswith("A.18.")]
+
+    assert len(a5_controls) >= 2, "Should have A.5.x controls"
+    assert len(a9_controls) >= 10, "Should have A.9.x controls (Access control)"
+    assert len(a18_controls) >= 2, "Should have A.18.x controls (Compliance)"
+
+
+def test_extract_controls_2013_basic():
+    """Test basic control extraction from ISO 27001:2013 PDF."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    # Mock PDF with 2013 version and a few controls
+    pdf_text = b"""
+    ISO/IEC 27001:2013
+    Annex A
+    A.5 Information security policies
+
+    A.5.1.1 Policies for information security
+    A set of policies for information security shall be defined, approved by
+    management, published and communicated to employees and relevant external parties.
+
+    A.5.1.2 Review of the policies for information security
+    The policies for information security shall be reviewed at planned intervals or if
+    significant changes occur to ensure their continuing suitability, adequacy and effectiveness.
+
+    A.9 Access control
+
+    A.9.1.1 Access control policy
+    An access control policy shall be established, documented and reviewed based on business
+    and information security requirements.
+    """
+
+    result = extractor.extract(pdf_text)
+
+    # Should extract at least these 3 controls
+    assert len(result.controls) >= 3
+    control_ids = [c.id for c in result.controls]
+    assert "A.5.1.1" in control_ids
+    assert "A.5.1.2" in control_ids
+    assert "A.9.1.1" in control_ids
+
+
+def test_extract_controls_2013_sets_categories():
+    """Test that 2013 control categories are correctly set."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    pdf_text = b"""
+    ISO/IEC 27001:2013
+    A.5.1.1 Security policy control
+    Content for A.5.1.1
+
+    A.6.1.1 Organization control
+    Content for A.6.1.1
+
+    A.9.1.1 Access control
+    Content for A.9.1.1
+
+    A.18.1.1 Compliance control
+    Content for A.18.1.1
+    """
+
+    result = extractor.extract(pdf_text)
+
+    # Check categories are set correctly for 2013
+    a5_control = next((c for c in result.controls if c.id == "A.5.1.1"), None)
+    assert a5_control is not None
+    assert a5_control.category == "Information security policies"
+
+    a6_control = next((c for c in result.controls if c.id == "A.6.1.1"), None)
+    assert a6_control is not None
+    assert a6_control.category == "Organization of information security"
+
+    a9_control = next((c for c in result.controls if c.id == "A.9.1.1"), None)
+    assert a9_control is not None
+    assert a9_control.category == "Access control"
+
+    a18_control = next((c for c in result.controls if c.id == "A.18.1.1"), None)
+    assert a18_control is not None
+    assert a18_control.category == "Compliance"
+
+
+def test_extract_uses_extract_controls_2013_when_version_2013():
+    """Test that extract() uses _extract_controls_2013() when version is 2013."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    pdf_text = b"""
+    ISO/IEC 27001:2013
+    A.5.1.1 Test control
+    Content here
+    """
+
+    result = extractor.extract(pdf_text)
+
+    # Should detect as 2013
+    assert result.version == "2013"
+
+    # Should have extracted controls (proving _extract_controls_2013 was called)
+    assert len(result.controls) > 0
+
+    # extraction_method should indicate 2013
+    assert "2013" in result.extraction_method
+
+
+def test_extract_controls_2013_full_extraction():
+    """Test full extraction with all 114 controls for 2013 version."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    # Build PDF with all 114 controls
+    controls_text = ["ISO/IEC 27001:2013\n"]
+    for control_id in extractor_class.VERSIONS[2013]["expected_ids"]:
+        controls_text.append(f"{control_id} Control title\nControl content here.\n\n")
+
+    pdf_text = "".join(controls_text).encode()
+
+    result = extractor.extract(pdf_text)
+
+    # Should extract all 114 controls
+    assert len(result.controls) == 114
+
+    # Confidence should be high
+    assert result.confidence_score >= 0.9
+
+    # Should have no missing controls
+    assert result.missing_control_ids is not None
+    assert len(result.missing_control_ids) == 0
+
+
+def test_extract_controls_2013_validates_against_expected():
+    """Test that 2013 extraction validates against expected 114 control IDs."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    # Mock PDF with 2013 version
+    pdf_text = b"""
+    ISO/IEC 27001:2013
+    A.5.1.1 Title
+    Content
+    A.5.1.2 Title
+    Content
+    """
+
+    result = extractor.extract(pdf_text)
+
+    # Should have expected_control_ids set
+    assert result.expected_control_ids is not None
+    assert len(result.expected_control_ids) == 114
+
+    # Should calculate missing_control_ids
+    assert result.missing_control_ids is not None
+    # We only provided 2 controls, so should have 112 missing
+    assert len(result.missing_control_ids) == 112
+
+
+def test_extract_controls_2013_sets_parent():
+    """Test that parent relationships are correctly set for 2013 controls."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    pdf_text = b"""
+    ISO/IEC 27001:2013
+    A.5.1.1 Control title
+    Content
+
+    A.9.2.3 Control title
+    Content
+
+    A.18.1.5 Control title
+    Content
+    """
+
+    result = extractor.extract(pdf_text)
+
+    # Check parent structure (A.X.Y.Z -> A.X.Y)
+    a511 = next((c for c in result.controls if c.id == "A.5.1.1"), None)
+    assert a511 is not None
+    assert a511.parent == "A.5.1"
+
+    a923 = next((c for c in result.controls if c.id == "A.9.2.3"), None)
+    assert a923 is not None
+    assert a923.parent == "A.9.2"
+
+    a1815 = next((c for c in result.controls if c.id == "A.18.1.5"), None)
+    assert a1815 is not None
+    assert a1815.parent == "A.18.1"

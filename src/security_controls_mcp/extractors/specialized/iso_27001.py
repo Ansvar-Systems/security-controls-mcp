@@ -132,7 +132,136 @@ class ISO27001Extractor(BaseExtractor):
         },
         2013: {
             "count": 114,
-            "expected_ids": [],  # To be added in future tasks
+            "expected_ids": [
+                # A.5 Information security policies (2)
+                "A.5.1.1",
+                "A.5.1.2",
+                # A.6 Organization of information security (7)
+                "A.6.1.1",
+                "A.6.1.2",
+                "A.6.1.3",
+                "A.6.1.4",
+                "A.6.1.5",
+                "A.6.2.1",
+                "A.6.2.2",
+                # A.7 Human resource security (6)
+                "A.7.1.1",
+                "A.7.1.2",
+                "A.7.2.1",
+                "A.7.2.2",
+                "A.7.2.3",
+                "A.7.3.1",
+                # A.8 Asset management (10)
+                "A.8.1.1",
+                "A.8.1.2",
+                "A.8.1.3",
+                "A.8.1.4",
+                "A.8.2.1",
+                "A.8.2.2",
+                "A.8.2.3",
+                "A.8.3.1",
+                "A.8.3.2",
+                "A.8.3.3",
+                # A.9 Access control (14)
+                "A.9.1.1",
+                "A.9.1.2",
+                "A.9.2.1",
+                "A.9.2.2",
+                "A.9.2.3",
+                "A.9.2.4",
+                "A.9.2.5",
+                "A.9.2.6",
+                "A.9.3.1",
+                "A.9.4.1",
+                "A.9.4.2",
+                "A.9.4.3",
+                "A.9.4.4",
+                "A.9.4.5",
+                # A.10 Cryptography (2)
+                "A.10.1.1",
+                "A.10.1.2",
+                # A.11 Physical and environmental security (15)
+                "A.11.1.1",
+                "A.11.1.2",
+                "A.11.1.3",
+                "A.11.1.4",
+                "A.11.1.5",
+                "A.11.1.6",
+                "A.11.2.1",
+                "A.11.2.2",
+                "A.11.2.3",
+                "A.11.2.4",
+                "A.11.2.5",
+                "A.11.2.6",
+                "A.11.2.7",
+                "A.11.2.8",
+                "A.11.2.9",
+                # A.12 Operations security (14)
+                "A.12.1.1",
+                "A.12.1.2",
+                "A.12.1.3",
+                "A.12.1.4",
+                "A.12.2.1",
+                "A.12.3.1",
+                "A.12.4.1",
+                "A.12.4.2",
+                "A.12.4.3",
+                "A.12.4.4",
+                "A.12.5.1",
+                "A.12.6.1",
+                "A.12.6.2",
+                "A.12.7.1",
+                # A.13 Communications security (7)
+                "A.13.1.1",
+                "A.13.1.2",
+                "A.13.1.3",
+                "A.13.2.1",
+                "A.13.2.2",
+                "A.13.2.3",
+                "A.13.2.4",
+                # A.14 System acquisition, development and maintenance (13)
+                "A.14.1.1",
+                "A.14.1.2",
+                "A.14.1.3",
+                "A.14.2.1",
+                "A.14.2.2",
+                "A.14.2.3",
+                "A.14.2.4",
+                "A.14.2.5",
+                "A.14.2.6",
+                "A.14.2.7",
+                "A.14.2.8",
+                "A.14.2.9",
+                "A.14.3.1",
+                # A.15 Supplier relationships (5)
+                "A.15.1.1",
+                "A.15.1.2",
+                "A.15.1.3",
+                "A.15.2.1",
+                "A.15.2.2",
+                # A.16 Information security incident management (7)
+                "A.16.1.1",
+                "A.16.1.2",
+                "A.16.1.3",
+                "A.16.1.4",
+                "A.16.1.5",
+                "A.16.1.6",
+                "A.16.1.7",
+                # A.17 Information security aspects of business continuity management (4)
+                "A.17.1.1",
+                "A.17.1.2",
+                "A.17.1.3",
+                "A.17.2.1",
+                # A.18 Compliance (8)
+                "A.18.1.1",
+                "A.18.1.2",
+                "A.18.1.3",
+                "A.18.1.4",
+                "A.18.1.5",
+                "A.18.2.1",
+                "A.18.2.2",
+                "A.18.2.3",
+            ],
         },
     }
 
@@ -345,6 +474,178 @@ class ISO27001Extractor(BaseExtractor):
 
         return controls
 
+    def _extract_controls_2013(self, pdf_bytes: bytes) -> List[Control]:
+        """Extract controls from ISO 27001:2013 PDF.
+
+        Args:
+            pdf_bytes: Raw bytes of the ISO 27001:2013 PDF document.
+
+        Returns:
+            List of Control objects extracted from the PDF.
+
+        Note:
+            Handles control ID pattern matching for 2013 format (A.X.Y.Z).
+            Sets categories based on A.X prefix (5=Policies, 6=Organization, etc.).
+            Extracts control titles and content until next control or section.
+        """
+        controls: List[Control] = []
+
+        # Try to use pdfplumber for better text extraction
+        try:
+            import pdfplumber
+
+            with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+                for page_num, page in enumerate(pdf.pages):
+                    page_text = page.extract_text()
+                    if page_text:
+                        # Extract controls from this page
+                        page_controls = self._parse_controls_2013_from_text(
+                            page_text, page_num + 1
+                        )
+                        controls.extend(page_controls)
+        except ImportError:
+            logger.debug("pdfplumber not available, using fallback text extraction")
+            # Fall back to simple text extraction if pdfplumber not available
+            try:
+                text = pdf_bytes.decode("utf-8", errors="ignore")
+                page_controls = self._parse_controls_2013_from_text(text, 1)
+                controls.extend(page_controls)
+            except Exception as e:
+                logger.debug(f"Fallback text extraction failed: {e}")
+                # If all extraction methods fail, return empty list
+                return []
+        except Exception as e:
+            logger.debug(f"pdfplumber extraction failed: {e}")
+            # If pdfplumber fails, try simple text extraction
+            try:
+                text = pdf_bytes.decode("utf-8", errors="ignore")
+                page_controls = self._parse_controls_2013_from_text(text, 1)
+                controls.extend(page_controls)
+            except Exception as e2:
+                logger.debug(f"Fallback extraction failed: {e2}")
+                return []
+
+        return controls
+
+    def _parse_controls_2013_from_text(
+        self, text: str, page_num: int
+    ) -> List[Control]:
+        """Parse 2013 controls from text content.
+
+        Args:
+            text: Text content to parse.
+            page_num: Page number for tracking.
+
+        Returns:
+            List of Control objects found in the text.
+        """
+        controls: List[Control] = []
+        seen_ids = set()  # Track control IDs to detect duplicates
+
+        # Control ID pattern for 2013: A.X.Y.Z (with possible spacing variations)
+        # Matches: A.5.1.1, A.5.1.1 , A 5 1 1, etc.
+        control_pattern = r"A[\.\s]?(\d+)[\.\s]?(\d+)[\.\s]?(\d+)"
+
+        # Find all control IDs in the text
+        matches = list(re.finditer(control_pattern, text))
+
+        for i, match in enumerate(matches):
+            # Extract control ID parts
+            category_num = match.group(1)
+            subcategory_num = match.group(2)
+            control_num = match.group(3)
+            control_id = f"A.{category_num}.{subcategory_num}.{control_num}"
+
+            # Only process if this is an expected control ID
+            if control_id not in self.VERSIONS[2013]["expected_ids"]:
+                continue
+
+            # Determine category based on A.X prefix
+            category_map = {
+                "5": "Information security policies",
+                "6": "Organization of information security",
+                "7": "Human resource security",
+                "8": "Asset management",
+                "9": "Access control",
+                "10": "Cryptography",
+                "11": "Physical and environmental security",
+                "12": "Operations security",
+                "13": "Communications security",
+                "14": "System acquisition, development and maintenance",
+                "15": "Supplier relationships",
+                "16": "Information security incident management",
+                "17": "Information security aspects of business continuity management",
+                "18": "Compliance",
+            }
+            category = category_map.get(category_num, "Unknown")
+
+            # Set parent (e.g., A.5.1.1 -> A.5.1)
+            parent = f"A.{category_num}.{subcategory_num}"
+
+            # Extract title (text after control ID on same line or next line)
+            start_pos = match.end()
+            # Find the end of the line with the control ID
+            line_end = text.find("\n", start_pos)
+            if line_end == -1:
+                line_end = len(text)
+
+            # Title is the rest of the line after control ID
+            title_line = text[start_pos:line_end].strip()
+
+            # If title is empty or very short, check next line
+            if len(title_line) < self.MIN_TITLE_LENGTH:
+                next_line_start = line_end + 1
+                next_line_end = text.find("\n", next_line_start)
+                if next_line_end == -1:
+                    next_line_end = len(text)
+                title_line = text[next_line_start:next_line_end].strip()
+
+            title = title_line
+
+            # Extract content (from after title to next control or end)
+            content_start = line_end + 1
+
+            # Find the next control ID or end of content
+            if i + 1 < len(matches):
+                content_end = matches[i + 1].start()
+            else:
+                content_end = len(text)
+
+            content = text[content_start:content_end].strip()
+
+            # Clean up content (remove excessive whitespace)
+            content = " ".join(content.split())
+
+            # Check for duplicates
+            if control_id in seen_ids:
+                logger.warning(f"Duplicate control ID detected: {control_id}")
+                continue
+            seen_ids.add(control_id)
+
+            # Validate control data before creating object
+            if not title or len(title.strip()) < 2:
+                logger.debug(f"Skipping control {control_id}: title too short or empty")
+                continue
+
+            if not content or len(content.strip()) < self.MIN_CONTENT_LENGTH:
+                logger.debug(
+                    f"Control {control_id} has minimal content (length: {len(content)})"
+                )
+                # Don't skip - still create control, but content may be incomplete
+
+            # Create control object
+            control = Control(
+                id=control_id,
+                title=title,
+                content=content,
+                page=page_num,
+                category=category,
+                parent=parent,
+            )
+            controls.append(control)
+
+        return controls
+
     def _parse_controls_from_text(self, text: str, page_num: int) -> List[Control]:
         """Parse controls from text content.
 
@@ -501,9 +802,30 @@ class ISO27001Extractor(BaseExtractor):
                 )
 
         elif version == "2013":
-            # 2013 extraction not yet implemented
-            warnings.append("ISO 27001:2013 extraction not yet implemented")
-            extraction_method = "not_implemented_2013"
+            extraction_method = "specialized_iso_27001_2013"
+            controls = self._extract_controls_2013(pdf_bytes)
+
+            # Get expected control IDs for validation
+            expected_control_ids = self.VERSIONS[2013]["expected_ids"]
+
+            # Calculate missing controls
+            extracted_ids = [c.id for c in controls]
+            missing_control_ids = [
+                cid for cid in expected_control_ids if cid not in extracted_ids
+            ]
+
+            # Calculate confidence score based on completeness
+            if len(expected_control_ids) > 0:
+                confidence_score = len(extracted_ids) / len(expected_control_ids)
+            else:
+                confidence_score = 0.0
+
+            # Add warnings for missing controls
+            if len(missing_control_ids) > 0:
+                warnings.append(
+                    f"Missing {len(missing_control_ids)} of {len(expected_control_ids)} "
+                    f"expected controls ({confidence_score:.1%} complete)"
+                )
 
         else:
             # Unknown version
