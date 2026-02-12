@@ -84,7 +84,7 @@ security-controls-mcp/
 └── pyproject.toml             # Package configuration
 ```
 
-## Standards Import Feature (NEW in v0.5.0)
+## Standards Import Feature (NEW in v1.0.0)
 
 ### Web UI for Standards Upload
 Business users can upload purchased standards (ISO, NIST, etc.) via a web interface:
@@ -250,7 +250,7 @@ poetry run pytest tests/test_map_frameworks.py -v
 - **Database Size**: ~7MB (JSON)
 - **Tools**: 9 (6 core + 3 paid standards)
 - **Tests**: 242 passing (100% pass rate)
-- **Specialized Extractors**: 12 (NEW in v0.5.0)
+- **Specialized Extractors**: 12 (NEW in v1.0.0)
   - IT/Cloud: ISO 27001, NIST 800-53, SOC 2, PCI DSS, CIS Controls
   - OT/ICS: IEC 62443
   - Automotive: ISO 21434
@@ -259,7 +259,7 @@ poetry run pytest tests/test_map_frameworks.py -v
 
 ## Version History
 
-- **v0.5.0** (2026-02-12): Standards import feature with 12 specialized extractors, web UI, auto-discovery registry
+- **v1.0.0** (2026-02-12): 🎉 **Production Release!** Standards import feature with 12 specialized extractors, web UI, auto-discovery registry, 242 tests
 - **v0.4.0** (2026-02-05): Major framework expansion (28→261), AI governance support
 - **v0.3.5** (2026-02-01): Entry point fix
 - **v0.2.1** (2026-01-29): Framework expansion (16→28 frameworks)
