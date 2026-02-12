@@ -4,13 +4,11 @@
 This provides HTTP transport (Server-Sent Events) for remote MCP clients.
 Compatible with Ansvar platform's HTTP MCP client.
 """
-import dataclasses
-import io
 import json
 import logging
 import os
 from datetime import datetime, timezone
-from typing import Dict, List
+from typing import Dict
 
 import uvicorn
 from mcp.server import Server
@@ -26,6 +24,7 @@ from .legal_notice import print_legal_notice
 logger = logging.getLogger(__name__)
 
 SERVER_VERSION = "0.4.2"
+MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB max upload size
 
 # Initialize data loader
 scf_data = SCFData()
@@ -972,7 +971,14 @@ async def api_root(request):
 
 async def standards_upload_page(request: Request):
     """Serve the standards upload HTML page."""
-    return HTMLResponse(UPLOAD_PAGE_HTML)
+    return HTMLResponse(
+        UPLOAD_PAGE_HTML,
+        headers={
+            "X-Content-Type-Options": "nosniff",
+            "X-Frame-Options": "DENY",
+            "Content-Security-Policy": "default-src 'self' 'unsafe-inline'"
+        }
+    )
 
 
 async def api_standards_extract(request: Request):
@@ -992,12 +998,34 @@ async def api_standards_extract(request: Request):
                 status_code=400
             )
 
+        # Check content length if available
+        content_length = request.headers.get("content-length")
+        if content_length and int(content_length) > MAX_FILE_SIZE:
+            return JSONResponse(
+                {"error": "Bad Request", "message": "File too large (max 50MB)"},
+                status_code=413
+            )
+
         # Read PDF bytes
         pdf_bytes = await file_field.read()
 
         if not pdf_bytes or len(pdf_bytes) == 0:
             return JSONResponse(
                 {"error": "Bad Request", "message": "Empty file provided"},
+                status_code=400
+            )
+
+        # Check file size after reading
+        if len(pdf_bytes) > MAX_FILE_SIZE:
+            return JSONResponse(
+                {"error": "Bad Request", "message": "File too large (max 50MB)"},
+                status_code=413
+            )
+
+        # Validate PDF magic bytes
+        if not pdf_bytes.startswith(b'%PDF-'):
+            return JSONResponse(
+                {"error": "Bad Request", "message": "Invalid PDF file"},
                 status_code=400
             )
 
@@ -1059,8 +1087,8 @@ async def api_standards_extract(request: Request):
             return JSONResponse(
                 {
                     "error": "Extraction Error",
-                    "message": f"Failed to extract controls: {str(e)}",
-                    "warnings": [str(e)]
+                    "message": "Failed to extract controls. Please verify the PDF is a valid ISO 27001 standard.",
+                    "warnings": ["Extraction failed. Check server logs for details."]
                 },
                 status_code=500
             )
