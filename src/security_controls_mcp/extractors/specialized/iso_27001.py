@@ -1,10 +1,11 @@
 """ISO 27001 specialized extractor."""
 
+import io
 import re
 import time
 from typing import Any, Dict, List, Tuple
 
-from ..base import BaseExtractor, ExtractionResult, VersionDetection
+from ..base import BaseExtractor, Control, ExtractionResult, VersionDetection
 from ..registry import register_extractor
 
 
@@ -280,6 +281,143 @@ class ISO27001Extractor(BaseExtractor):
             # No clear indicators found
             return ("unknown", VersionDetection.UNKNOWN, [])
 
+    def _extract_controls_2022(self, pdf_bytes: bytes) -> List[Control]:
+        """Extract controls from ISO 27001:2022 PDF.
+
+        Args:
+            pdf_bytes: Raw bytes of the ISO 27001:2022 PDF document.
+
+        Returns:
+            List of Control objects extracted from the PDF.
+
+        Note:
+            Handles control ID pattern matching with spacing variations.
+            Sets categories based on A.X prefix (5=Org, 6=People, 7=Physical, 8=Tech).
+            Extracts control titles and content until next control or section.
+        """
+        controls: List[Control] = []
+
+        # Try to use pdfplumber for better text extraction
+        try:
+            import pdfplumber
+
+            with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+                for page_num, page in enumerate(pdf.pages):
+                    page_text = page.extract_text()
+                    if page_text:
+                        # Extract controls from this page
+                        page_controls = self._parse_controls_from_text(
+                            page_text, page_num + 1
+                        )
+                        controls.extend(page_controls)
+        except ImportError:
+            # Fall back to simple text extraction if pdfplumber not available
+            try:
+                text = pdf_bytes.decode("utf-8", errors="ignore")
+                page_controls = self._parse_controls_from_text(text, 1)
+                controls.extend(page_controls)
+            except Exception:
+                # If all extraction methods fail, return empty list
+                return []
+        except Exception:
+            # If pdfplumber fails, try simple text extraction
+            try:
+                text = pdf_bytes.decode("utf-8", errors="ignore")
+                page_controls = self._parse_controls_from_text(text, 1)
+                controls.extend(page_controls)
+            except Exception:
+                return []
+
+        return controls
+
+    def _parse_controls_from_text(self, text: str, page_num: int) -> List[Control]:
+        """Parse controls from text content.
+
+        Args:
+            text: Text content to parse.
+            page_num: Page number for tracking.
+
+        Returns:
+            List of Control objects found in the text.
+        """
+        controls: List[Control] = []
+
+        # Control ID pattern: A.X.Y (with possible spacing variations)
+        # Matches: A.5.1, A.5.1 , A 5 1, etc.
+        control_pattern = r"A[\.\s]?(\d+)[\.\s]?(\d+)"
+
+        # Find all control IDs in the text
+        matches = list(re.finditer(control_pattern, text))
+
+        for i, match in enumerate(matches):
+            # Extract control ID parts
+            category_num = match.group(1)
+            control_num = match.group(2)
+            control_id = f"A.{category_num}.{control_num}"
+
+            # Only process if this is an expected control ID
+            if control_id not in self.VERSIONS[2022]["expected_ids"]:
+                continue
+
+            # Determine category based on A.X prefix
+            category_map = {
+                "5": "Organizational",
+                "6": "People",
+                "7": "Physical",
+                "8": "Technological",
+            }
+            category = category_map.get(category_num, "Unknown")
+
+            # Set parent (e.g., A.5.1 -> A.5)
+            parent = f"A.{category_num}"
+
+            # Extract title (text after control ID on same line or next line)
+            start_pos = match.end()
+            # Find the end of the line with the control ID
+            line_end = text.find("\n", start_pos)
+            if line_end == -1:
+                line_end = len(text)
+
+            # Title is the rest of the line after control ID
+            title_line = text[start_pos:line_end].strip()
+
+            # If title is empty or very short, check next line
+            if len(title_line) < 3:
+                next_line_start = line_end + 1
+                next_line_end = text.find("\n", next_line_start)
+                if next_line_end == -1:
+                    next_line_end = len(text)
+                title_line = text[next_line_start:next_line_end].strip()
+
+            title = title_line
+
+            # Extract content (from after title to next control or end)
+            content_start = line_end + 1
+
+            # Find the next control ID or end of content
+            if i + 1 < len(matches):
+                content_end = matches[i + 1].start()
+            else:
+                content_end = len(text)
+
+            content = text[content_start:content_end].strip()
+
+            # Clean up content (remove excessive whitespace)
+            content = " ".join(content.split())
+
+            # Create control object
+            control = Control(
+                id=control_id,
+                title=title,
+                content=content,
+                page=page_num,
+                category=category,
+                parent=parent,
+            )
+            controls.append(control)
+
+        return controls
+
     def extract(self, pdf_bytes: bytes) -> ExtractionResult:
         """Extract controls from ISO 27001 PDF.
 
@@ -288,34 +426,74 @@ class ISO27001Extractor(BaseExtractor):
 
         Returns:
             ExtractionResult with extracted controls and metadata.
-
-        Note:
-            This is a placeholder implementation. Full extraction logic
-            will be implemented in future tasks.
         """
         start_time = time.time()
 
         # Detect version
         version, version_detection, version_evidence = self._detect_version(pdf_bytes)
 
+        # Initialize variables
+        controls: List[Control] = []
+        extraction_method = "version_detection_only"
+        warnings: List[str] = []
+        expected_control_ids: List[str] = []
+        missing_control_ids: List[str] = []
+        confidence_score = 0.0
+
+        # Extract controls based on version
+        if version == "2022":
+            extraction_method = "specialized_iso_27001_2022"
+            controls = self._extract_controls_2022(pdf_bytes)
+
+            # Get expected control IDs for validation
+            expected_control_ids = self.VERSIONS[2022]["expected_ids"]
+
+            # Calculate missing controls
+            extracted_ids = [c.id for c in controls]
+            missing_control_ids = [
+                cid for cid in expected_control_ids if cid not in extracted_ids
+            ]
+
+            # Calculate confidence score based on completeness
+            if len(expected_control_ids) > 0:
+                confidence_score = len(extracted_ids) / len(expected_control_ids)
+            else:
+                confidence_score = 0.0
+
+            # Add warnings for missing controls
+            if len(missing_control_ids) > 0:
+                warnings.append(
+                    f"Missing {len(missing_control_ids)} of {len(expected_control_ids)} "
+                    f"expected controls ({confidence_score:.1%} complete)"
+                )
+
+        elif version == "2013":
+            # 2013 extraction not yet implemented
+            warnings.append("ISO 27001:2013 extraction not yet implemented")
+            extraction_method = "not_implemented_2013"
+
+        else:
+            # Unknown version
+            warnings.append("Could not detect ISO 27001 version")
+            extraction_method = "version_detection_failed"
+
         # Calculate duration
         duration = time.time() - start_time
-
-        # Placeholder implementation - return empty result with version info
-        warnings = ["This is a placeholder implementation"]
-        if version == "unknown":
-            warnings.append("Could not detect ISO 27001 version")
 
         return ExtractionResult(
             standard_id="iso_27001",
             version=version,
             version_detection=version_detection,
             version_evidence=version_evidence,
-            controls=[],
-            expected_control_ids=None,
-            missing_control_ids=None,
-            confidence_score=0.0,
-            extraction_method="version_detection_only",
+            controls=controls,
+            expected_control_ids=expected_control_ids if expected_control_ids else None,
+            missing_control_ids=(
+                missing_control_ids
+                if expected_control_ids  # Only set if we have expected IDs
+                else None
+            ),
+            confidence_score=confidence_score,
+            extraction_method=extraction_method,
             extraction_duration_seconds=duration,
             warnings=warnings,
         )

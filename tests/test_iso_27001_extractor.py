@@ -323,3 +323,392 @@ def test_detect_version_handles_pdfplumber_import_error():
     # For now, just verify the method exists and is callable
     assert hasattr(extractor, "_detect_version")
     assert callable(extractor._detect_version)
+
+
+# ============================================================================
+# Control Extraction Tests (ISO 27001:2022)
+# ============================================================================
+
+
+def test_extract_controls_2022_basic():
+    """Test basic control extraction from ISO 27001:2022 PDF."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    # Mock PDF with a few controls
+    pdf_text = b"""
+    ISO/IEC 27001:2022
+    Annex A
+    A.5 Organizational controls
+
+    A.5.1 Policies for information security
+    Information security policy and topic-specific policies shall be defined,
+    approved by management, published, communicated to and acknowledged by
+    relevant personnel and relevant interested parties, and reviewed at
+    planned intervals and if significant changes occur.
+
+    A.5.2 Information security roles and responsibilities
+    Information security roles and responsibilities shall be defined and
+    allocated according to the organization needs.
+
+    A.8 Technological controls
+
+    A.8.1 User endpoint devices
+    Information stored on, processed by or accessible via user endpoint
+    devices shall be protected.
+    """
+
+    result = extractor.extract(pdf_text)
+
+    # Should extract at least these 3 controls
+    assert len(result.controls) >= 3
+    control_ids = [c.id for c in result.controls]
+    assert "A.5.1" in control_ids
+    assert "A.5.2" in control_ids
+    assert "A.8.1" in control_ids
+
+
+def test_extract_controls_2022_sets_titles():
+    """Test that control titles are correctly extracted."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    pdf_text = b"""
+    ISO/IEC 27001:2022
+    A.5.1 Policies for information security
+    Some control content here.
+
+    A.5.2 Information security roles and responsibilities
+    More control content.
+    """
+
+    result = extractor.extract(pdf_text)
+
+    # Find the controls
+    a51 = next((c for c in result.controls if c.id == "A.5.1"), None)
+    a52 = next((c for c in result.controls if c.id == "A.5.2"), None)
+
+    assert a51 is not None
+    assert "Policies for information security" in a51.title
+
+    assert a52 is not None
+    assert "Information security roles and responsibilities" in a52.title
+
+
+def test_extract_controls_2022_sets_content():
+    """Test that control content is correctly extracted."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    pdf_text = b"""
+    ISO/IEC 27001:2022
+    A.5.1 Policies for information security
+    Information security policy and topic-specific policies shall be defined.
+    This is the control content that should be captured.
+
+    A.5.2 Information security roles and responsibilities
+    Different control content here.
+    """
+
+    result = extractor.extract(pdf_text)
+
+    a51 = next((c for c in result.controls if c.id == "A.5.1"), None)
+    assert a51 is not None
+    assert "Information security policy" in a51.content
+    assert "shall be defined" in a51.content
+
+
+def test_extract_controls_2022_sets_categories():
+    """Test that control categories are correctly set based on A.X prefix."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    pdf_text = b"""
+    ISO/IEC 27001:2022
+    A.5.1 Organizational control
+    Content for A.5.1
+
+    A.6.1 People control
+    Content for A.6.1
+
+    A.7.1 Physical control
+    Content for A.7.1
+
+    A.8.1 Technological control
+    Content for A.8.1
+    """
+
+    result = extractor.extract(pdf_text)
+
+    # Check categories
+    a51 = next((c for c in result.controls if c.id == "A.5.1"), None)
+    assert a51 is not None
+    assert a51.category == "Organizational"
+
+    a61 = next((c for c in result.controls if c.id == "A.6.1"), None)
+    assert a61 is not None
+    assert a61.category == "People"
+
+    a71 = next((c for c in result.controls if c.id == "A.7.1"), None)
+    assert a71 is not None
+    assert a71.category == "Physical"
+
+    a81 = next((c for c in result.controls if c.id == "A.8.1"), None)
+    assert a81 is not None
+    assert a81.category == "Technological"
+
+
+def test_extract_controls_2022_sets_parent():
+    """Test that parent relationships are correctly set."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    pdf_text = b"""
+    ISO/IEC 27001:2022
+    A.5.1 Control title
+    Content
+
+    A.5.10 Control title
+    Content
+
+    A.8.23 Control title
+    Content
+    """
+
+    result = extractor.extract(pdf_text)
+
+    a51 = next((c for c in result.controls if c.id == "A.5.1"), None)
+    assert a51 is not None
+    assert a51.parent == "A.5"
+
+    a510 = next((c for c in result.controls if c.id == "A.5.10"), None)
+    assert a510 is not None
+    assert a510.parent == "A.5"
+
+    a823 = next((c for c in result.controls if c.id == "A.8.23"), None)
+    assert a823 is not None
+    assert a823.parent == "A.8"
+
+
+def test_extract_controls_2022_sets_page_numbers():
+    """Test that page numbers are tracked for controls."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    # Note: This is a simplified test since we're using byte strings
+    # In a real PDF, page numbers would come from pdfplumber
+    pdf_text = b"""
+    ISO/IEC 27001:2022
+    A.5.1 Control on page 1
+    Content
+    """
+
+    result = extractor.extract(pdf_text)
+
+    # At minimum, page numbers should be integers
+    for control in result.controls:
+        assert isinstance(control.page, int)
+        assert control.page >= 0
+
+
+def test_extract_controls_2022_handles_spacing_variations():
+    """Test that control ID patterns handle spacing variations."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    pdf_text = b"""
+    ISO/IEC 27001:2022
+    A.5.1 Control with standard spacing
+    Content
+
+    A.5.2  Control with extra space
+    Content
+
+    A.5.3
+    Control on next line
+    Content
+    """
+
+    result = extractor.extract(pdf_text)
+
+    control_ids = [c.id for c in result.controls]
+    assert "A.5.1" in control_ids
+    assert "A.5.2" in control_ids
+    assert "A.5.3" in control_ids
+
+
+def test_extract_controls_2022_validates_against_expected():
+    """Test that extraction validates against expected 93 control IDs."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    # Mock complete PDF with all 93 controls
+    controls_text = []
+    for control_id in extractor_class.VERSIONS[2022]["expected_ids"]:
+        controls_text.append(f"{control_id} Title\nContent\n")
+
+    pdf_text = b"ISO/IEC 27001:2022\n" + "\n".join(controls_text).encode()
+
+    result = extractor.extract(pdf_text)
+
+    # Should have expected_control_ids set
+    assert result.expected_control_ids is not None
+    assert len(result.expected_control_ids) == 93
+
+    # Should calculate missing_control_ids
+    assert result.missing_control_ids is not None
+
+
+def test_extract_controls_2022_confidence_score():
+    """Test that confidence score reflects extraction completeness."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    # Extract with only a few controls (incomplete)
+    pdf_text = b"""
+    ISO/IEC 27001:2022
+    A.5.1 Title
+    Content
+    A.5.2 Title
+    Content
+    """
+
+    result = extractor.extract(pdf_text)
+
+    # Confidence should be low since we only have 2/93 controls
+    assert result.confidence_score < 0.5
+    assert result.confidence_score >= 0.0
+
+
+def test_extract_controls_2022_full_extraction():
+    """Test full extraction with all 93 controls returns high confidence."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    # Build PDF with all 93 controls
+    controls_text = ["ISO/IEC 27001:2022\n"]
+    for control_id in extractor_class.VERSIONS[2022]["expected_ids"]:
+        controls_text.append(f"{control_id} Control title\nControl content here.\n\n")
+
+    pdf_text = "".join(controls_text).encode()
+
+    result = extractor.extract(pdf_text)
+
+    # Should extract all 93 controls
+    assert len(result.controls) == 93
+
+    # Confidence should be high
+    assert result.confidence_score >= 0.9
+
+    # Should have no missing controls
+    assert result.missing_control_ids is not None
+    assert len(result.missing_control_ids) == 0
+
+
+def test_extract_controls_returns_empty_for_non_iso_pdf():
+    """Test that extraction returns empty list for non-ISO 27001 PDFs."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    pdf_text = b"""
+    This is some random document
+    It has nothing to do with ISO 27001
+    Just random text content
+    """
+
+    result = extractor.extract(pdf_text)
+
+    # Should detect as unknown version
+    assert result.version == "unknown"
+
+    # Should return empty controls list
+    assert len(result.controls) == 0
+
+    # Should have low confidence
+    assert result.confidence_score == 0.0
+
+
+def test_extract_controls_handles_malformed_pdf():
+    """Test that extraction handles malformed PDFs gracefully."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    # Malformed PDF with version but no readable controls
+    pdf_text = b"""
+    ISO/IEC 27001:2022
+    \x00\x01\x02\x03\x04\x05
+    Random binary garbage
+    """
+
+    result = extractor.extract(pdf_text)
+
+    # Should not crash
+    assert isinstance(result, ExtractionResult)
+    assert result.version == "2022"
+
+    # May have low or zero controls
+    assert len(result.controls) >= 0
+
+
+def test_extract_uses_extract_controls_2022_when_version_2022():
+    """Test that extract() uses _extract_controls_2022() when version is 2022."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    pdf_text = b"""
+    ISO/IEC 27001:2022
+    A.5.1 Test control
+    Content here
+    """
+
+    result = extractor.extract(pdf_text)
+
+    # Should detect as 2022
+    assert result.version == "2022"
+
+    # Should have extracted controls (proving _extract_controls_2022 was called)
+    assert len(result.controls) > 0
+
+    # extraction_method should indicate full extraction, not placeholder
+    assert "placeholder" not in result.extraction_method.lower()
+
+
+def test_extract_metadata_fields():
+    """Test that all metadata fields are properly set in ExtractionResult."""
+    _ensure_iso27001_registered()
+    extractor_class = SPECIALIZED_EXTRACTORS["iso_27001"]
+    extractor = extractor_class()
+
+    pdf_text = b"""
+    ISO/IEC 27001:2022
+    A.5.1 Title
+    Content
+    """
+
+    result = extractor.extract(pdf_text)
+
+    # Check all required fields are present
+    assert result.standard_id == "iso_27001"
+    assert result.version is not None
+    assert result.version_detection is not None
+    assert result.version_evidence is not None
+    assert result.controls is not None
+    assert isinstance(result.confidence_score, float)
+    assert result.extraction_method is not None
+    assert isinstance(result.extraction_duration_seconds, float)
+    assert result.extraction_duration_seconds >= 0.0
+    assert result.warnings is not None
+    assert isinstance(result.warnings, list)
