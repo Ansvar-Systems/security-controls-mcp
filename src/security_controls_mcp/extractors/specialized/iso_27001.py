@@ -1,12 +1,16 @@
 """ISO 27001 specialized extractor."""
 
 import io
+import logging
 import re
 import time
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from ..base import BaseExtractor, Control, ExtractionResult, VersionDetection
 from ..registry import register_extractor
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 
 @register_extractor("iso_27001")
@@ -16,6 +20,11 @@ class ISO27001Extractor(BaseExtractor):
     Handles both ISO 27001:2022 (93 controls) and ISO 27001:2013 (114 controls).
     Uses heuristics to detect version and extract controls with high precision.
     """
+
+    # Configuration constants
+    VERSION_DETECTION_MAX_PAGES = 5  # Pages to analyze for version detection
+    MIN_TITLE_LENGTH = 3  # Minimum characters for valid control title
+    MIN_CONTENT_LENGTH = 10  # Minimum characters for valid control content
 
     # Expected control counts and IDs by version
     VERSIONS: Dict[int, Dict[str, Any]] = {
@@ -154,25 +163,27 @@ class ISO27001Extractor(BaseExtractor):
             # If pdfplumber not available, try simple text extraction
             try:
                 text = pdf_bytes.decode("utf-8", errors="ignore").lower()
-            except Exception:
+            except Exception as e:
+                logger.debug(f"Failed to decode PDF bytes: {e}")
                 return ("unknown", VersionDetection.UNKNOWN, [])
         else:
-            # Use pdfplumber to extract text from first 5 pages
+            # Use pdfplumber to extract text from first pages
             try:
-                import io
                 with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
                     text_parts = []
-                    # Extract from first 5 pages only for performance
-                    for page in pdf.pages[:5]:
+                    # Extract from first N pages only for performance
+                    for page in pdf.pages[:self.VERSION_DETECTION_MAX_PAGES]:
                         page_text = page.extract_text()
                         if page_text:
                             text_parts.append(page_text)
                     text = "\n".join(text_parts).lower()
-            except Exception:
+            except Exception as e:
+                logger.debug(f"pdfplumber extraction failed: {e}")
                 # Fall back to simple decoding if pdfplumber fails
                 try:
                     text = pdf_bytes.decode("utf-8", errors="ignore").lower()
-                except Exception:
+                except Exception as e2:
+                    logger.debug(f"Fallback text extraction failed: {e2}")
                     return ("unknown", VersionDetection.UNKNOWN, [])
 
         if not text or len(text.strip()) == 0:
@@ -311,21 +322,25 @@ class ISO27001Extractor(BaseExtractor):
                         )
                         controls.extend(page_controls)
         except ImportError:
+            logger.debug("pdfplumber not available, using fallback text extraction")
             # Fall back to simple text extraction if pdfplumber not available
             try:
                 text = pdf_bytes.decode("utf-8", errors="ignore")
                 page_controls = self._parse_controls_from_text(text, 1)
                 controls.extend(page_controls)
-            except Exception:
+            except Exception as e:
+                logger.debug(f"Fallback text extraction failed: {e}")
                 # If all extraction methods fail, return empty list
                 return []
-        except Exception:
+        except Exception as e:
+            logger.debug(f"pdfplumber extraction failed: {e}")
             # If pdfplumber fails, try simple text extraction
             try:
                 text = pdf_bytes.decode("utf-8", errors="ignore")
                 page_controls = self._parse_controls_from_text(text, 1)
                 controls.extend(page_controls)
-            except Exception:
+            except Exception as e2:
+                logger.debug(f"Fallback extraction failed: {e2}")
                 return []
 
         return controls
@@ -341,6 +356,7 @@ class ISO27001Extractor(BaseExtractor):
             List of Control objects found in the text.
         """
         controls: List[Control] = []
+        seen_ids = set()  # Track control IDs to detect duplicates
 
         # Control ID pattern: A.X.Y (with possible spacing variations)
         # Matches: A.5.1, A.5.1 , A 5 1, etc.
@@ -382,7 +398,7 @@ class ISO27001Extractor(BaseExtractor):
             title_line = text[start_pos:line_end].strip()
 
             # If title is empty or very short, check next line
-            if len(title_line) < 3:
+            if len(title_line) < self.MIN_TITLE_LENGTH:
                 next_line_start = line_end + 1
                 next_line_end = text.find("\n", next_line_start)
                 if next_line_end == -1:
@@ -404,6 +420,23 @@ class ISO27001Extractor(BaseExtractor):
 
             # Clean up content (remove excessive whitespace)
             content = " ".join(content.split())
+
+            # Check for duplicates
+            if control_id in seen_ids:
+                logger.warning(f"Duplicate control ID detected: {control_id}")
+                continue
+            seen_ids.add(control_id)
+
+            # Validate control data before creating object
+            if not title or len(title.strip()) < 2:
+                logger.debug(f"Skipping control {control_id}: title too short or empty")
+                continue
+
+            if not content or len(content.strip()) < self.MIN_CONTENT_LENGTH:
+                logger.debug(
+                    f"Control {control_id} has minimal content (length: {len(content)})"
+                )
+                # Don't skip - still create control, but content may be incomplete
 
             # Create control object
             control = Control(
