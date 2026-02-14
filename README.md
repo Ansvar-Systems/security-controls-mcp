@@ -28,26 +28,57 @@ Different frameworks describe the same security measures in different ways. ISO 
 
 This MCP server provides instant bidirectional mapping between any two frameworks via the SCF rosetta stone. Ask Claude "What DORA controls does ISO 27001 A.5.15 map to?" and get an immediate answer backed by ComplianceForge's framework database.
 
-## Installation
+## Quick Start
 
-```bash
-# Using pipx (recommended)
-pipx install security-controls-mcp
+### Use Remotely (No Install Needed)
 
-# Using pip
-pip install security-controls-mcp
+> Connect directly to the hosted version — zero dependencies, nothing to install.
 
-# From source
-git clone https://github.com/Ansvar-Systems/security-controls-mcp.git
-cd security-controls-mcp
-pip install -e .
+**Endpoint:** `https://security-controls-mcp.vercel.app/mcp`
+
+| Client | How to Connect |
+|--------|---------------|
+| **Claude.ai** | Settings > Connectors > Add Integration > paste URL |
+| **Claude Code** | `claude mcp add security-controls --transport http https://security-controls-mcp.vercel.app/mcp` |
+| **Claude Desktop** | Add to config (see below) |
+| **GitHub Copilot** | Add to VS Code settings (see below) |
+
+**Claude Desktop** — add to `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "security-controls": {
+      "type": "url",
+      "url": "https://security-controls-mcp.vercel.app/mcp"
+    }
+  }
+}
 ```
 
-**Requirements:** Python 3.10+
+**GitHub Copilot** — add to VS Code `settings.json`:
 
-### Claude Desktop Configuration
+```json
+{
+  "github.copilot.chat.mcp.servers": {
+    "security-controls": {
+      "type": "http",
+      "url": "https://security-controls-mcp.vercel.app/mcp"
+    }
+  }
+}
+```
 
-Add to `claude_desktop_config.json`:
+### Use Locally (npm)
+
+```bash
+pipx install security-controls-mcp
+```
+
+**Claude Desktop** — add to `claude_desktop_config.json`:
+
+**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
 {
@@ -59,7 +90,7 @@ Add to `claude_desktop_config.json`:
 }
 ```
 
-**macOS users:** GUI apps don't inherit your shell's PATH. Use the full path instead:
+**macOS users:** Use the full path (GUI apps don't inherit shell PATH):
 ```json
 {
   "mcpServers": {
@@ -71,13 +102,17 @@ Add to `claude_desktop_config.json`:
 ```
 Find your path with: `which scf-mcp`
 
-**Config location:**
-- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+**Cursor / VS Code:**
 
-### Cursor / VS Code
-
-Same configuration under `"mcp.servers"` in your settings.
+```json
+{
+  "mcp.servers": {
+    "security-controls": {
+      "command": "scf-mcp"
+    }
+  }
+}
+```
 
 ## Example Queries
 
