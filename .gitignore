@@ -68,3 +68,4 @@ standards/
 .vscode/
 .idea/
 .mcpregistry_*
+.vercel

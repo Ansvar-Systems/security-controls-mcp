@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/mcp.py": {
+      "maxDuration": 30,
+      "memory": 512
+    }
+  },
+  "rewrites": [
+    { "source": "/mcp", "destination": "/api/mcp" },
+    { "source": "/health", "destination": "/api/health" }
+  ]
+}
