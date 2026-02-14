@@ -1,6 +1,10 @@
 """MCP server for security controls framework queries."""
 
 import asyncio
+import hashlib
+import json as json_module
+from datetime import datetime, timezone
+from pathlib import Path
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
@@ -24,6 +28,32 @@ app = Server("security-controls-mcp")
 
 SERVER_VERSION = "0.4.2"
 
+# Compute data fingerprint and build timestamp once at module load
+_data_dir = Path(__file__).parent / "data"
+_controls_file = _data_dir / "scf-controls.json"
+
+
+def _compute_data_fingerprint() -> str:
+    """Compute a short SHA-256 fingerprint of the controls data file."""
+    try:
+        content = _controls_file.read_bytes()
+        return hashlib.sha256(content).hexdigest()[:12]
+    except Exception:
+        return "unknown"
+
+
+def _get_data_built() -> str:
+    """Get the modification time of the controls data file as ISO timestamp."""
+    try:
+        mtime = _controls_file.stat().st_mtime
+        return datetime.fromtimestamp(mtime, tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    except Exception:
+        return "unknown"
+
+
+DATA_FINGERPRINT = _compute_data_fingerprint()
+DATA_BUILT = _get_data_built()
+
 
 @app.list_tools()
 async def list_tools() -> list[Tool]:
@@ -34,6 +64,17 @@ async def list_tools() -> list[Tool]:
             description=(
                 "Get server version, statistics, and database info. "
                 "Call this first to understand what data is available."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {},
+            },
+        ),
+        Tool(
+            name="about",
+            description=(
+                "Server metadata, dataset statistics, and provenance in structured JSON. "
+                "Call this to verify data coverage and currency."
             ),
             inputSchema={
                 "type": "object",
@@ -258,6 +299,63 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                     text += f"- {s['title']} (`{s['standard_id']}`)\n"
 
         return [TextContent(type="text", text=text)]
+
+    elif name == "about":
+        about_data = {
+            "server": {
+                "name": "Security Controls MCP",
+                "package": "security-controls-mcp",
+                "version": SERVER_VERSION,
+                "suite": "Ansvar Compliance Suite",
+                "repository": "https://github.com/Ansvar-Systems/security-controls-mcp",
+            },
+            "dataset": {
+                "fingerprint": DATA_FINGERPRINT,
+                "built": DATA_BUILT,
+                "jurisdiction": "International",
+                "content_basis": (
+                    "Secure Controls Framework (SCF) 2025.4 control catalog with "
+                    "cross-framework mappings. Framework identifiers and mapping "
+                    "relationships only \u2014 no copyrighted standard text included."
+                ),
+                "counts": {
+                    "controls": len(scf_data.controls),
+                    "frameworks": len(scf_data.frameworks),
+                },
+                "freshness": {
+                    "last_checked": None,
+                    "check_method": "Manual SCF release monitoring",
+                    "scf_version": "2025.4",
+                },
+            },
+            "provenance": {
+                "sources": ["Secure Controls Framework (SCF)"],
+                "license": (
+                    "Apache-2.0 (server code). SCF data used under SCF license terms. "
+                    "Framework control IDs and mapping relationships are factual data."
+                ),
+                "authenticity_note": (
+                    "Control mappings are derived from the Secure Controls Framework. "
+                    "Individual framework standards (ISO 27001, NIST, etc.) are copyrighted "
+                    "by their respective bodies. This server provides mapping relationships, "
+                    "not standard text."
+                ),
+            },
+            "security": {
+                "access_model": "read-only",
+                "network_access": False,
+                "filesystem_access": False,
+                "arbitrary_execution": False,
+            },
+        }
+
+        # Include paid standards count if available
+        if registry.has_paid_standards():
+            standards = registry.list_standards()
+            paid = [s for s in standards if s["type"] == "paid"]
+            about_data["dataset"]["counts"]["paid_standards"] = len(paid)
+
+        return [TextContent(type="text", text=json_module.dumps(about_data, indent=2))]
 
     elif name == "get_control":
         control_id = arguments["control_id"]

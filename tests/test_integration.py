@@ -148,7 +148,7 @@ class TestMCPProtocol:
             response = json.loads(response_line.decode())
 
             assert "result" in response
-            assert len(response["result"]["tools"]) == 9  # version_info + 5 core + 3 paid standards tools
+            assert len(response["result"]["tools"]) == 10  # version_info + about + 5 core + 3 paid standards tools
 
             # Test tool call
             call_request = {
