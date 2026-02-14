@@ -335,6 +335,23 @@ All servers are configured for MCP Registry auto-discovery:
 
 Similar configuration in `.cursor/mcp.json` or VS Code settings.
 
+### Remote Endpoints (Vercel Streamable HTTP)
+
+The following servers are deployed as Vercel serverless functions for remote MCP access (ChatGPT, Claude Web, etc.):
+
+| Server | Endpoint | Protocol |
+|--------|----------|----------|
+| **EU Regulations MCP** | `https://eu-regulations-mcp.vercel.app/mcp` | Streamable HTTP |
+| **US Regulations MCP** | `https://us-regulations-mcp.vercel.app/mcp` | Streamable HTTP |
+| **Security Controls MCP** | `https://security-controls-mcp.vercel.app/mcp` | Streamable HTTP |
+| **Automotive MCP** | `https://automotive-cybersecurity-mcp.vercel.app/mcp` | Streamable HTTP |
+| **Swedish Law MCP** | `https://swedish-law-mcp.vercel.app/mcp` | Streamable HTTP |
+
+Health check endpoints are available at `/health` for each server.
+
+**Not deployed** (database too large for Vercel's 250MB limit):
+- Dutch Law MCP (919MB database)
+
 ---
 
 ## Cross-Server Workflows
