@@ -2,21 +2,23 @@
 
 **Central documentation for all Ansvar Systems MCP servers**
 
-Last Updated: 2026-01-30
+Last Updated: 2026-02-14
 
 ---
 
 ## Overview
 
-Ansvar Systems maintains a suite of 5 interconnected MCP servers for comprehensive compliance, security, and risk management. These servers work together to provide end-to-end regulatory compliance and security control implementation.
+Ansvar Systems maintains a suite of interconnected MCP servers for comprehensive compliance, security, and risk management. These servers work together to provide end-to-end regulatory compliance and security control implementation.
 
-### The Five Servers
+### Server Inventory
 
 | Server | Purpose | Tech Stack | Package Registry | Status |
 |--------|---------|------------|------------------|--------|
-| **Security Controls MCP** | 1,451 controls across 28 frameworks | Python + SQLite | PyPI | ✅ v0.2.1 Published |
-| **EU Regulations MCP** | 47 EU regulations (GDPR, DORA, etc.) | TypeScript + SQLite | npm | ✅ Published |
+| **Security Controls MCP** | 1,451 controls across 261 frameworks | Python + JSON | PyPI | ✅ v1.0.0 Published |
+| **EU Regulations MCP** | 49 EU regulations (GDPR, DORA, etc.) | TypeScript + SQLite | npm | ✅ Published |
 | **US Regulations MCP** | 15 US federal & state laws | TypeScript + SQLite | npm | ✅ Published |
+| **Automotive MCP** | UNECE R155/R156 + ISO 21434 | TypeScript + SQLite | npm | ✅ v1.0.1 Published |
+| **Swedish Law MCP** | Swedish statutes, case law, EU cross-refs | TypeScript + SQLite | npm | ✅ v1.2.1 Published |
 | **OT Security MCP** | IEC 62443, NIST 800-82/53, MITRE ICS | TypeScript + SQLite | npm | ✅ v0.2.0 Published |
 | **Sanctions MCP** | OFAC/EU/UN sanctions + PEP checks | Python + SQLite | PyPI | 🟡 Ready (Not Published) |
 
@@ -47,6 +49,98 @@ Ansvar Systems maintains a suite of 5 interconnected MCP servers for comprehensi
 - **Consistent IDs**: Control IDs work across all servers
 - **Workflow examples**: Documentation shows multi-server use cases
 
+### 5. Standardized `about()` Tool
+
+Every server exposes an `about` tool returning structured JSON with four sections. This enables orchestration layers to discover server capabilities, verify data freshness, and display provenance without hardcoded knowledge of each server.
+
+**Schema** (all servers return this exact shape):
+
+```jsonc
+{
+  "server": {
+    "name": "Human-readable name",
+    "package": "@ansvar/package-name",
+    "version": "1.0.0",               // from package.json / pyproject.toml
+    "suite": "Ansvar Compliance Suite",
+    "repository": "https://github.com/Ansvar-Systems/..."
+  },
+  "dataset": {
+    "fingerprint": "a1b2c3d4e5f6",    // first 12 hex chars of SHA-256 of data file
+    "built": "2026-02-14T10:00:00Z",   // mtime of database / data file
+    "jurisdiction": "EU | US | SE | International (UNECE) + ISO | International",
+    "content_basis": "Free-text describing source, consolidation status, caveats",
+    "counts": { /* server-specific table counts */ },
+    "freshness": {
+      "last_checked": null,            // or ISO timestamp
+      "check_method": "Daily EUR-Lex RSS | Manual review | ..."
+    }
+  },
+  "provenance": {
+    "sources": ["EUR-Lex", "NIST", "..."],
+    "license": "Apache-2.0 (server code). Data license details...",
+    "authenticity_note": "Not an official legal publication. Verify against..."
+  },
+  "security": {
+    "access_model": "read-only",
+    "network_access": false,
+    "filesystem_access": false,
+    "arbitrary_execution": false
+  }
+}
+```
+
+**Implementation pattern** (TypeScript servers):
+
+```typescript
+// src/tools/about.ts — pure function, no side effects
+export interface AboutContext { version: string; fingerprint: string; dbBuilt: string; }
+export function getAbout(db, context: AboutContext): AboutResult { /* ... */ }
+
+// Entry point (index.ts / http-server.ts) — computed once at startup
+const fingerprint = createHash('sha256').update(readFileSync(DB_PATH)).digest('hex').slice(0, 12);
+const aboutContext: AboutContext = { version: pkgVersion, fingerprint, dbBuilt: stat.mtime.toISOString() };
+registerTools(server, db, aboutContext);
+
+// registry.ts — factory closure keeps handler signature consistent
+function createAboutTool(context: AboutContext): ToolDefinition { /* ... */ }
+export function buildTools(context: AboutContext): ToolDefinition[] {
+  return [...TOOLS, createAboutTool(context)];
+}
+```
+
+**Implementation pattern** (Python servers):
+
+```python
+# server.py — computed at module load
+DATA_FINGERPRINT = hashlib.sha256(Path("data/controls.json").read_bytes()).hexdigest()[:12]
+DATA_BUILT = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+# In call_tool handler
+about_data = { "server": {...}, "dataset": {...}, "provenance": {...}, "security": {...} }
+return [TextContent(type="text", text=json.dumps(about_data, indent=2))]
+```
+
+### 6. Tool Annotations
+
+All servers annotate their tools with MCP tool annotations for client-side UX hints:
+
+```typescript
+const READ_ONLY_ANNOTATIONS = { readOnlyHint: true, destructiveHint: false } as const;
+
+function annotateTools(tools: Tool[]): Tool[] {
+  return tools.map((tool) => ({
+    ...tool,
+    annotations: {
+      title: tool.annotations?.title ?? toTitle(tool.name),
+      readOnlyHint: true,
+      destructiveHint: false,
+    },
+  }));
+}
+```
+
+Since all Ansvar servers are read-only data retrieval tools, every tool gets `readOnlyHint: true` and `destructiveHint: false`. The `title` is auto-generated from the tool name (e.g., `search_legislation` → `Search Legislation`) unless explicitly overridden.
+
 ---
 
 ## Server Details
@@ -66,10 +160,11 @@ Ansvar Systems maintains a suite of 5 interconnected MCP servers for comprehensi
 
 **Key Features**:
 - 1,451 security controls
-- 28 frameworks (16→28 in v0.2.1 expansion)
+- 261 frameworks (SCF 2025.4)
 - Bidirectional framework mapping
 - Gap analysis between frameworks
 - Official text import for purchased standards
+- `about` tool with structured metadata (see Architecture Principles §5)
 
 **Deployment**:
 ```bash
@@ -88,7 +183,7 @@ pipx install security-controls-mcp
 
 **Data Updates**: Manual - requires re-ingesting SCF data and republishing
 
-**Current Version**: v0.2.1 (Published 2026-01-29)
+**Current Version**: v1.0.0 (Published)
 
 ---
 
@@ -96,7 +191,7 @@ pipx install security-controls-mcp
 
 **Repository**: https://github.com/Ansvar-Systems/EU_compliance_MCP
 
-**Purpose**: Query 47 EU regulations with full article text, recitals, definitions, and control mappings.
+**Purpose**: Query 49 EU regulations with full article text, recitals, definitions, and control mappings.
 
 **Tech Stack**:
 - **Language**: TypeScript
@@ -106,11 +201,13 @@ pipx install security-controls-mcp
 - **Distribution**: npm (`npx @ansvar/eu-regulations-mcp`)
 
 **Key Features**:
-- 47 regulations (GDPR, DORA, NIS2, AI Act, etc.)
-- 2,438 articles + 3,712 recitals
-- 1,138 official definitions
-- 685 ISO 27001 & NIST CSF mappings
-- 305 sector applicability rules
+- 49 regulations (GDPR, DORA, NIS2, AI Act, CRA, 10 DORA RTS/ITS, etc.)
+- 2,528 articles + 3,869 recitals
+- 1,226 official definitions
+- 709 ISO 27001 & NIST CSF 2.0 mappings
+- 323 sector applicability rules
+- 407 evidence requirements (all 49 regulations)
+- `about` tool with structured metadata (see Architecture Principles §5)
 
 **Deployment**:
 ```bash
@@ -240,7 +337,98 @@ npm install -g @ansvar/ot-security-mcp
 
 ---
 
-### 5. Sanctions MCP
+### 5. Automotive Cybersecurity MCP
+
+**Repository**: https://github.com/Ansvar-Systems/Automotive-MCP
+
+**Purpose**: Query UNECE R155/R156 regulation text and ISO/SAE 21434 clause structure for automotive cybersecurity compliance.
+
+**Tech Stack**:
+- **Language**: TypeScript
+- **Database**: SQLite with FTS5
+- **Data Sources**: EUR-Lex (UNECE regulations), ISO (clause structure only)
+- **Package Manager**: npm
+- **Distribution**: npm (`npm install @ansvar/automotive-cybersecurity-mcp`)
+
+**Key Features**:
+- UNECE R155 (Cybersecurity) + R156 (Software Updates) full regulation text
+- ISO/SAE 21434 clause structure and work products (full text requires license)
+- Cross-framework mappings (regulation ↔ standard)
+- Compliance traceability matrix export (Markdown/CSV)
+- FTS5 full-text search across all sources
+- `about` tool with structured metadata (see Architecture Principles §5)
+
+**Deployment**:
+```bash
+# Claude Desktop config
+{
+  "mcpServers": {
+    "automotive-cybersecurity": {
+      "command": "npx",
+      "args": ["-y", "@ansvar/automotive-cybersecurity-mcp"]
+    }
+  }
+}
+```
+
+**Data Updates**: Manual — requires re-ingesting from EUR-Lex
+
+**Current Version**: v1.0.1 (Published)
+
+**Special Notes**:
+- ISO 21434 full text NOT included (copyrighted) — only clause titles and mappings
+- UNECE regulation text is freely reusable under EUR-Lex policy
+
+---
+
+### 6. Swedish Law MCP
+
+**Repository**: https://github.com/Ansvar-Systems/swedish-law-mcp
+
+**Purpose**: Query Swedish statutes (SFS), case law, preparatory works, and EU law cross-references for legal research.
+
+**Tech Stack**:
+- **Language**: TypeScript
+- **Database**: SQLite with FTS5
+- **Data Sources**: riksdagen.se (statutes), lagen.nu (case law, CC-BY)
+- **Package Manager**: npm
+- **Distribution**: npm (`npm install @ansvar/swedish-law-mcp`)
+
+**Key Features**:
+- 10,286 legal documents (statutes)
+- 31,198 legal provisions with historical versions
+- 5,944 court decisions (HD, HFD, AD, etc.)
+- 6,735 preparatory works (Prop., SOU, Ds)
+- 228 EU directives/regulations with Swedish implementation mappings
+- Citation validation and formatting
+- Time-aware queries (as-of-date for historical law)
+- `about` tool with structured metadata (see Architecture Principles §5)
+
+**Deployment**:
+```bash
+# Claude Desktop config
+{
+  "mcpServers": {
+    "swedish-law": {
+      "command": "npx",
+      "args": ["-y", "@ansvar/swedish-law-mcp"]
+    }
+  }
+}
+```
+
+**Data Updates**: Manual — riksdagen.se API for statutes, lagen.nu sync for case law
+
+**Current Version**: v1.2.1 (Published)
+
+**Special Notes**:
+- Swedish law is not subject to copyright per 1 § upphovsrättslagen (1960:729)
+- Case law from lagen.nu under CC-BY (Domstolsverket)
+- Database is ~73MB (pre-built, shipped in npm package)
+
+---
+
+### 7. Sanctions MCP
 
 **Repository**: https://github.com/Ansvar-Systems/Sanctions-MCP
 
@@ -319,6 +507,14 @@ All servers are configured for MCP Registry auto-discovery:
     "us-regulations": {
       "command": "npx",
       "args": ["-y", "@ansvar/us-regulations-mcp"]
+    },
+    "automotive-cybersecurity": {
+      "command": "npx",
+      "args": ["-y", "@ansvar/automotive-cybersecurity-mcp"]
+    },
+    "swedish-law": {
+      "command": "npx",
+      "args": ["-y", "@ansvar/swedish-law-mcp"]
     },
     "ot-security": {
       "command": "npx",
@@ -414,6 +610,8 @@ Health check endpoints are available at `/health` for each server.
 |--------|-------------|---------|------------------|
 | EU Regulations MCP | EUR-Lex, UNECE | Public domain (EU/UN) | Daily checks |
 | US Regulations MCP | GPO, state sites | Public domain (US gov) | Manual |
+| Automotive MCP | EUR-Lex (UNECE R155/R156) | Public domain (UN) | Manual |
+| Swedish Law MCP | riksdagen.se, lagen.nu | No copyright (1 § URL), CC-BY | Manual |
 | OT Security (NIST) | NIST GitHub OSCAL | Public domain | Daily checks |
 | OT Security (MITRE) | MITRE GitHub STIX | Apache 2.0 | Daily checks |
 | Security Controls MCP | SCF Framework | CC BY 4.0 | Manual |
@@ -424,6 +622,7 @@ Health check endpoints are available at `/health` for each server.
 | Server | Data Source | License | Notes |
 |--------|-------------|---------|-------|
 | Security Controls MCP | ISO standards text | Purchased from ISO | Optional import |
+| Automotive MCP | ISO/SAE 21434 | Purchased from ISO | Clause titles only; full text not included |
 | OT Security MCP | IEC 62443 | Purchased from ISA/IEC | User provides JSON |
 
 **Important**: No copyrighted standards are included in distributions. Tools and schemas provided for users who own licenses.
@@ -573,10 +772,12 @@ poetry run python -m src.server  # Python
 
 | Server | Version | Date | Notes |
 |--------|---------|------|-------|
-| Security Controls | v0.2.1 | 2026-01-29 | 28 frameworks (16→28 expansion) |
+| Security Controls | v1.0.0 | 2026-02-14 | 261 frameworks, `about` tool |
+| EU Regulations | Latest | 2026-02-14 | 49 regulations, `about` tool |
+| US Regulations | Latest | 2026-02-14 | 15 regulations, `about` tool |
+| Automotive | v1.0.1 | 2026-02-14 | R155/R156 + ISO 21434, `about` tool |
+| Swedish Law | v1.2.1 | 2026-02-14 | 10K statutes, case law, `about` tool |
 | OT Security | v0.2.0 | 2026-01-29 | MITRE ATT&CK, zone/conduit |
-| EU Regulations | Latest | 2026-01-xx | 47 regulations |
-| US Regulations | Latest | 2026-01-xx | 15 regulations |
 | Sanctions | v1.0.0 | Pending | Ready for PyPI |
 
 ---
@@ -586,26 +787,29 @@ poetry run python -m src.server  # Python
 ### Data Flow Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Claude Desktop / Cursor                    │
-│                      (MCP Client)                            │
-└───────────────────┬─────────────────────────────────────────┘
-                    │ MCP Protocol (stdio)
-        ┌───────────┼───────────┬───────────┬───────────┐
-        │           │           │           │           │
-┌───────▼─────┐ ┌──▼─────┐ ┌──▼─────┐ ┌──▼─────┐ ┌──▼─────┐
-│ Security    │ │   EU   │ │   US   │ │   OT   │ │Sanctions│
-│ Controls    │ │  Regs  │ │  Regs  │ │Security│ │   MCP  │
-│    MCP      │ │  MCP   │ │  MCP   │ │  MCP   │ │        │
-└──────┬──────┘ └───┬────┘ └───┬────┘ └───┬────┘ └───┬────┘
-       │            │           │           │           │
-       │ SQLite     │ SQLite    │ SQLite    │ SQLite    │ SQLite
-       │ FTS5       │ FTS5      │ FTS5      │ FTS5      │ FTS5
-       │            │           │           │           │
-┌──────▼──────┐ ┌──▼─────┐ ┌──▼─────┐ ┌──▼─────┐ ┌──▼─────┐
-│  28 Frameworks││47 Regs ││15 Regs ││IEC/NIST││OpenSanc-│
-│1,451 Controls││2,438 Art││Articles││MITRE   ││tions    │
-└─────────────┘ └────────┘ └────────┘ └────────┘ └────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    Claude Desktop / Cursor / ChatGPT                     │
+│                           (MCP Client)                                  │
+│              calls about() on each server to discover capabilities      │
+└───────────────────┬─────────────────────────────────────────────────────┘
+                    │ MCP Protocol (stdio or Streamable HTTP)
+    ┌───────┬───────┼───────┬───────┬───────┬───────┐
+    │       │       │       │       │       │       │
+┌───▼──┐ ┌─▼────┐ ┌▼─────┐ ┌▼─────┐ ┌▼─────┐ ┌▼────┐ ┌──────┐
+│ Sec  │ │  EU  │ │  US  │ │Auto- │ │ SE   │ │ OT  │ │Sanc- │
+│ Ctrl │ │ Regs │ │ Regs │ │motive│ │ Law  │ │ Sec │ │tions │
+│ MCP  │ │ MCP  │ │ MCP  │ │ MCP  │ │ MCP  │ │ MCP │ │ MCP  │
+└──┬───┘ └──┬───┘ └──┬───┘ └──┬───┘ └──┬───┘ └──┬──┘ └──┬───┘
+   │        │        │        │        │        │       │
+   │ JSON   │ SQLite │ SQLite │ SQLite │ SQLite │SQLite │SQLite
+   │        │ FTS5   │ FTS5   │ FTS5   │ FTS5   │FTS5   │FTS5
+   │        │        │        │        │        │       │
+┌──▼───┐ ┌─▼────┐ ┌─▼────┐ ┌─▼────┐ ┌─▼────┐ ┌▼────┐ ┌▼─────┐
+│ 261  │ │49 EU │ │15 US │ │R155  │ │10K   │ │IEC  │ │Open  │
+│Framew│ │Regs  │ │Regs  │ │R156  │ │Stats │ │NIST │ │Sanc- │
+│1451  │ │2528  │ │      │ │ISO   │ │6K    │ │MITRE│ │tions │
+│Ctrls │ │Arts  │ │      │ │21434 │ │Cases │ │     │ │      │
+└──────┘ └──────┘ └──────┘ └──────┘ └──────┘ └─────┘ └──────┘
 ```
 
 ### Cross-Server Integration
@@ -657,6 +861,6 @@ We build AI-accelerated threat modeling and compliance tools for:
 
 ---
 
-*Last updated: 2026-01-30*
+*Last updated: 2026-02-14*
 *Document maintained by: Ansvar Systems*
 *File location: security-controls-mcp/docs/ANSVAR_MCP_ARCHITECTURE.md*
