@@ -47,11 +47,28 @@ class TestToolCalls:
 
     @pytest.mark.asyncio
     async def test_list_frameworks(self):
-        """Test list_frameworks."""
+        """Test list_frameworks shows categories."""
         result = await call_tool("list_frameworks", {})
         assert len(result) == 1
-        assert "total" in result[0].text and "261" in result[0].text  # SCF 2025.4 has 261 frameworks
+        assert "261" in result[0].text
+        assert "categories" in result[0].text.lower()
         assert "dora" in result[0].text.lower()
+
+    @pytest.mark.asyncio
+    async def test_list_frameworks_with_category(self):
+        """Test list_frameworks filtered by category."""
+        result = await call_tool("list_frameworks", {"category": "uk_cybersecurity"})
+        assert len(result) == 1
+        assert "uk_cyber_essentials" in result[0].text
+        assert "uk_caf_4.0" in result[0].text
+
+    @pytest.mark.asyncio
+    async def test_list_frameworks_invalid_category(self):
+        """Test list_frameworks with invalid category."""
+        result = await call_tool("list_frameworks", {"category": "fake_category"})
+        assert len(result) == 1
+        assert "not found" in result[0].text.lower()
+        assert "Available categories" in result[0].text
 
     @pytest.mark.asyncio
     async def test_get_framework_controls(self):

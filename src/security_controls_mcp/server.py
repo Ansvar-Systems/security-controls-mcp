@@ -26,7 +26,7 @@ registry = StandardRegistry(config)
 app = Server("security-controls-mcp")
 
 
-SERVER_VERSION = "0.4.2"
+SERVER_VERSION = "1.1.0"
 
 # Compute data fingerprint and build timestamp once at module load
 _data_dir = Path(__file__).parent / "data"
@@ -134,14 +134,20 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="list_frameworks",
-            description="List all available security frameworks with metadata",
+            description=(
+                "List available security frameworks, optionally filtered by category. "
+                "Without a category filter, returns frameworks grouped by category."
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "detailed": {
-                        "type": "boolean",
-                        "description": "Include detailed information (default: false)",
-                        "default": False,
+                    "category": {
+                        "type": "string",
+                        "description": (
+                            "Filter to a specific category (e.g., 'uk_cybersecurity', "
+                            "'privacy', 'ai_governance', 'eu_regulations'). "
+                            "Omit to see all categories with their frameworks."
+                        ),
                     },
                 },
             },
@@ -480,12 +486,36 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return [TextContent(type="text", text=text)]
 
     elif name == "list_frameworks":
-        frameworks = list(scf_data.frameworks.values())
-        frameworks.sort(key=lambda x: x["controls_mapped"], reverse=True)
+        category = arguments.get("category")
+        categories = scf_data.framework_categories
 
-        text = f"**Available Frameworks ({len(frameworks)} total)**\n\n"
-        for fw in frameworks:
-            text += f"- **{fw['key']}**: {fw['name']} ({fw['controls_mapped']} controls)\n"
+        if category:
+            # Filter to a specific category
+            if category not in categories:
+                available = ", ".join(sorted(categories.keys()))
+                return [
+                    TextContent(
+                        type="text",
+                        text=f"Category '{category}' not found.\n\n**Available categories:** {available}",
+                    )
+                ]
+
+            fw_keys = categories[category]
+            text = f"**{category.replace('_', ' ').title()}** ({len(fw_keys)} frameworks)\n\n"
+            for fw_key in sorted(fw_keys):
+                fw = scf_data.frameworks.get(fw_key)
+                if fw:
+                    text += f"- **{fw['key']}**: {fw['name']} ({fw['controls_mapped']} controls)\n"
+        else:
+            # Show all frameworks grouped by category
+            text = f"**Available Frameworks ({len(scf_data.frameworks)} total, {len(categories)} categories)**\n\n"
+            for cat_name in sorted(categories.keys()):
+                fw_keys = categories[cat_name]
+                text += f"\n### {cat_name.replace('_', ' ').title()} ({len(fw_keys)})\n"
+                for fw_key in sorted(fw_keys):
+                    fw = scf_data.frameworks.get(fw_key)
+                    if fw:
+                        text += f"- `{fw['key']}`: {fw['name']} ({fw['controls_mapped']} controls)\n"
 
         return [TextContent(type="text", text=text)]
 

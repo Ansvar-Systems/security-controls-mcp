@@ -1,0 +1,146 @@
+name: Check Framework Updates
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Weekly on Monday at 6 AM UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: check-updates
+  cancel-in-progress: true
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # === PRIMARY: SCF Data Source ===
+      # All 261 frameworks come from the SCF spreadsheet.
+      # A new SCF release means potential updates to every framework.
+      - name: Check SCF GitHub releases
+        id: scf
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CURRENT_VERSION="2025.4"
+          echo "current_version=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
+
+          LATEST=$(gh api repos/securecontrolsframework/scf/releases/latest --jq '.tag_name' 2>/dev/null || echo "unknown")
+          echo "latest_version=$LATEST" >> "$GITHUB_OUTPUT"
+
+          if [ "$LATEST" = "unknown" ]; then
+            echo "has_update=unknown" >> "$GITHUB_OUTPUT"
+            echo "⚠️ Could not check SCF releases"
+          elif [ "$LATEST" != "$CURRENT_VERSION" ] && [ "$LATEST" != "v$CURRENT_VERSION" ]; then
+            echo "has_update=true" >> "$GITHUB_OUTPUT"
+            echo "🔄 SCF update: $LATEST (current: $CURRENT_VERSION)"
+          else
+            echo "has_update=false" >> "$GITHUB_OUTPUT"
+            echo "✅ SCF up to date ($CURRENT_VERSION)"
+          fi
+
+      # === SECONDARY: Key Framework Source Pages ===
+      # Monitor official pages for major version changes.
+      # These don't trigger issues — they feed into the summary.
+      - name: Check framework source pages
+        id: sources
+        run: |
+          check_url() {
+            local name="$1" url="$2"
+            local status
+            status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$url" 2>/dev/null || echo "000")
+            echo "$name: $status"
+            if [ "$status" != "200" ] && [ "$status" != "301" ] && [ "$status" != "302" ]; then
+              echo "⚠️ $name returned $status"
+            fi
+          }
+
+          echo "=== Checking framework source pages ==="
+
+          # UK Frameworks
+          check_url "UK Cyber Essentials" "https://www.ncsc.gov.uk/cyberessentials/overview"
+          check_url "NCSC CAF" "https://www.ncsc.gov.uk/collection/cyber-assessment-framework"
+
+          # Core International Standards (landing pages)
+          check_url "NIST CSF" "https://www.nist.gov/cyberframework"
+          check_url "NIST 800-53" "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+          check_url "CIS Controls" "https://www.cisecurity.org/controls"
+          check_url "OWASP Top 10" "https://owasp.org/www-project-top-ten/"
+          check_url "MITRE ATT&CK" "https://attack.mitre.org/"
+
+          # EU Regulations
+          check_url "ENISA" "https://www.enisa.europa.eu/"
+
+          # Financial
+          check_url "PCI SSC" "https://www.pcisecuritystandards.org/"
+          check_url "SWIFT CSP" "https://www.swift.com/myswift/customer-security-programme-csp"
+
+          # Asia-Pacific
+          check_url "Australia ISM" "https://www.cyber.gov.au/resources-business-and-government/essential-cyber-security/ism"
+          check_url "Singapore MAS" "https://www.mas.gov.sg/regulation/guidelines"
+
+          # Middle East
+          check_url "Saudi NCA" "https://nca.gov.sa/en/"
+
+          echo "=== Source page checks complete ==="
+
+      # === CREATE ISSUE IF SCF UPDATE AVAILABLE ===
+      - name: Create issue for SCF update
+        if: steps.scf.outputs.has_update == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CURRENT_VER: ${{ steps.scf.outputs.current_version }}
+          LATEST_VER: ${{ steps.scf.outputs.latest_version }}
+        run: |
+          EXISTING=$(gh issue list --label "scf-update" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
+
+          if [ -z "$EXISTING" ]; then
+            gh issue create \
+              --title "SCF Update Available: ${LATEST_VER}" \
+              --label "scf-update,dependencies" \
+              --body "$(cat <<'ISSUE_EOF'
+          ## SCF Data Update Available
+
+          **Current version:** CURRENT_VER_PLACEHOLDER
+          **Latest version:** LATEST_VER_PLACEHOLDER
+
+          ### Impact
+          All 261 frameworks may have updated mappings. Key areas to verify:
+          - UK Cyber Essentials (currently 26 controls)
+          - NCSC CAF 4.0 (currently 67 controls)
+          - New frameworks that may have been added to SCF
+
+          ### Action Required
+
+          1. Download the new SCF spreadsheet from [SCF GitHub](https://github.com/securecontrolsframework/scf/releases)
+          2. Place it in `scripts/data/`
+          3. Update the filename in `scripts/extract_scf_frameworks.py`
+          4. Run `poetry run python scripts/extract_scf_frameworks.py`
+          5. Run `poetry run pytest` to validate all 261 frameworks
+          6. Check for new frameworks not yet in categories (run category coverage test)
+          7. Bump version and publish
+
+          ### Categories to verify after update
+          - [ ] ai_governance
+          - [ ] iso_standards
+          - [ ] nist_frameworks
+          - [ ] uk_cybersecurity
+          - [ ] eu_regulations
+          - [ ] financial
+          - [ ] asia_pacific
+          - [ ] americas
+
+          _Created automatically by check-updates workflow._
+          ISSUE_EOF
+          )"
+            echo "📋 Created SCF update issue"
+          else
+            echo "ℹ️ Issue #${EXISTING} already open"
+          fi

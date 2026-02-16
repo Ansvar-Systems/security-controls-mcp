@@ -160,6 +160,51 @@ class TestMapFrameworks:
         assert mappings == []
 
 
+class TestCategoryCompleteness:
+    """Ensure every framework is in at least one category."""
+
+    def test_all_frameworks_are_categorized(self, scf_data):
+        """Every framework in data must appear in at least one category.
+
+        This is a guardrail test. If a new SCF version adds frameworks,
+        this test will fail until they are added to categories in data_loader.py.
+        """
+        categorized = set()
+        for fws in scf_data.framework_categories.values():
+            categorized.update(fws)
+
+        uncategorized = [
+            fw_id for fw_id in scf_data.frameworks if fw_id not in categorized
+        ]
+        assert uncategorized == [], (
+            f"{len(uncategorized)} frameworks not in any category: {uncategorized}"
+        )
+
+    def test_category_entries_exist_in_data(self, scf_data):
+        """Every framework listed in a category must exist in the data."""
+        all_fw_keys = set(scf_data.frameworks.keys())
+        phantom = []
+        for cat, fws in scf_data.framework_categories.items():
+            for fw in fws:
+                if fw not in all_fw_keys:
+                    phantom.append(f"{cat}/{fw}")
+
+        assert phantom == [], (
+            f"Category entries without data: {phantom}"
+        )
+
+    def test_minimum_category_count(self, scf_data):
+        """Verify we have a reasonable number of categories."""
+        assert len(scf_data.framework_categories) >= 15, (
+            f"Expected at least 15 categories, got {len(scf_data.framework_categories)}"
+        )
+
+    def test_no_empty_categories(self, scf_data):
+        """No category should be empty."""
+        for cat, fws in scf_data.framework_categories.items():
+            assert len(fws) > 0, f"Category '{cat}' is empty"
+
+
 class TestCriticalFrameworks:
     """Test critical framework data integrity."""
 

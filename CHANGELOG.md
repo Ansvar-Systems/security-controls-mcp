@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-02-16
+
+### Added
+- **100% framework categorization** — all 261 frameworks now in 26 categories for discoverability
+- **`list_frameworks` category support** — optional `category` parameter filters by category; without it, frameworks are grouped by category instead of a flat dump
+- **UK Cybersecurity category** — UK Cyber Essentials, NCSC CAF 4.0, UK DPA, DEFSTAN 05-138, CAP 1850, FCA CRM
+- **17 new categories** — governance, fedramp, govramp, cmmc, zero_trust, us_state_laws, europe_national, middle_east_africa, asia_pacific, americas, media_entertainment, threat_intel_appsec, and more
+- **Weekly update monitoring** — GitHub Actions workflow checks SCF releases + 14 framework source pages every Monday
+- **Guardrail tests** — `TestCategoryCompleteness` ensures no framework goes uncategorized in future SCF updates
+- **UK framework tests** — 24 tests covering Cyber Essentials (5 core areas), NCSC CAF (4 objectives A-D), cross-framework mappings
+
+### Changed
+- `list_frameworks` tool now groups output by category (was flat list of 261 items)
+- Categories expanded from 9 (49 frameworks) to 26 (261 frameworks, 100% coverage)
+- Test count increased from 242 to 277
+
 ## [1.0.0] - 2026-02-12
 
 ### 🎉 Production Release!
