@@ -12,4 +12,5 @@ class handler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps({
             'status': 'ok',
             'server': 'security-controls-mcp',
+            'version': '1.1.0',
         }).encode())
