@@ -1,0 +1,15 @@
+{
+  "_description": "SHA-256 hashes of data files for drift detection. If these change, the data has been modified and golden tests should be re-validated.",
+  "_last_updated": "2026-02-18",
+  "files": {
+    "src/security_controls_mcp/data/scf-controls.json": {
+      "sha256": "84ec65f8fb82b903278952a2202997256069358fb7d9cf1d702faad1e98a5c4c",
+      "description": "SCF 2025.4 control catalog with mappings",
+      "expected_controls": 1451
+    },
+    "src/security_controls_mcp/data/framework-to-scf.json": {
+      "sha256": "a1fae6f3df2381e306fbc2a5469ef0fea530c6201099fe11d3ee94aa65ada628",
+      "description": "Framework to SCF reverse index"
+    }
+  }
+}

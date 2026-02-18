@@ -13,6 +13,8 @@ on:
 permissions:
   contents: read
   security-events: write
+  issues: write
+  pull-requests: write
 
 jobs:
   socket-security:
@@ -23,16 +25,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # v6
 
-      - name: Set up Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6
+      - name: Socket Security for pull requests
+        if: github.event_name == 'pull_request'
+        uses: SocketDev/socket-security-py-action@v1
         with:
-          python-version: "3.11"
-
-      - name: Install Socket CLI
-        run: npm install -g @socketsecurity/cli
-
-      - name: Run Socket Security scan
-        run: socket report create --view --strict
-        env:
-          SOCKET_SECURITY_API_KEY: ${{ secrets.SOCKET_SECURITY_API_KEY }}
-        continue-on-error: true
+          api_key: ${{ secrets.SOCKET_SECURITY_API_KEY }}

@@ -1452,7 +1452,13 @@ async def standards_upload_page(request: Request):
         headers={
             "X-Content-Type-Options": "nosniff",
             "X-Frame-Options": "DENY",
-            "Content-Security-Policy": "default-src 'self' 'unsafe-inline'"
+            "Content-Security-Policy": (
+                "default-src 'self'; "
+                "style-src 'sha256-inkKMavX+gQibNWiX7fDAgAXRcttR1WY8pfFBWXowVM='; "
+                "script-src 'sha256-px/6dWmcLJfbZdKMiitpUaGGK4QIv5wPMsLZ/8UbMmE='; "
+                "img-src 'self' data:; "
+                "connect-src 'self'"
+            )
         }
     )
 

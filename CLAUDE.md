@@ -18,7 +18,7 @@ MCP server providing access to 1,451 security controls across **261 frameworks**
 ## Tech Stack
 
 - **Language**: Python 3.11+
-- **Database**: SQLite with FTS5 full-text search
+- **Data Store**: In-memory JSON with Python substring search
 - **Package Manager**: Poetry
 - **Distribution**: PyPI (`pipx install security-controls-mcp`)
 - **Data Source**: SCF Framework (Creative Commons BY 4.0)
@@ -49,7 +49,7 @@ scf-mcp --version
 security-controls-mcp/
 ├── src/security_controls_mcp/
 │   ├── __main__.py            # Entry point (stdio transport)
-│   ├── server.py              # MCP server with 9 tools (stdio)
+│   ├── server.py              # MCP server with 10 tools (stdio)
 │   ├── http_server.py         # HTTP/SSE server with web UI for standards import
 │   ├── data_loader.py         # SCF data loading & search logic
 │   ├── config.py              # User config & paid standards paths
@@ -149,28 +149,31 @@ The extractor auto-registers and becomes available immediately.
 ### 1. `version_info`
 Get MCP server version, statistics, and database info
 
-### 2. `get_control`
+### 2. `about`
+Get a human-readable overview of the server's capabilities and data freshness
+
+### 3. `get_control`
 Retrieve a specific control by ID (e.g., GOV-01)
 
-### 3. `search_controls`
+### 4. `search_controls`
 Full-text search across all controls by keyword
 
-### 4. `list_frameworks`
+### 5. `list_frameworks`
 List all 261 supported frameworks with control counts
 
-### 5. `get_framework_controls`
+### 6. `get_framework_controls`
 Get all controls for a specific framework
 
-### 6. `map_frameworks`
+### 7. `map_frameworks`
 Map controls between any two frameworks (bidirectional)
 
-### 7. `list_available_standards`
+### 8. `list_available_standards`
 List all available standards (SCF built-in + purchased)
 
-### 8. `query_standard`
+### 9. `query_standard`
 Search within a purchased standard's official text
 
-### 9. `get_clause`
+### 10. `get_clause`
 Get full text of a specific clause from a purchased standard
 
 ## Framework IDs
@@ -247,8 +250,8 @@ poetry run pytest tests/test_map_frameworks.py -v
 - **Frameworks**: 261 (expanded from 28 in v0.4.0)
 - **Controls**: 1,451 unique controls
 - **Mappings**: 50,000+ bidirectional relationships
-- **Database Size**: ~7MB (JSON)
-- **Tools**: 9 (6 core + 3 paid standards)
+- **Data Size**: ~7MB (JSON, loaded in-memory at startup)
+- **Tools**: 10 (7 core + 3 paid standards)
 - **Tests**: 242 passing (100% pass rate)
 - **Specialized Extractors**: 12 (NEW in v1.0.0)
   - IT/Cloud: ISO 27001, NIST 800-53, SOC 2, PCI DSS, CIS Controls
@@ -280,7 +283,7 @@ See [ANSVAR_MCP_ARCHITECTURE.md](./docs/ANSVAR_MCP_ARCHITECTURE.md) for complete
 
 - Python 3.11+ with type hints
 - Pydantic for data validation
-- SQLite for data storage
+- In-memory JSON for data (no external database)
 - Black for formatting
 - Ruff for linting
 - pytest for testing
