@@ -66,6 +66,42 @@ class TestConfig:
             config.remove_standard("test_standard")
             assert "test_standard" not in config.data["standards"]
 
+    def test_config_uses_env_override(self, monkeypatch, tmp_path):
+        """Test config directory can be overridden with environment variable."""
+        config_root = tmp_path / "custom-config"
+        monkeypatch.setenv("SECURITY_CONTROLS_MCP_CONFIG_DIR", str(config_root))
+
+        config = Config()
+
+        assert config.config_dir == config_root
+        assert config.config_file.exists()
+        assert config.standards_dir.exists()
+
+    def test_config_falls_back_to_temp_when_primary_dir_fails(self, monkeypatch, tmp_path):
+        """Test fallback to temp directory if primary config location is not writable."""
+        monkeypatch.delenv("SECURITY_CONTROLS_MCP_CONFIG_DIR", raising=False)
+        fallback_tmp = tmp_path / "fallback-tmp"
+        monkeypatch.setattr(tempfile, "gettempdir", lambda: str(fallback_tmp))
+
+        original_ensure_directories = Config._ensure_directories
+        call_count = {"value": 0}
+
+        def fail_then_succeed(self):
+            call_count["value"] += 1
+            if call_count["value"] == 1:
+                raise PermissionError("primary config directory not writable")
+            return original_ensure_directories(self)
+
+        monkeypatch.setattr(Config, "_ensure_directories", fail_then_succeed)
+
+        config = Config()
+
+        expected_dir = fallback_tmp / ".security-controls-mcp"
+        assert config.config_dir == expected_dir
+        assert config.config_file.exists()
+        assert config.standards_dir.exists()
+        assert call_count["value"] == 2
+
 
 class TestPaidStandardProvider:
     """Test paid standard provider."""

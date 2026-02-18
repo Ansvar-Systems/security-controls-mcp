@@ -1,6 +1,8 @@
 """Configuration management for security controls MCP server."""
 
 import json
+import os
+import tempfile
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -15,7 +17,11 @@ class Config:
             config_dir: Optional path to config directory. Defaults to ~/.security-controls-mcp/
         """
         if config_dir is None:
-            self.config_dir = Path.home() / ".security-controls-mcp"
+            env_config_dir = os.getenv("SECURITY_CONTROLS_MCP_CONFIG_DIR")
+            if env_config_dir:
+                self.config_dir = Path(env_config_dir).expanduser()
+            else:
+                self.config_dir = Path.home() / ".security-controls-mcp"
         else:
             self.config_dir = Path(config_dir)
 
@@ -23,7 +29,15 @@ class Config:
         self.standards_dir = self.config_dir / "standards"
 
         # Ensure directories exist
-        self._ensure_directories()
+        try:
+            self._ensure_directories()
+        except OSError:
+            # Serverless platforms may expose a read-only home directory.
+            # Fall back to a writable temp location to keep startup resilient.
+            self.config_dir = Path(tempfile.gettempdir()) / ".security-controls-mcp"
+            self.config_file = self.config_dir / "config.json"
+            self.standards_dir = self.config_dir / "standards"
+            self._ensure_directories()
 
         # Load or create config
         self.data = self._load_config()
