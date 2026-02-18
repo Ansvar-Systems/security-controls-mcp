@@ -107,6 +107,20 @@ class TestToolCalls:
         assert len(result) == 1
         assert "not found" in result[0].text
 
+    @pytest.mark.asyncio
+    async def test_map_frameworks_annex_hint_for_iso27001(self):
+        """Annex-style ISO 27001 control IDs should provide a helpful ISO 27002 hint."""
+        result = await call_tool(
+            "map_frameworks",
+            {
+                "source_framework": "iso_27001_2022",
+                "target_framework": "dora",
+                "source_control": "A.5.15",
+            },
+        )
+        assert len(result) == 1
+        assert "iso_27002_2022" in result[0].text
+
 
 @pytest.mark.slow
 class TestMCPProtocol:

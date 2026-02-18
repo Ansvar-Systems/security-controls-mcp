@@ -1120,10 +1120,20 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         mappings = scf_data.map_frameworks(source_framework, target_framework, source_control)
 
         if not mappings:
+            hint = ""
+            if (
+                source_control
+                and source_framework == "iso_27001_2022"
+                and str(source_control).strip().upper().startswith("A.")
+            ):
+                hint = (
+                    "\n\nTip: Annex A control IDs (e.g., A.5.15) are mapped under "
+                    "`iso_27002_2022` in SCF data. Try source_framework='iso_27002_2022'."
+                )
             return [
                 TextContent(
                     type="text",
-                    text=f"No mappings found between {source_framework} and {target_framework}",
+                    text=f"No mappings found between {source_framework} and {target_framework}{hint}",
                 )
             ]
 
