@@ -760,55 +760,73 @@ class SCFData:
     def search_controls(
         self, query: str, frameworks: list[str] | None = None, limit: int = 10
     ) -> list[dict[str, Any]]:
-        """Search controls by description. Case-insensitive string matching for v1."""
-        query_lower = query.lower()
-        results = []
+        """Search controls by description with strict match + OR fallback for multi-term queries."""
+        query_lower = (query or "").strip().lower()
+        if not query_lower:
+            return []
+
+        terms = [term for term in query_lower.split() if term]
+        if not terms:
+            return []
+
+        primary_matches: list[dict[str, Any]] = []
+        fallback_matches: list[dict[str, Any]] = []
 
         for ctrl in self.controls:
-            # Check if query matches name or description (case-insensitive)
+            # Filter by frameworks if specified
+            if frameworks:
+                has_mapping = any(ctrl["framework_mappings"].get(fw) for fw in frameworks)
+                if not has_mapping:
+                    continue
+
             name_lower = ctrl["name"].lower() if ctrl["name"] else ""
-            desc_lower = ctrl["description"].lower() if ctrl["description"] else ""
+            desc = ctrl["description"] or ""
+            desc_lower = desc.lower()
+            haystack = f"{name_lower} {desc_lower}"
 
-            if query_lower in name_lower or query_lower in desc_lower:
-                # Filter by frameworks if specified
-                if frameworks:
-                    has_mapping = any(ctrl["framework_mappings"].get(fw) for fw in frameworks)
-                    if not has_mapping:
-                        continue
+            matched_terms = [term for term in terms if term in haystack]
+            if not matched_terms:
+                continue
 
-                # Get mapped frameworks for response
-                mapped_frameworks = [
-                    fw for fw, mappings in ctrl["framework_mappings"].items() if mappings
-                ]
+            is_exact_phrase = query_lower in haystack
+            is_primary = len(terms) == 1 or is_exact_phrase or len(matched_terms) == len(terms)
 
-                # Create snippet (simple version - first 150 chars with highlight)
-                desc = ctrl["description"]
-                idx = desc.lower().find(query_lower)
-                if idx >= 0:
-                    start = max(0, idx - 50)
-                    end = min(len(desc), idx + len(query) + 100)
-                    snippet = desc[start:end]
-                    if start > 0:
-                        snippet = "..." + snippet
-                    if end < len(desc):
-                        snippet = snippet + "..."
-                else:
-                    snippet = desc[:150] + "..." if len(desc) > 150 else desc
+            # Get mapped frameworks for response
+            mapped_frameworks = [fw for fw, mappings in ctrl["framework_mappings"].items() if mappings]
 
-                results.append(
-                    {
-                        "control_id": ctrl["id"],
-                        "name": ctrl["name"],
-                        "snippet": snippet,
-                        "relevance": 1.0,  # Simple scoring for v1
-                        "mapped_frameworks": mapped_frameworks,
-                    }
-                )
+            # Prefer phrase snippet, otherwise first matched term.
+            snippet_term = query_lower if is_exact_phrase else matched_terms[0]
+            idx = desc_lower.find(snippet_term)
+            if idx >= 0:
+                start = max(0, idx - 50)
+                end = min(len(desc), idx + len(snippet_term) + 100)
+                snippet = desc[start:end]
+                if start > 0:
+                    snippet = "..." + snippet
+                if end < len(desc):
+                    snippet = snippet + "..."
+            else:
+                snippet = desc[:150] + "..." if len(desc) > 150 else desc
 
-                if len(results) >= limit:
-                    break
+            entry = {
+                "control_id": ctrl["id"],
+                "name": ctrl["name"],
+                "snippet": snippet,
+                "relevance": (
+                    1.0 if is_exact_phrase else len(matched_terms) / max(len(terms), 1)
+                ),
+                "mapped_frameworks": mapped_frameworks,
+            }
 
-        return results
+            if is_primary:
+                primary_matches.append(entry)
+            else:
+                fallback_matches.append(entry)
+
+        # Use strict results first; if none for multi-term query, fall back to OR-style matches.
+        selected = primary_matches or fallback_matches
+        selected.sort(key=lambda item: item["relevance"], reverse=True)
+        return selected[:limit]
 
     def get_framework_controls(
         self, framework: str, include_descriptions: bool = False
@@ -852,7 +870,10 @@ class SCFData:
                 continue
 
             # Filter by source_control if specified
-            if source_control and source_control not in source_mappings:
+            if source_control and not any(
+                self._source_control_matches(source_control, mapped_id)
+                for mapped_id in source_mappings
+            ):
                 continue
 
             results.append(
@@ -866,3 +887,18 @@ class SCFData:
             )
 
         return results
+
+    @staticmethod
+    def _source_control_matches(source_control: str, mapped_id: str) -> bool:
+        """Compare source control IDs with normalization for Annex-style aliases."""
+        source = str(source_control or "").strip().upper()
+        mapped = str(mapped_id or "").strip().upper()
+        if not source or not mapped:
+            return False
+        if source == mapped:
+            return True
+
+        # Accept "A.5.15" and "5.15" as equivalent to reduce UX friction.
+        source_no_annex = source[2:] if source.startswith("A.") else source
+        mapped_no_annex = mapped[2:] if mapped.startswith("A.") else mapped
+        return source_no_annex == mapped_no_annex

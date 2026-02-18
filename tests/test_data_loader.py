@@ -97,6 +97,18 @@ class TestSearchControls:
         results = scf_data.search_controls("zzzzznonexistent", limit=10)
         assert results == []
 
+    def test_search_multi_term_falls_back_to_or(self, scf_data):
+        """Multi-term queries should return OR matches when strict matching yields none."""
+        encryption = scf_data.search_controls("encryption", limit=50)
+        cryptography = scf_data.search_controls("cryptography", limit=50)
+        multi = scf_data.search_controls("encryption cryptography", limit=20)
+
+        single_term_ids = {r["control_id"] for r in encryption} | {r["control_id"] for r in cryptography}
+        multi_ids = {r["control_id"] for r in multi}
+
+        assert len(multi) > 0
+        assert multi_ids.issubset(single_term_ids)
+
 
 class TestGetFrameworkControls:
     """Test get_framework_controls method."""
@@ -142,6 +154,15 @@ class TestMapFrameworks:
         assert len(mappings) >= 1
         for mapping in mappings:
             assert "5.1" in mapping["source_controls"]
+
+    def test_map_with_annex_style_source_control_filter(self, scf_data):
+        """Annex-style control IDs (A.x.y) should match plain x.y mappings."""
+        plain = scf_data.map_frameworks("iso_27002_2022", "dora", "5.15")
+        annex = scf_data.map_frameworks("iso_27002_2022", "dora", "A.5.15")
+
+        assert len(plain) > 0
+        assert len(annex) == len(plain)
+        assert {m["scf_id"] for m in annex} == {m["scf_id"] for m in plain}
 
     def test_mapping_structure(self, scf_data):
         """Verify mapping result structure."""
