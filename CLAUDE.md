@@ -76,7 +76,7 @@ security-controls-mcp/
 │   └── data/
 │       ├── scf-controls.json      # 1,451 controls with mappings
 │       └── framework-to-scf.json  # Framework → SCF reverse index
-├── tests/                     # 242 tests (all passing)
+├── tests/                     # 299 tests (all passing)
 ├── docs/
 │   ├── ANSVAR_MCP_ARCHITECTURE.md  # **Central architecture doc**
 │   ├── coverage.md            # Framework coverage details
@@ -262,7 +262,7 @@ poetry run pytest tests/test_map_frameworks.py -v
 
 ## Version History
 
-- **v1.0.0** (2026-02-12): 🎉 **Production Release!** Standards import feature with 12 specialized extractors, web UI, auto-discovery registry, 242 tests
+- **v1.0.0** (2026-02-12): 🎉 **Production Release!** Standards import feature with 12 specialized extractors, web UI, auto-discovery registry, 299 tests
 - **v0.4.0** (2026-02-05): Major framework expansion (28→261), AI governance support
 - **v0.3.5** (2026-02-01): Entry point fix
 - **v0.2.1** (2026-01-29): Framework expansion (16→28 frameworks)

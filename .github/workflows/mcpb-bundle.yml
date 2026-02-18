@@ -9,8 +9,13 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   mcpb:
+    timeout-minutes: 15
     uses: Ansvar-Systems/mcp-server-template/.github/workflows/mcpb-bundle-python.yml@main
     with:
       server-name: security-controls-mcp

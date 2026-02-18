@@ -14,10 +14,15 @@ permissions:
   contents: read
   security-events: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   semgrep:
     name: Semgrep Security Analysis
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     container:
       image: semgrep/semgrep

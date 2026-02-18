@@ -16,17 +16,21 @@ permissions:
   issues: write
   pull-requests: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   socket-security:
     name: Socket Security Analysis
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # v6
 
-      - name: Socket Security for pull requests
-        if: github.event_name == 'pull_request'
-        uses: SocketDev/socket-security-py-action@v1
+      - name: Socket Security scan
+        uses: SocketDev/action@v1
         with:
-          api_key: ${{ secrets.SOCKET_SECURITY_API_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

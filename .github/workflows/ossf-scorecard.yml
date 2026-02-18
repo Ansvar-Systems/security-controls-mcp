@@ -11,10 +11,15 @@ on:
 
 permissions: read-all
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   analysis:
     name: OSSF Scorecard Analysis
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       security-events: write
       id-token: write

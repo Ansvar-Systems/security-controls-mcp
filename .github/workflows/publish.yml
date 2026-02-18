@@ -15,10 +15,15 @@ permissions:
   contents: read
   id-token: write  # Required for trusted publishing
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   publish:
     name: Publish Python Package
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment:
       name: ${{ github.event.inputs.test_pypi == 'true' && 'testpypi' || 'pypi' }}
       url: ${{ github.event.inputs.test_pypi == 'true' && 'https://test.pypi.org/p/security-controls-mcp' || 'https://pypi.org/p/security-controls-mcp' }}
