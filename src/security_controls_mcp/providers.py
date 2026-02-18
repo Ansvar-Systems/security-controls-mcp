@@ -167,13 +167,19 @@ class PaidStandardProvider(StandardProvider):
 
         return results
 
-    def _iterate_sections(self, sections: List[Dict]) -> List[Dict]:
-        """Recursively iterate through sections and subsections."""
+    def _iterate_sections(self, sections: List[Dict], _depth: int = 0) -> List[Dict]:
+        """Recursively iterate through sections and subsections.
+
+        Depth is capped at 20 levels to prevent stack overflow from
+        adversarially nested imported JSON files.
+        """
+        if _depth > 20:
+            return
         for section in sections:
             yield section
             # Recursively iterate subsections
             if "subsections" in section:
-                yield from self._iterate_sections(section["subsections"])
+                yield from self._iterate_sections(section["subsections"], _depth + 1)
 
     def get_clause(self, clause_id: str) -> Optional[SearchResult]:
         """Get a specific clause by ID."""

@@ -489,7 +489,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return [TextContent(type="text", text=json_module.dumps(about_data, indent=2))]
 
     elif name == "get_control":
-        control_id = arguments.get("control_id", "").strip()
+        control_id = str(arguments.get("control_id") or "").strip()
         if not control_id:
             return [
                 TextContent(
@@ -596,7 +596,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return [TextContent(type="text", text=text)]
 
     elif name == "search_controls":
-        query = arguments.get("query", "").strip()
+        query = str(arguments.get("query") or "").strip()
         if not query:
             return [
                 TextContent(
@@ -606,7 +606,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                 )
             ]
         frameworks = arguments.get("frameworks")
-        limit = min(max(arguments.get("limit", 10), 1), 100)
+        limit = min(max(int(arguments.get("limit", 10) or 10), 1), 100)
 
         results = scf_data.search_controls(query, frameworks, limit)
 
@@ -661,7 +661,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return [TextContent(type="text", text=text)]
 
     elif name == "get_framework_controls":
-        framework = arguments.get("framework", "").strip()
+        framework = str(arguments.get("framework") or "").strip()
         if not framework:
             return [
                 TextContent(
@@ -670,7 +670,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                     "Use list_frameworks to discover valid framework keys.",
                 )
             ]
-        include_descriptions = arguments.get("include_descriptions", False)
+        include_descriptions = bool(arguments.get("include_descriptions", False))
 
         if framework not in scf_data.frameworks:
             available = ", ".join(scf_data.frameworks.keys())
@@ -712,8 +712,8 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return [TextContent(type="text", text=text)]
 
     elif name == "map_frameworks":
-        source_framework = arguments.get("source_framework", "").strip()
-        target_framework = arguments.get("target_framework", "").strip()
+        source_framework = str(arguments.get("source_framework") or "").strip()
+        target_framework = str(arguments.get("target_framework") or "").strip()
         if not source_framework or not target_framework:
             return [
                 TextContent(
@@ -859,8 +859,8 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return [TextContent(type="text", text=text)]
 
     elif name == "query_standard":
-        standard = arguments.get("standard", "").strip()
-        query = arguments.get("query", "").strip()
+        standard = str(arguments.get("standard") or "").strip()
+        query = str(arguments.get("query") or "").strip()
         if not standard or not query:
             return [
                 TextContent(
@@ -869,7 +869,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                     "Use list_available_standards to see available standard IDs.",
                 )
             ]
-        limit = min(max(arguments.get("limit", 10), 1), 50)
+        limit = min(max(int(arguments.get("limit", 10) or 10), 1), 50)
 
         provider = registry.get_provider(standard)
         if not provider:
@@ -902,8 +902,8 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return [TextContent(type="text", text=text)]
 
     elif name == "get_clause":
-        standard = arguments.get("standard", "").strip()
-        clause_id = arguments.get("clause_id", "").strip()
+        standard = str(arguments.get("standard") or "").strip()
+        clause_id = str(arguments.get("clause_id") or "").strip()
         if not standard or not clause_id:
             return [
                 TextContent(
