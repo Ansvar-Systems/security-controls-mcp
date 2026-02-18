@@ -606,7 +606,10 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                 )
             ]
         frameworks = arguments.get("frameworks")
-        limit = min(max(int(arguments.get("limit", 10) or 10), 1), 100)
+        try:
+            limit = min(max(int(arguments.get("limit", 10) or 10), 1), 100)
+        except (ValueError, TypeError):
+            limit = 10
 
         results = scf_data.search_controls(query, frameworks, limit)
 
@@ -869,7 +872,10 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                     "Use list_available_standards to see available standard IDs.",
                 )
             ]
-        limit = min(max(int(arguments.get("limit", 10) or 10), 1), 50)
+        try:
+            limit = min(max(int(arguments.get("limit", 10) or 10), 1), 50)
+        except (ValueError, TypeError):
+            limit = 10
 
         provider = registry.get_provider(standard)
         if not provider:
