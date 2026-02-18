@@ -1,0 +1,31 @@
+# Data Source Provenance for Security Controls MCP
+# Last updated: 2026-02-17
+
+sources:
+  - name: Secure Controls Framework (SCF)
+    version: "2025.4"
+    url: https://www.securecontrolsframework.com
+    license: Creative Commons BY 4.0
+    type: primary
+    description: >
+      The SCF provides a comprehensive catalog of security and privacy controls
+      with cross-framework mappings. Used as the rosetta stone for bidirectional
+      framework mapping across 261 frameworks.
+    data_files:
+      - src/security_controls_mcp/data/scf-controls.json
+      - src/security_controls_mcp/data/framework-to-scf.json
+    update_mechanism: manual
+    update_frequency: quarterly (aligned with SCF releases)
+    last_checked: "2026-02-17"
+    controls_count: 1451
+    frameworks_count: 261
+
+notes:
+  - >
+    This server provides SCF control IDs, names, descriptions, and mapping
+    relationships. It does NOT include copyrighted standard text from ISO, NIST,
+    PCI SSC, or other standards bodies. Users can import their own purchased
+    standard PDFs via the standards import feature.
+  - >
+    Framework control identifiers (e.g., "A.5.1" for ISO 27001, "AC-1" for
+    NIST 800-53) are factual data used for cross-referencing purposes.

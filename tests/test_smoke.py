@@ -95,7 +95,7 @@ class TestModuleImports:
         import importlib
 
         pkg = importlib.import_module("security_controls_mcp")
-        assert pkg.__version__ == "0.4.2"
+        assert pkg.__version__ == "1.1.0"
 
     def test_import_server(self):
         """Can import server module."""

@@ -45,15 +45,28 @@ class handler(BaseHTTPRequestHandler):
         }).encode())
 
     def do_POST(self):
-        content_length = int(self.headers.get('Content-Length', 0))
-        body = json.loads(self.rfile.read(content_length))
-
-        method = body.get('method')
-        params = body.get('params', {})
-        request_id = body.get('id', 1)
-
+        request_id = 1
         try:
-            response = asyncio.run(_handle_method(method, params, request_id))
+            content_length = int(self.headers.get('Content-Length', 0))
+            raw = self.rfile.read(content_length)
+            if not raw:
+                response = {
+                    'jsonrpc': '2.0',
+                    'id': request_id,
+                    'error': {'code': -32700, 'message': 'Parse error: empty request body'},
+                }
+            else:
+                body = json.loads(raw)
+                method = body.get('method')
+                params = body.get('params', {})
+                request_id = body.get('id', 1)
+                response = asyncio.run(_handle_method(method, params, request_id))
+        except json.JSONDecodeError:
+            response = {
+                'jsonrpc': '2.0',
+                'id': request_id,
+                'error': {'code': -32700, 'message': 'Parse error: invalid JSON'},
+            }
         except Exception as e:
             response = {
                 'jsonrpc': '2.0',
@@ -74,7 +87,7 @@ async def _handle_method(method, params, request_id):
             'jsonrpc': '2.0',
             'id': request_id,
             'result': {
-                'protocolVersion': '2024-11-05',
+                'protocolVersion': '2025-03-26',
                 'capabilities': {'tools': {}},
                 'serverInfo': {
                     'name': 'security-controls-mcp',

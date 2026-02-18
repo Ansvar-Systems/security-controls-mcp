@@ -1,0 +1,149 @@
+{
+  "_description": "Golden tests for Security Controls MCP. Each test defines a tool call and the expected output pattern. These serve as regression tests to ensure data accuracy across releases.",
+  "_version": "1.0.0",
+  "_last_updated": "2026-02-17",
+  "tests": [
+    {
+      "id": "golden-01",
+      "description": "GOV-01 control exists and has governance domain",
+      "tool": "get_control",
+      "arguments": {"control_id": "GOV-01", "include_mappings": false},
+      "expected": {
+        "contains": ["GOV-01", "Governance"],
+        "not_contains": ["not found"]
+      }
+    },
+    {
+      "id": "golden-02",
+      "description": "GOV-01 maps to ISO 27001 clause 5.1",
+      "tool": "get_control",
+      "arguments": {"control_id": "GOV-01", "include_mappings": true},
+      "expected": {
+        "contains": ["5.1", "ISO/IEC 27001:2022", "Framework Mappings"]
+      }
+    },
+    {
+      "id": "golden-03",
+      "description": "Search for encryption returns cryptography controls",
+      "tool": "search_controls",
+      "arguments": {"query": "encryption", "limit": 5},
+      "expected": {
+        "contains": ["CRY-"],
+        "not_contains": ["No controls found"]
+      }
+    },
+    {
+      "id": "golden-04",
+      "description": "Non-existent control returns not found",
+      "tool": "get_control",
+      "arguments": {"control_id": "FAKE-999"},
+      "expected": {
+        "contains": ["not found"],
+        "not_contains": ["Domain", "Weight"]
+      }
+    },
+    {
+      "id": "golden-05",
+      "description": "ISO 27001 framework has correct name and control count",
+      "tool": "get_framework_controls",
+      "arguments": {"framework": "iso_27001_2022"},
+      "expected": {
+        "contains": ["ISO/IEC 27001:2022", "Total Controls"]
+      }
+    },
+    {
+      "id": "golden-06",
+      "description": "Framework mapping ISO 27001 to NIST CSF produces results",
+      "tool": "map_frameworks",
+      "arguments": {"source_framework": "iso_27001_2022", "target_framework": "nist_csf_2.0"},
+      "expected": {
+        "contains": ["Mapping:", "ISO/IEC 27001:2022", "NIST Cybersecurity Framework"],
+        "not_contains": ["No mappings found"]
+      }
+    },
+    {
+      "id": "golden-07",
+      "description": "Non-existent framework returns error",
+      "tool": "get_framework_controls",
+      "arguments": {"framework": "nonexistent_framework"},
+      "expected": {
+        "contains": ["not found"]
+      }
+    },
+    {
+      "id": "golden-08",
+      "description": "version_info returns correct counts",
+      "tool": "version_info",
+      "arguments": {},
+      "expected": {
+        "contains": ["1451", "261", "SCF 2025.4"]
+      }
+    },
+    {
+      "id": "golden-09",
+      "description": "list_frameworks shows AI governance category",
+      "tool": "list_frameworks",
+      "arguments": {"category": "ai_governance"},
+      "expected": {
+        "contains": ["iso_42001_2023", "nist_ai_rmf_1.0", "eu_ai_act"]
+      }
+    },
+    {
+      "id": "golden-10",
+      "description": "Search for access control returns IAC domain controls",
+      "tool": "search_controls",
+      "arguments": {"query": "access control", "limit": 10},
+      "expected": {
+        "contains": ["access control"],
+        "not_contains": ["No controls found"]
+      }
+    },
+    {
+      "id": "golden-11",
+      "description": "DORA framework has controls mapped",
+      "tool": "get_framework_controls",
+      "arguments": {"framework": "dora"},
+      "expected": {
+        "contains": ["Digital Operational Resilience Act", "Total Controls"]
+      }
+    },
+    {
+      "id": "golden-12",
+      "description": "about tool returns structured provenance data",
+      "tool": "about",
+      "arguments": {},
+      "expected": {
+        "contains": ["Security Controls MCP", "Ansvar Compliance Suite", "2025.4", "read-only"]
+      }
+    },
+    {
+      "id": "golden-13",
+      "description": "IAC-01 control exists with identity domain",
+      "tool": "get_control",
+      "arguments": {"control_id": "IAC-01", "include_mappings": false},
+      "expected": {
+        "contains": ["IAC-01", "identification", "access"],
+        "not_contains": ["not found"]
+      }
+    },
+    {
+      "id": "golden-14",
+      "description": "PCI DSS to NIST 800-53 mapping produces high overlap",
+      "tool": "map_frameworks",
+      "arguments": {"source_framework": "pci_dss_4.0.1", "target_framework": "nist_800_53_r5"},
+      "expected": {
+        "contains": ["Mapping:", "PCI DSS", "NIST SP 800-53"],
+        "not_contains": ["No mappings found"]
+      }
+    },
+    {
+      "id": "golden-15",
+      "description": "list_available_standards includes SCF built-in",
+      "tool": "list_available_standards",
+      "arguments": {},
+      "expected": {
+        "contains": ["Available Standards", "Built-in"]
+      }
+    }
+  ]
+}

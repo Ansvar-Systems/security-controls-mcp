@@ -62,49 +62,80 @@ async def list_tools() -> list[Tool]:
         Tool(
             name="version_info",
             description=(
-                "Get server version, statistics, and database info. "
-                "Call this first to understand what data is available."
+                "Get server version, control/framework counts, and top 10 frameworks by "
+                "coverage. Use this as a quick overview of what data is available. "
+                "For structured provenance metadata, use the 'about' tool instead. "
+                "Returns ~500 tokens."
             ),
             inputSchema={
                 "type": "object",
                 "properties": {},
+                "additionalProperties": False,
             },
         ),
         Tool(
             name="about",
             description=(
-                "Server metadata, dataset statistics, and provenance in structured JSON. "
-                "Call this to verify data coverage and currency."
+                "Returns structured JSON with server metadata, dataset provenance, "
+                "data fingerprint, freshness indicators, and security posture. "
+                "Use this to verify data currency and coverage before relying on results. "
+                "Prefer this over version_info when you need machine-readable metadata. "
+                "Returns ~800 tokens."
             ),
             inputSchema={
                 "type": "object",
                 "properties": {},
+                "additionalProperties": False,
             },
         ),
         Tool(
             name="get_control",
-            description="Get details about a specific SCF control by its ID (e.g., GOV-01, IAC-05)",
+            description=(
+                "Retrieve a specific SCF control by its exact ID. Returns the control's "
+                "domain, description, weight (1-10 criticality), PPTDF classification, "
+                "validation cadence, and optionally all framework mappings. "
+                "Use this when you already know the control ID (e.g., GOV-01, IAC-05, CRY-01). "
+                "If you don't know the ID, use search_controls first. "
+                "Returns 'not found' for invalid IDs. "
+                "With include_mappings=true (default), returns ~1000-3000 tokens depending "
+                "on how many frameworks map to this control. Set include_mappings=false "
+                "to reduce to ~200 tokens."
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
                     "control_id": {
                         "type": "string",
-                        "description": "SCF control ID (e.g., GOV-01)",
+                        "description": (
+                            "SCF control ID in format DOMAIN-NN (e.g., GOV-01, IAC-05, "
+                            "CRY-01, NET-01). Use search_controls to discover valid IDs."
+                        ),
+                        "pattern": "^[A-Z]{2,5}-\\d{2}(\\.\\d{1,2})?$",
                     },
                     "include_mappings": {
                         "type": "boolean",
-                        "description": "Include framework mappings (default: true)",
+                        "description": (
+                            "Include cross-framework mappings in the response. "
+                            "Set to false to reduce token usage when you only need "
+                            "the control description. Default: true."
+                        ),
                         "default": True,
                     },
                 },
                 "required": ["control_id"],
+                "additionalProperties": False,
             },
         ),
         Tool(
             name="search_controls",
             description=(
-                "Search for controls by keyword in name or description. "
-                "Returns relevant controls with snippets."
+                "Full-text search across all 1,451 SCF controls by keyword in name or "
+                "description. Returns matching controls with text snippets and their "
+                "top framework mappings. Use this to discover controls by topic "
+                "(e.g., 'encryption', 'incident response', 'access control'). "
+                "Optionally filter to controls that map to specific frameworks. "
+                "Returns 'No controls found' when no matches exist. "
+                "Each result is ~100 tokens; default limit of 10 returns ~1000 tokens."
             ),
             inputSchema={
                 "type": "object",
@@ -112,31 +143,46 @@ async def list_tools() -> list[Tool]:
                     "query": {
                         "type": "string",
                         "description": (
-                            "Search query (e.g., 'encryption', 'access control', "
-                            "'incident response')"
+                            "Search keyword or phrase. Matches against control names and "
+                            "descriptions. Examples: 'encryption', 'access control', "
+                            "'incident response', 'data classification'. "
+                            "Must not be empty."
                         ),
+                        "minLength": 1,
                     },
                     "frameworks": {
                         "type": "array",
                         "items": {"type": "string"},
                         "description": (
-                            "Optional: filter to controls that map to specific frameworks"
+                            "Optional: filter results to controls that map to these "
+                            "framework keys (e.g., ['iso_27001_2022', 'nist_csf_2.0']). "
+                            "Use list_frameworks to discover valid keys."
                         ),
                     },
                     "limit": {
                         "type": "integer",
-                        "description": "Maximum number of results (default: 10)",
+                        "description": (
+                            "Maximum number of results to return. Default: 10. "
+                            "Use lower values to save tokens."
+                        ),
                         "default": 10,
+                        "minimum": 1,
+                        "maximum": 100,
                     },
                 },
                 "required": ["query"],
+                "additionalProperties": False,
             },
         ),
         Tool(
             name="list_frameworks",
             description=(
-                "List available security frameworks, optionally filtered by category. "
-                "Without a category filter, returns frameworks grouped by category."
+                "List all 261 supported security frameworks, optionally filtered by "
+                "category. Without a category filter, returns all frameworks grouped "
+                "by category (~3000 tokens). With a category filter, returns only that "
+                "category's frameworks (~200-500 tokens). Use this to discover valid "
+                "framework keys for get_framework_controls and map_frameworks. "
+                "Returns an error listing valid categories if an invalid category is given."
             ),
             inputSchema={
                 "type": "object",
@@ -144,41 +190,88 @@ async def list_tools() -> list[Tool]:
                     "category": {
                         "type": "string",
                         "description": (
-                            "Filter to a specific category (e.g., 'uk_cybersecurity', "
-                            "'privacy', 'ai_governance', 'eu_regulations'). "
-                            "Omit to see all categories with their frameworks."
+                            "Filter to a specific category. Omit to see all categories "
+                            "with their frameworks."
                         ),
+                        "enum": [
+                            "ai_governance",
+                            "americas",
+                            "asia_pacific",
+                            "automotive",
+                            "cis_controls",
+                            "cloud_security",
+                            "cmmc",
+                            "eu_regulations",
+                            "europe_national",
+                            "fedramp",
+                            "financial",
+                            "governance",
+                            "govramp",
+                            "healthcare",
+                            "industrial_ot",
+                            "iso_standards",
+                            "media_entertainment",
+                            "middle_east_africa",
+                            "nist_frameworks",
+                            "privacy",
+                            "supply_chain",
+                            "threat_intel_appsec",
+                            "uk_cybersecurity",
+                            "us_federal",
+                            "us_state_laws",
+                            "zero_trust",
+                        ],
                     },
                 },
+                "additionalProperties": False,
             },
         ),
         Tool(
             name="get_framework_controls",
-            description="Get all SCF controls that map to a specific framework",
+            description=(
+                "Get all SCF controls that map to a specific framework, grouped by "
+                "domain. WARNING: Large frameworks like NIST 800-53 can return 700+ "
+                "controls (~5000 tokens with descriptions, ~2000 without). "
+                "Set include_descriptions=false (default) to reduce token usage. "
+                "Controls are capped at 10 per domain with overflow indicated. "
+                "Returns 'not found' with a list of valid framework keys if the "
+                "framework doesn't exist. Use list_frameworks to discover valid keys."
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
                     "framework": {
                         "type": "string",
-                        "description": "Framework key (e.g., dora, iso_27001_2022, nist_csf_2.0)",
+                        "description": (
+                            "Framework key (e.g., 'iso_27001_2022', 'nist_csf_2.0', "
+                            "'dora', 'pci_dss_4.0.1'). Use list_frameworks to discover "
+                            "valid keys."
+                        ),
                     },
                     "include_descriptions": {
                         "type": "boolean",
                         "description": (
-                            "Include control descriptions "
-                            "(increases token usage, default: false)"
+                            "Include control descriptions in the response. Significantly "
+                            "increases token usage (~2.5x). Default: false."
                         ),
                         "default": False,
                     },
                 },
                 "required": ["framework"],
+                "additionalProperties": False,
             },
         ),
         Tool(
             name="map_frameworks",
             description=(
-                "Map controls between two frameworks via SCF. Shows which target "
-                "framework requirements are satisfied by source framework controls."
+                "Map controls between two frameworks via SCF as a rosetta stone. "
+                "Shows which target framework requirements are satisfied by source "
+                "framework controls, and identifies gaps where no mapping exists. "
+                "Useful for gap analysis and compliance mapping. "
+                "Results are capped at 20 mappings; use source_control to filter "
+                "to a specific control for detailed mapping. "
+                "Returns 'not found' if either framework key is invalid. "
+                "Typical response: ~1500-3000 tokens."
             ),
             inputSchema={
                 "type": "object",
@@ -186,42 +279,56 @@ async def list_tools() -> list[Tool]:
                     "source_framework": {
                         "type": "string",
                         "description": (
-                            "Source framework key (what you HAVE, e.g., iso_27001_2022)"
+                            "Source framework key - the framework you HAVE implemented "
+                            "(e.g., 'iso_27001_2022'). Use list_frameworks to discover keys."
                         ),
                     },
                     "source_control": {
                         "type": "string",
                         "description": (
-                            "Optional: specific source control ID (e.g., A.5.15) "
-                            "to filter results"
+                            "Optional: filter to a specific source control ID "
+                            "(e.g., 'A.5.15' for ISO 27001, 'PR.AC-1' for NIST CSF) "
+                            "to see its specific mappings to the target framework."
                         ),
                     },
                     "target_framework": {
                         "type": "string",
                         "description": (
-                            "Target framework key (what you want to SATISFY, e.g., dora)"
+                            "Target framework key - the framework you want to SATISFY "
+                            "(e.g., 'dora', 'nist_800_53_r5'). Use list_frameworks to "
+                            "discover keys."
                         ),
                     },
                 },
                 "required": ["source_framework", "target_framework"],
+                "additionalProperties": False,
             },
         ),
         Tool(
             name="list_available_standards",
             description=(
-                "List all available standards including SCF (built-in) and any "
-                "purchased standards the user has imported"
+                "List all available standards: SCF (always built-in) plus any purchased "
+                "standards the user has imported via PDF upload. Purchased standards "
+                "provide official clause text for query_standard and get_clause tools. "
+                "If no standards have been imported, only SCF is shown with a guidance "
+                "message. Returns ~200-500 tokens."
             ),
             inputSchema={
                 "type": "object",
                 "properties": {},
+                "additionalProperties": False,
             },
         ),
         Tool(
             name="query_standard",
             description=(
-                "Search for content within a specific purchased standard. "
-                "Requires the standard to be imported first."
+                "Search within a purchased standard's official text by keyword. "
+                "Requires the standard to have been imported first via PDF upload. "
+                "Returns matching clauses with text snippets. "
+                "If the standard is not found, returns available standard IDs. "
+                "If no standards are imported, returns guidance to import first. "
+                "Use list_available_standards to check what's available before calling. "
+                "Returns ~500-2000 tokens depending on matches."
             ),
             inputSchema={
                 "type": "object",
@@ -229,44 +336,62 @@ async def list_tools() -> list[Tool]:
                     "standard": {
                         "type": "string",
                         "description": (
-                            "Standard identifier (e.g., iso_27001_2022). "
-                            "Use list_available_standards to see what's available."
+                            "Standard identifier (e.g., 'iso_27001_2022', 'nist_800_53_r5'). "
+                            "Use list_available_standards to see imported standards."
                         ),
                     },
                     "query": {
                         "type": "string",
                         "description": (
-                            "Search query (e.g., 'encryption key management', "
-                            "'access control policy')"
+                            "Search query for clause content (e.g., 'encryption key "
+                            "management', 'access control policy'). Must not be empty."
                         ),
+                        "minLength": 1,
                     },
                     "limit": {
                         "type": "integer",
-                        "description": "Maximum number of results (default: 10)",
+                        "description": (
+                            "Maximum number of results to return. Default: 10."
+                        ),
                         "default": 10,
+                        "minimum": 1,
+                        "maximum": 50,
                     },
                 },
                 "required": ["standard", "query"],
+                "additionalProperties": False,
             },
         ),
         Tool(
             name="get_clause",
             description=(
-                "Get the full text of a specific clause/section from a purchased standard"
+                "Get the full text of a specific clause or section from a purchased "
+                "standard by its clause ID. Requires the standard to have been imported "
+                "first via PDF upload. Returns the complete clause content with page "
+                "reference and license notice. If the clause is not found, returns an "
+                "error message. Use query_standard to discover clause IDs first."
             ),
             inputSchema={
                 "type": "object",
                 "properties": {
                     "standard": {
                         "type": "string",
-                        "description": "Standard identifier (e.g., iso_27001_2022)",
+                        "description": (
+                            "Standard identifier (e.g., 'iso_27001_2022'). "
+                            "Use list_available_standards to see imported standards."
+                        ),
                     },
                     "clause_id": {
                         "type": "string",
-                        "description": ("Clause/section identifier (e.g., '5.1.2', 'A.5.15')"),
+                        "description": (
+                            "Clause or section identifier within the standard "
+                            "(e.g., '5.1.2', 'A.5.15' for ISO 27001, 'AC-1' for "
+                            "NIST 800-53). Use query_standard to discover valid IDs."
+                        ),
                     },
                 },
                 "required": ["standard", "clause_id"],
+                "additionalProperties": False,
             },
         ),
     ]
@@ -329,7 +454,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                     "frameworks": len(scf_data.frameworks),
                 },
                 "freshness": {
-                    "last_checked": None,
+                    "last_checked": "2026-02-17",
                     "check_method": "Manual SCF release monitoring",
                     "scf_version": "2025.4",
                 },
@@ -364,7 +489,15 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return [TextContent(type="text", text=json_module.dumps(about_data, indent=2))]
 
     elif name == "get_control":
-        control_id = arguments["control_id"]
+        control_id = arguments.get("control_id", "").strip()
+        if not control_id:
+            return [
+                TextContent(
+                    type="text",
+                    text="Error: control_id is required and must not be empty. "
+                    "Use search_controls to discover valid control IDs (e.g., GOV-01, IAC-05).",
+                )
+            ]
         include_mappings = arguments.get("include_mappings", True)
 
         control = scf_data.get_control(control_id)
@@ -463,9 +596,17 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return [TextContent(type="text", text=text)]
 
     elif name == "search_controls":
-        query = arguments["query"]
+        query = arguments.get("query", "").strip()
+        if not query:
+            return [
+                TextContent(
+                    type="text",
+                    text="Error: query is required and must not be empty. "
+                    "Provide a keyword or phrase (e.g., 'encryption', 'access control').",
+                )
+            ]
         frameworks = arguments.get("frameworks")
-        limit = arguments.get("limit", 10)
+        limit = min(max(arguments.get("limit", 10), 1), 100)
 
         results = scf_data.search_controls(query, frameworks, limit)
 
@@ -520,7 +661,15 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return [TextContent(type="text", text=text)]
 
     elif name == "get_framework_controls":
-        framework = arguments["framework"]
+        framework = arguments.get("framework", "").strip()
+        if not framework:
+            return [
+                TextContent(
+                    type="text",
+                    text="Error: framework is required and must not be empty. "
+                    "Use list_frameworks to discover valid framework keys.",
+                )
+            ]
         include_descriptions = arguments.get("include_descriptions", False)
 
         if framework not in scf_data.frameworks:
@@ -563,8 +712,16 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return [TextContent(type="text", text=text)]
 
     elif name == "map_frameworks":
-        source_framework = arguments["source_framework"]
-        target_framework = arguments["target_framework"]
+        source_framework = arguments.get("source_framework", "").strip()
+        target_framework = arguments.get("target_framework", "").strip()
+        if not source_framework or not target_framework:
+            return [
+                TextContent(
+                    type="text",
+                    text="Error: both source_framework and target_framework are required. "
+                    "Use list_frameworks to discover valid framework keys.",
+                )
+            ]
         source_control = arguments.get("source_control")
 
         # Validate frameworks exist
@@ -702,9 +859,17 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return [TextContent(type="text", text=text)]
 
     elif name == "query_standard":
-        standard = arguments["standard"]
-        query = arguments["query"]
-        limit = arguments.get("limit", 10)
+        standard = arguments.get("standard", "").strip()
+        query = arguments.get("query", "").strip()
+        if not standard or not query:
+            return [
+                TextContent(
+                    type="text",
+                    text="Error: both standard and query are required and must not be empty. "
+                    "Use list_available_standards to see available standard IDs.",
+                )
+            ]
+        limit = min(max(arguments.get("limit", 10), 1), 50)
 
         provider = registry.get_provider(standard)
         if not provider:
@@ -737,8 +902,16 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return [TextContent(type="text", text=text)]
 
     elif name == "get_clause":
-        standard = arguments["standard"]
-        clause_id = arguments["clause_id"]
+        standard = arguments.get("standard", "").strip()
+        clause_id = arguments.get("clause_id", "").strip()
+        if not standard or not clause_id:
+            return [
+                TextContent(
+                    type="text",
+                    text="Error: both standard and clause_id are required and must not be empty. "
+                    "Use query_standard to discover clause IDs.",
+                )
+            ]
 
         provider = registry.get_provider(standard)
         if not provider:
