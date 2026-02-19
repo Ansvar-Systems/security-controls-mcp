@@ -69,3 +69,4 @@ standards/
 .idea/
 .mcpregistry_*
 .vercel
+*.mcpb

@@ -1,0 +1,84 @@
+{
+  "manifest_version": "0.3",
+  "name": "security-controls-mcp",
+  "display_name": "Security Controls MCP",
+  "version": "1.0.0",
+  "description": "Query and map security framework controls via the Secure Controls Framework (SCF). Map between ISO 27001, NIST CSF, DORA, PCI DSS, SOC 2, and 100+ frameworks.",
+  "long_description": "The Security Controls MCP Server provides searchable access to the Secure Controls Framework (SCF) — a comprehensive meta-framework that maps security controls across 100+ industry standards and regulations.\n\n**Key capabilities:**\n- Search 1,000+ SCF controls by keyword\n- Map controls between any two frameworks (e.g., ISO 27001 to NIST CSF)\n- List all available security frameworks with metadata\n- Get detailed control information including descriptions and framework mappings\n- Import and query purchased standards (ISO 27001, NIST 800-53, etc.)\n\n**Frameworks include:** ISO 27001, ISO 27002, NIST CSF, NIST 800-53, PCI DSS, SOC 2, DORA, GDPR, HIPAA, CIS Controls, COBIT, and many more.",
+  "author": {
+    "name": "Ansvar Systems",
+    "email": "hello@ansvar.eu",
+    "url": "https://ansvar.eu"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ansvar-Systems/security-controls-mcp"
+  },
+  "homepage": "https://ansvar.eu",
+  "keywords": [
+    "security",
+    "compliance",
+    "iso27001",
+    "nist",
+    "pci-dss",
+    "soc2",
+    "controls",
+    "frameworks"
+  ],
+  "server": {
+    "type": "python",
+    "entry_point": "run.py",
+    "mcp_config": {
+      "command": "python3",
+      "args": ["${__dirname}/run.py"],
+      "env": {
+        "PYTHONPATH": "${__dirname}/src:${__dirname}/lib"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "version_info",
+      "description": "Get server version, statistics, and database info"
+    },
+    {
+      "name": "get_control",
+      "description": "Get details about a specific SCF control by ID (e.g., GOV-01, IAC-05)"
+    },
+    {
+      "name": "search_controls",
+      "description": "Search for controls by keyword in name or description"
+    },
+    {
+      "name": "list_frameworks",
+      "description": "List all available security frameworks with metadata"
+    },
+    {
+      "name": "get_framework_controls",
+      "description": "Get all SCF controls that map to a specific framework"
+    },
+    {
+      "name": "map_frameworks",
+      "description": "Map controls between two frameworks via SCF"
+    },
+    {
+      "name": "list_available_standards",
+      "description": "List all available standards including SCF and any imported standards"
+    },
+    {
+      "name": "query_standard",
+      "description": "Search for content within a specific purchased standard"
+    },
+    {
+      "name": "get_clause",
+      "description": "Get the full text of a specific clause/section from a standard"
+    }
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "python": ">=3.10"
+    }
+  }
+}
