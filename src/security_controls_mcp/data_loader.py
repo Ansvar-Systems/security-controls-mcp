@@ -75,6 +75,12 @@ class SCFData:
             # === INDUSTRIAL / OT ===
             "iec_62443_4_2_2019": "IEC 62443-4-2:2019 (Industrial Security)",
             "iec_tr_60601_4_5_2021": "IEC TR 60601-4-5:2021 (Medical IT)",
+            # === MEDICAL DEVICE CYBERSECURITY ===
+            "iec_81001_5_1_2021": "IEC 81001-5-1:2021 (Health Software Security)",
+            "imdrf_n60_2020": "IMDRF N60:2020 (Medical Device Cybersecurity)",
+            "imdrf_n73_2023": "IMDRF N73:2023 (Medical Device Cybersecurity Updates)",
+            "nist_ai_100_2_2025": "NIST AI 100-2e:2025 (Adversarial ML)",
+            "fda_premarket_cyber_2025": "FDA Premarket Cybersecurity Guidance (2025)",
             "nerc_cip_2024": "NERC CIP 2024",
             "nist_800_82_r3_low": "NIST SP 800-82 R3 OT Overlay (Low)",
             "nist_800_82_r3_moderate": "NIST SP 800-82 R3 OT Overlay (Moderate)",
