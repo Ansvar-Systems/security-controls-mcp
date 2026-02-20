@@ -9,13 +9,13 @@
 
 ## Overview
 
-**THE definitive MCP server for security framework mapping.** Makes 1,451 security controls across **261 frameworks** searchable and AI-accessible through Claude, Cursor, or any MCP-compatible client.
+**THE definitive MCP server for security framework mapping.** Makes 1,451 security controls across **266 frameworks** searchable and AI-accessible through Claude, Cursor, or any MCP-compatible client.
 
 Built on the [Secure Controls Framework (SCF)](https://securecontrolsframework.com/) by ComplianceForge.
 
 **Key capabilities:**
 - 1,451 security controls across governance, risk, compliance, and technical domains
-- **261 frameworks** including ISO 27001, NIST CSF, DORA, PCI DSS, CMMC, and 256 more
+- **266 frameworks** including ISO 27001, NIST CSF, DORA, PCI DSS, CMMC, and 261 more
 - **AI Governance:** ISO 42001, NIST AI RMF, EU AI Act, Cyber Resilience Act
 - Bidirectional mapping between frameworks via SCF rosetta stone
 - Optional integration with purchased standards (ISO, NIST 800-53) for official text
@@ -150,9 +150,9 @@ Find your path with: `which scf-mcp`
 ### Specialized
 - **Industrial/OT:** IEC 62443 (197), NERC CIP (224), NIST 800-82
 - **Automotive:** ISO/SAE 21434, TISAX, UN R155
-- **Healthcare:** HIPAA, HITRUST, CMS MARS-E
+- **Healthcare/MedDev:** HIPAA, HITRUST, CMS MARS-E, IEC 81001-5-1, IMDRF N60/N73, FDA Premarket Cybersecurity
 
-See [docs/coverage.md](docs/coverage.md) for the complete list of 261 frameworks.
+See [docs/coverage.md](docs/coverage.md) for the complete list of 266 frameworks.
 
 ## Tools
 
@@ -161,10 +161,10 @@ See [docs/coverage.md](docs/coverage.md) for the complete list of 261 frameworks
 **`version_info()`** - Get server version, statistics, and top frameworks
 - Call this first to understand what data is available
 
-**`list_frameworks()`** - List all 261 frameworks with control counts
+**`list_frameworks()`** - List all 266 frameworks with control counts
 
 **`get_control(control_id)`** - Get full details for a specific SCF control
-- Returns description, domain, weight, PPTDF category, and mappings to all 261 frameworks
+- Returns description, domain, weight, PPTDF category, and mappings to all 266 frameworks
 
 **`search_controls(query, frameworks=[], limit=10)`** - Search controls by keyword
 - Optional framework filtering
@@ -232,7 +232,7 @@ SCF JSON → In-memory index → MCP tools → AI response
 Based on **SCF 2025.4** (released December 29, 2025)
 
 - 1,451 controls across all domains
-- **261 frameworks** with full mapping coverage
+- **266 frameworks** with full mapping coverage
 - Licensed under Creative Commons (data)
 - Source: [ComplianceForge SCF](https://securecontrolsframework.com/)
 
