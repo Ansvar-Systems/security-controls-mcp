@@ -837,7 +837,11 @@ class SCFData:
     def get_framework_controls(
         self, framework: str, include_descriptions: bool = False
     ) -> list[dict[str, Any]]:
-        """Get all controls that map to a framework."""
+        """Get all controls that map to a framework.
+
+        Uses per-control framework_mappings first; falls back to the
+        framework-to-scf reverse index for frameworks that only exist there.
+        """
         results = []
 
         for ctrl in self.controls:
@@ -854,6 +858,23 @@ class SCFData:
                     result["description"] = ctrl["description"]
 
                 results.append(result)
+
+        # Fallback: use reverse index if no per-control mappings found
+        if not results and framework in self.framework_to_scf:
+            reverse = self.framework_to_scf[framework]
+            for section_id, scf_ids in reverse.items():
+                for scf_id in scf_ids:
+                    ctrl = self.controls_by_id.get(scf_id)
+                    if ctrl:
+                        result = {
+                            "scf_id": ctrl["id"],
+                            "scf_name": ctrl["name"],
+                            "framework_control_ids": [section_id],
+                            "weight": ctrl["weight"],
+                        }
+                        if include_descriptions:
+                            result["description"] = ctrl["description"]
+                        results.append(result)
 
         return results
 
