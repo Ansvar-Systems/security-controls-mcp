@@ -143,7 +143,7 @@ class TestMCPProtocol:
         from security_controls_mcp.server import list_tools
 
         tools = await list_tools()
-        assert len(tools) == 10, f"Expected 10 tools, got {len(tools)}"
+        assert len(tools) == 13, f"Expected 13 tools, got {len(tools)}"
 
         # Verify tool names match expected set
         tool_names = {t.name for t in tools}
@@ -151,5 +151,7 @@ class TestMCPProtocol:
             "version_info", "about", "get_control", "search_controls",
             "list_frameworks", "get_framework_controls", "map_frameworks",
             "list_available_standards", "query_standard", "get_clause",
+            # Premium tools (version tracking)
+            "get_control_history", "diff_control", "get_framework_changes",
         }
         assert tool_names == expected, f"Tool name mismatch: {tool_names ^ expected}"

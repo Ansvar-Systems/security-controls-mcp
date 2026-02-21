@@ -1,0 +1,6 @@
+{
+  "_comment": "SCF control version history. Populated by monthly ingestion pipeline comparing SCF releases.",
+  "scf_versions": ["2024.4", "2025.4"],
+  "last_updated": "2026-02-21T00:00:00Z",
+  "changes": []
+}

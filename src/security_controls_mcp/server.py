@@ -14,6 +14,7 @@ from .config import Config
 from .data_loader import SCFData
 from .legal_notice import print_legal_notice
 from .registry import StandardRegistry
+from .tools.version_tracking import PREMIUM_TOOLS, PREMIUM_HANDLERS
 
 # Initialize data loader
 scf_data = SCFData()
@@ -394,7 +395,7 @@ async def list_tools() -> list[Tool]:
                 "additionalProperties": False,
             },
         ),
-    ]
+    ] + [Tool(name=t["name"], description=t["description"], inputSchema=t["inputSchema"]) for t in PREMIUM_TOOLS]
 
 
 @app.call_tool()
@@ -955,6 +956,10 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         text += f"**License:** {metadata.license}\n"
         text += "⚠️ **This content is from your personally licensed copy. Do not share or redistribute.**\n"
 
+        return [TextContent(type="text", text=text)]
+
+    elif name in PREMIUM_HANDLERS:
+        text = PREMIUM_HANDLERS[name](arguments)
         return [TextContent(type="text", text=text)]
 
     else:
