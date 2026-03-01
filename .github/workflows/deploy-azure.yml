@@ -2,8 +2,9 @@
 # MCP Azure Deployment — Build, Push to ACR, Deploy to Container Apps
 # =============================================================================
 #
-# Triggered on push to main. Builds Docker image, pushes to Azure Container
-# Registry, and deploys to the corresponding Azure Container App.
+# Triggered on push to main or dev, and on manual dispatch.
+# - main/workflow_dispatch: builds, pushes to ACR, AND deploys to Container App
+# - dev: builds and pushes to ACR only (no deploy — use dev→main PR to deploy)
 #
 # PREREQUISITES:
 # 1. Org secret: AZURE_CREDENTIALS (service principal JSON)
@@ -15,7 +16,7 @@ name: Deploy to Azure
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   workflow_dispatch:
 
 concurrency:
@@ -61,6 +62,7 @@ jobs:
           tags: ${{ steps.tag.outputs.image }}
 
       - name: Deploy to Container App
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         run: |
           az containerapp update \
             --name "${{ env.CONTAINER_APP }}" \
@@ -68,6 +70,7 @@ jobs:
             --image "${{ steps.tag.outputs.image }}"
 
       - name: Verify deployment
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         run: |
           echo "Waiting for new revision to become active..."
           sleep 10
@@ -99,3 +102,7 @@ jobs:
           echo "| Container App | \`${{ env.CONTAINER_APP }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Image | \`${{ steps.tag.outputs.image }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Commit | \`${{ steps.tag.outputs.sha }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Branch | \`${{ github.ref_name }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          if [[ "${{ github.ref }}" != "refs/heads/main" && "${{ github.event_name }}" != "workflow_dispatch" ]]; then
+            echo "| Deploy | Skipped (dev branch — build+push only) |" >> "$GITHUB_STEP_SUMMARY"
+          fi
