@@ -1,0 +1,100 @@
+# =============================================================================
+# MCP Azure Deployment — Build, Push to ACR, Deploy to Container Apps
+# =============================================================================
+#
+# Triggered on push to main. Builds Docker image, pushes to Azure Container
+# Registry, and deploys to the corresponding Azure Container App.
+#
+# PREREQUISITES:
+# 1. Org secret: AZURE_CREDENTIALS (service principal JSON)
+# 2. Container App already provisioned (see scripts/provision-azure-mcps.sh)
+#
+# =============================================================================
+
+name: Deploy to Azure
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ansvardev.azurecr.io
+  CONTAINER_APP: "ca-mcp-security-controls"
+  RESOURCE_GROUP: "rg-ansvar-dev"
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to ACR
+        run: az acr login --name ansvardev
+
+      - name: Set image tag
+        id: tag
+        run: |
+          SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          IMAGE="${{ env.REGISTRY }}/${{ env.CONTAINER_APP }}:${SHA}"
+          echo "sha=${SHA}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
+          echo "Image: ${IMAGE}"
+
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.tag.outputs.image }}
+
+      - name: Deploy to Container App
+        run: |
+          az containerapp update \
+            --name "${{ env.CONTAINER_APP }}" \
+            --resource-group "${{ env.RESOURCE_GROUP }}" \
+            --image "${{ steps.tag.outputs.image }}"
+
+      - name: Verify deployment
+        run: |
+          echo "Waiting for new revision to become active..."
+          sleep 10
+
+          HEALTH=$(az containerapp revision list \
+            --name "${{ env.CONTAINER_APP }}" \
+            --resource-group "${{ env.RESOURCE_GROUP }}" \
+            --query "[0].{name:name, state:properties.runningState, health:properties.healthState, replicas:properties.replicas}" \
+            -o json)
+
+          echo "Latest revision status:"
+          echo "$HEALTH" | jq .
+
+          STATE=$(echo "$HEALTH" | jq -r '.state // "unknown"')
+          if [ "$STATE" = "Failed" ]; then
+            echo "::error::Revision is in Failed state"
+            exit 1
+          fi
+
+          echo "Deployment complete: state=${STATE}"
+
+      - name: Write summary
+        if: always()
+        run: |
+          echo "## MCP Deployment" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Field | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Container App | \`${{ env.CONTAINER_APP }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Image | \`${{ steps.tag.outputs.image }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Commit | \`${{ steps.tag.outputs.sha }}\` |" >> "$GITHUB_STEP_SUMMARY"
