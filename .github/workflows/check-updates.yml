@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 15
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       # === PRIMARY: SCF Data Source ===
       # All 261 frameworks come from the SCF spreadsheet.
